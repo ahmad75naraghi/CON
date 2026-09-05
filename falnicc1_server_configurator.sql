@@ -1,0 +1,965 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.3
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost:3306
+-- Generation Time: Sep 05, 2026 at 11:46 AM
+-- Server version: 10.6.28-MariaDB-log
+-- PHP Version: 8.4.24
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `falnicc1_server_configurator`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Chassis`
+--
+
+CREATE TABLE `Chassis` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `brand` varchar(50) DEFAULT 'HPE',
+  `family` varchar(50) DEFAULT 'ProLiant',
+  `model` varchar(50) NOT NULL,
+  `generation` varchar(50) NOT NULL,
+  `form_factor` varchar(50) NOT NULL,
+  `cpu_socket_type` varchar(50) NOT NULL,
+  `max_cpus` int(11) NOT NULL,
+  `ram_generation` varchar(50) NOT NULL,
+  `max_ram_slots` int(11) NOT NULL,
+  `ram_slots_per_cpu` int(11) NOT NULL DEFAULT 12,
+  `base_pcie_slots` int(11) NOT NULL DEFAULT 3,
+  `base_x16_slots` int(11) NOT NULL DEFAULT 1,
+  `base_x8_slots` int(11) NOT NULL DEFAULT 2,
+  `max_pcie_slots` int(11) NOT NULL DEFAULT 8,
+  `default_network` varchar(255) DEFAULT NULL,
+  `default_controller` varchar(255) DEFAULT NULL,
+  `gpu_support` tinyint(1) DEFAULT 1,
+  `max_psu_bays` int(11) NOT NULL DEFAULT 2,
+  `base_power_watts` int(11) NOT NULL DEFAULT 100,
+  `storage_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`storage_rules`)),
+  `cooling_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`cooling_rules`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Chassis`
+--
+
+INSERT INTO `Chassis` (`id`, `part_number`, `price`, `currency`, `brand`, `family`, `model`, `generation`, `form_factor`, `cpu_socket_type`, `max_cpus`, `ram_generation`, `max_ram_slots`, `ram_slots_per_cpu`, `base_pcie_slots`, `base_x16_slots`, `base_x8_slots`, `max_pcie_slots`, `default_network`, `default_controller`, `gpu_support`, `max_psu_bays`, `base_power_watts`, `storage_rules`, `cooling_rules`) VALUES
+(1, '868703-B21', NULL, 'USD', 'HPE', 'ProLiant', 'DL380', 'Gen10', '2U', 'LGA 3647', 2, 'DDR4', 24, 12, 3, 1, 2, 8, 'HPE 1Gb Ethernet 4-Port 331i (Embedded)', 'HPE Smart Array S100i SR Gen10 SW RAID', 1, 2, 100, '{\"base_drive_type\":\"SFF\",\"base_bays\":8,\"max_bays\":24}', '{\"default_qty\":4,\"default_type\":\"Standard\",\"upgrade_to_high_perf_on\":[\"NVMe\",\"GPU\",\"CPU>130W\",\"RearDrives\"]}'),
+(2, 'P51518-B21', NULL, 'USD', 'HPE', 'ProLiant', 'ML110', 'Gen11', '4.5U Tower', 'LGA 4677', 1, 'DDR5', 16, 16, 2, 2, 0, 4, 'Broadcom BCM5720 2-Port 1GbE (Embedded)', 'Embedded SATA Controller with Intel VROC Hybrid RAID (8 SATA ports)', 1, 2, 100, '{\"base_drive_type\":\"SFF\",\"base_bays\":8,\"max_bays\":16}', '{\"default_qty\":2,\"default_type\":\"Standard\",\"upgrade_to_high_perf_on\":[\"NVMe\",\"GPU\",\"SAS10K\",\"SAS15K\",\"SAS4SSD\"]}'),
+(3, '755258-B21', NULL, 'USD', 'HPE', 'ProLiant', 'DL360', 'Gen9', '1U', 'LGA 2011-3', 2, 'DDR4', 24, 12, 2, 1, 1, 3, 'HPE Embedded 1Gb Ethernet 4-port 331i Adapter', 'HPE Dynamic Smart Array B140i (SW RAID)', 1, 2, 100, '{\"base_drive_type\":\"SFF\",\"base_bays\":8,\"max_bays\":10}', '{\"default_qty\":5,\"default_type\":\"Standard\",\"upgrade_to_high_perf_on\":[\"NVMe\",\"GPU\",\"CPU>160W\",\"LRDIMM\",\"10SFF\"]}');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `CPUs`
+--
+
+CREATE TABLE `CPUs` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `socket_type` varchar(50) NOT NULL DEFAULT '',
+  `model_name` varchar(255) NOT NULL,
+  `generation` varchar(100) NOT NULL,
+  `cores` int(11) NOT NULL,
+  `base_frequency_ghz` float NOT NULL,
+  `tdp_watts` int(11) NOT NULL,
+  `supported_ram_speed_mt` int(11) NOT NULL,
+  `max_ram_capacity_tb` float NOT NULL,
+  `cooling_requirements` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`cooling_requirements`)),
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `CPUs`
+--
+
+INSERT INTO `CPUs` (`id`, `part_number`, `price`, `currency`, `socket_type`, `model_name`, `generation`, `cores`, `base_frequency_ghz`, `tdp_watts`, `supported_ram_speed_mt`, `max_ram_capacity_tb`, `cooling_requirements`, `compatible_chassis_ids`) VALUES
+(1, 'P02526-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Platinum 8276', 'Scalable Gen 2', 28, 2.2, 165, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(2, 'P02524-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Platinum 8268', 'Scalable Gen 2', 24, 2.9, 205, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(3, 'P02521-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Platinum 8260', 'Scalable Gen 2', 24, 2.4, 165, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(4, 'P24474-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6258R', 'Scalable Gen 2', 28, 2.7, 205, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(5, 'P24476-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6256', 'Scalable Gen 2', 12, 3.6, 205, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(6, 'P02516-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6252', 'Scalable Gen 2', 24, 2.1, 150, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(7, 'P24475-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6250', 'Scalable Gen 2', 8, 3.9, 185, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(8, 'P24473-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6248R', 'Scalable Gen 2', 24, 3, 205, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(9, 'P24472-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6246R', 'Scalable Gen 2', 16, 3.4, 205, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(10, 'P15758-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6246', 'Scalable Gen 2', 12, 3.3, 165, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(11, 'P02512-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6244', 'Scalable Gen 2', 8, 3.6, 150, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(12, 'P24471-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6242R', 'Scalable Gen 2', 20, 3.1, 205, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(13, 'P02510-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6242', 'Scalable Gen 2', 16, 2.8, 150, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(14, 'P24470-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6240R', 'Scalable Gen 2', 24, 2.4, 165, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(15, 'P02509-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6240', 'Scalable Gen 2', 18, 2.6, 150, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(16, 'P24469-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6238R', 'Scalable Gen 2', 28, 2.2, 165, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(17, 'P02503-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6234', 'Scalable Gen 2', 8, 3.3, 130, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(18, 'P24468-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6230R', 'Scalable Gen 2', 26, 2.1, 150, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(19, 'P02502-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6230', 'Scalable Gen 2', 20, 2.1, 125, 2933, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(20, 'P11830-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6230N', 'Scalable Gen 2', 20, 2.3, 125, 2933, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(21, 'P24467-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6226R', 'Scalable Gen 2', 16, 2.9, 150, 2933, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[1]'),
+(22, 'P02501-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 6226', 'Scalable Gen 2', 12, 2.7, 125, 2933, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(23, 'P02500-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 5222', 'Scalable Gen 2', 4, 3.8, 105, 2666, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":true}', '[1]'),
+(24, 'P24466-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 5218R', 'Scalable Gen 2', 20, 2.1, 125, 2666, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(25, 'P02498-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 5218', 'Scalable Gen 2', 16, 2.3, 125, 2666, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(26, 'P02497-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 5217', 'Scalable Gen 2', 8, 3, 115, 2666, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(27, 'P02496-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Gold 5215', 'Scalable Gen 2', 10, 2.5, 85, 2666, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(28, 'P02495-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Silver 4216', 'Scalable Gen 2', 16, 2.1, 100, 2400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(29, 'P24465-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Silver 4215R', 'Scalable Gen 2', 8, 3.2, 130, 2400, 1, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":true}', '[1]'),
+(30, 'P23550-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Silver 4214R', 'Scalable Gen 2', 12, 2.4, 100, 2400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(31, 'P02493-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Silver 4214', 'Scalable Gen 2', 12, 2.2, 85, 2400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(32, 'P23549-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Silver 4210R', 'Scalable Gen 2', 10, 2.4, 100, 2400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(33, 'P02492-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Silver 4210', 'Scalable Gen 2', 10, 2.2, 85, 2400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(34, 'P02491-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Silver 4208', 'Scalable Gen 2', 8, 2.1, 85, 2400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(35, 'P23547-B21', NULL, 'USD', 'LGA 3647', 'Intel Xeon-Bronze 3206R', 'Scalable Gen 2', 8, 1.9, 85, 2133, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[1]'),
+(36, 'P49598-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 6426Y', 'Xeon Scalable 4th Gen', 16, 2.5, 185, 4800, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(37, 'P49641-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 6421N', 'Xeon Scalable 4th Gen', 32, 1.8, 185, 4400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(38, 'P49612-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 5418Y', 'Xeon Scalable 4th Gen', 24, 2, 185, 4400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(39, 'P49653-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 5416S', 'Xeon Scalable 4th Gen', 16, 2, 150, 4000, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(40, 'P49639-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 5411N', 'Xeon Scalable 4th Gen', 24, 1.9, 165, 4400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(41, 'P49597-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 5415+', 'Xeon Scalable 4th Gen', 8, 2.9, 150, 4400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(42, 'P49611-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Silver 4416+', 'Xeon Scalable 4th Gen', 20, 2, 165, 4000, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(43, 'P49610-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Silver 4410Y', 'Xeon Scalable 4th Gen', 12, 2, 150, 4000, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(44, 'P49617-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Bronze 3408U', 'Xeon Scalable 4th Gen', 8, 1.8, 125, 4000, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(45, 'P67101-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 5512U', 'Xeon Scalable 5th Gen', 28, 2.1, 185, 4800, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(46, 'P67079-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Gold 5515+', 'Xeon Scalable 5th Gen', 8, 3.2, 165, 4800, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(47, 'P67093-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Silver 4516Y+', 'Xeon Scalable 5th Gen', 24, 2.2, 185, 4400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(48, 'P67092-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Silver 4514Y', 'Xeon Scalable 5th Gen', 16, 2, 150, 4400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(49, 'P67091-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Silver 4510', 'Xeon Scalable 5th Gen', 12, 2.4, 150, 4400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(50, 'P67090-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Silver 4509Y', 'Xeon Scalable 5th Gen', 8, 2.6, 125, 4400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(51, 'P67100-B21', NULL, 'USD', 'LGA 4677', 'Intel Xeon-Bronze 3508U', 'Xeon Scalable 5th Gen', 8, 2.1, 125, 4400, 1, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[2]'),
+(52, '818172-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2620v4', 'E5-2600 v4', 8, 2.1, 85, 2133, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(53, '818174-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2630v4', 'E5-2600 v4', 10, 2.2, 85, 2133, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(54, '818176-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2640v4', 'E5-2600 v4', 10, 2.4, 90, 2133, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(55, '818178-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2650v4', 'E5-2600 v4', 12, 2.2, 105, 2400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(56, '818180-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2660v4', 'E5-2600 v4', 14, 2, 105, 2400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(57, '818184-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2680v4', 'E5-2600 v4', 14, 2.4, 120, 2400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(58, '818186-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2690v4', 'E5-2600 v4', 14, 2.6, 135, 2400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(59, '818196-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2667v4', 'E5-2600 v4', 8, 3.2, 135, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[3]'),
+(60, '818166-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2650Lv4', 'E5-2600 v4', 14, 1.7, 65, 2400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(61, '818168-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2603v4', 'E5-2600 v4', 6, 1.7, 85, 1866, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(62, '818170-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2609v4', 'E5-2600 v4', 8, 1.7, 85, 1866, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(63, '818190-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2623v4', 'E5-2600 v4', 4, 2.6, 85, 2133, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(64, '818192-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2637v4', 'E5-2600 v4', 4, 3.5, 135, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[3]'),
+(65, '818194-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2643v4', 'E5-2600 v4', 6, 3.4, 135, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[3]'),
+(66, '818182-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2697Av4', 'E5-2600 v4', 16, 2.6, 145, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[3]'),
+(67, '818188-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2687Wv4', 'E5-2600 v4', 12, 3, 160, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":true}', '[3]'),
+(68, '818198-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2683v4', 'E5-2600 v4', 16, 2.1, 120, 2400, 1.5, '{\"heatsink\":\"Standard\",\"requires_high_perf_fan\":false}', '[3]'),
+(69, '818202-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2697v4', 'E5-2600 v4', 18, 2.3, 145, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[3]'),
+(70, '818204-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2698v4', 'E5-2600 v4', 20, 2.2, 135, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[3]'),
+(71, '818206-B21', NULL, 'USD', 'LGA 2011-3', 'Intel Xeon E5-2699v4', 'E5-2600 v4', 22, 2.2, 145, 2400, 1.5, '{\"heatsink\":\"High Performance\",\"requires_high_perf_fan\":false}', '[3]');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `GPUs`
+--
+
+CREATE TABLE `GPUs` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `memory_gb` int(11) NOT NULL,
+  `tdp_watts` int(11) NOT NULL,
+  `pcie_slots_used` int(11) NOT NULL DEFAULT 1,
+  `requires_high_perf_fan` tinyint(1) DEFAULT 1,
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `GPUs`
+--
+
+INSERT INTO `GPUs` (`id`, `part_number`, `price`, `currency`, `model_name`, `memory_gb`, `tdp_watts`, `pcie_slots_used`, `requires_high_perf_fan`, `compatible_chassis_ids`) VALUES
+(1, 'Q1K38C', NULL, 'USD', 'AMD Radeon Instinct MI25 Accelerator', 16, 300, 2, 1, NULL),
+(2, 'Q9B37C', NULL, 'USD', 'Intel Arria 10 GX FPGA Accelerator', 8, 75, 1, 1, NULL),
+(3, 'R0X82C', NULL, 'USD', 'Intel FPGA PAC D5005 (Stratix 10 SX) Accelerator', 32, 75, 1, 1, NULL),
+(4, 'Q7G75C', NULL, 'USD', 'NEC Vector Engine Accelerator Module', 48, 300, 1, 1, NULL),
+(5, 'R9S37C', NULL, 'USD', 'NVIDIA A40 48GB GPU NonCEC Accelerator', 48, 300, 2, 1, NULL),
+(6, 'R7E31C', NULL, 'USD', 'NVIDIA A40 PCIe 48GB GPU for HPE', 48, 300, 2, 1, NULL),
+(7, 'R7G39C', NULL, 'USD', 'NVIDIA A30 24GB PCIe GPU Module', 24, 165, 2, 1, NULL),
+(8, 'R9H23C', NULL, 'USD', 'NVIDIA A2 16GB PCIe Non-CEC Accelerator for HPE', 16, 60, 1, 1, NULL),
+(9, 'R2U55C', NULL, 'USD', 'HPE NVIDIA Quadro P2200 GPU Module', 5, 75, 1, 1, NULL),
+(10, 'R1F95C', NULL, 'USD', 'HPE NVIDIA Quadro RTX4000 GPU Module', 8, 160, 1, 1, NULL),
+(11, 'R0Z45C', NULL, 'USD', 'HPE NVIDIA Quadro RTX 6000', 24, 260, 2, 1, NULL),
+(12, 'R1F97C', NULL, 'USD', 'HPE NVIDIA Quadro RTX8000 GPU Module', 48, 260, 2, 1, NULL),
+(13, 'Q0J62C', NULL, 'USD', 'NVIDIA Tesla M10 32GB Module', 32, 225, 2, 1, NULL),
+(14, 'Q0V80C', NULL, 'USD', 'NVIDIA Tesla P40 24GB Module', 24, 250, 2, 1, NULL),
+(15, 'R0W29C', NULL, 'USD', 'NVIDIA Tesla T4 16GB Computational Accelerator', 16, 70, 1, 1, NULL),
+(16, 'Q9U36C', NULL, 'USD', 'HPE NVIDIA Tesla V100 PCIe 32GB Module', 32, 250, 2, 1, NULL),
+(17, 'R4D73C', NULL, 'USD', 'HPE NVIDIA Tesla V100S PCIe 32GB Module', 32, 250, 2, 1, NULL),
+(18, 'R4B02C', NULL, 'USD', 'HPE Xilinx Alveo U50 Accelerator', 8, 75, 1, 1, NULL),
+(19, 'R4B03C', NULL, 'USD', 'HPE Xilinx Alveo U250 Accelerator', 64, 75, 1, 1, NULL),
+(20, 'R8T26C', NULL, 'USD', 'NVIDIA A16 64GB PCIe Non-CEC Accelerator for HPE', 64, 250, 2, 1, NULL),
+(21, 'Q0V78A', NULL, 'USD', 'HPE NVIDIA Quadro P4000 Graphics Accelerator', 8, 105, 1, 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `HBAs`
+--
+
+CREATE TABLE `HBAs` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `pcie_slots_used` int(11) DEFAULT 1,
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `HBAs`
+--
+
+INSERT INTO `HBAs` (`id`, `part_number`, `price`, `currency`, `model_name`, `pcie_slots_used`, `compatible_chassis_ids`) VALUES
+(1, 'Q0L13A', NULL, 'USD', 'HPE SN1200E 16Gb Single Port Fibre Channel Host Bus Adapter', 1, NULL),
+(2, 'Q0L14A', NULL, 'USD', 'HPE SN1200E 16Gb Dual Port Fibre Channel Host Bus Adapter', 1, NULL),
+(3, 'Q0L11A', NULL, 'USD', 'HPE SN1600E 32Gb Single Port Fibre Channel Host Bus Adapter', 1, NULL),
+(4, 'Q0L12A', NULL, 'USD', 'HPE SN1600E 32Gb Dual Port Fibre Channel Host Bus Adapter', 1, NULL),
+(5, 'R2J62A', NULL, 'USD', 'HPE SN1610E 32Gb 1-port Fibre Channel Host Bus Adapter', 1, NULL),
+(6, 'R2J63A', NULL, 'USD', 'HPE SN1610E 32Gb 2-port Fibre Channel Host Bus Adapter', 1, NULL),
+(7, 'P9D93A', NULL, 'USD', 'HPE SN1100Q 16Gb Single Port Fibre Channel Host Bus Adapter', 1, NULL),
+(8, 'P9D94A', NULL, 'USD', 'HPE SN1100Q 16Gb Dual Port Fibre Channel Host Bus Adapter', 1, NULL),
+(9, 'R2E08A', NULL, 'USD', 'HPE SN1610Q 32Gb 1-port Fibre Channel Host Bus Adapter', 1, NULL),
+(10, 'R2E09A', NULL, 'USD', 'HPE SN1610Q 32Gb 2-port Fibre Channel Host Bus Adapter', 1, NULL),
+(11, 'C8R39A', NULL, 'USD', 'HPE StoreFabric SN1100E 16Gb Dual Port Fibre Channel Host Bus Adapter', 1, NULL),
+(12, 'P9D99A', NULL, 'USD', 'HPE StoreFabric SN1100E 4-port 16Gb Fibre Channel Host Bus Adapter', 1, NULL),
+(13, 'C8R38A', NULL, 'USD', 'HPE StoreFabric SN1100E 16Gb Single Port Fibre Channel Host Bus Adapter', 1, NULL),
+(14, 'AJ763B', NULL, 'USD', 'HPE 82E 8Gb 2-port PCIe Fibre Channel Host Bus Adapter', 1, NULL),
+(15, 'AJ762B', NULL, 'USD', 'HPE 81E 8Gb 1-port PCIe Fibre Channel Host Bus Adapter', 1, NULL),
+(16, 'QW971A', NULL, 'USD', 'HPE StoreFabric SN1000Q 16GB 1-port PCIe Fibre Channel Host Bus Adapter', 1, NULL),
+(17, 'QW972A', NULL, 'USD', 'HPE StoreFabric SN1000Q 16GB 2-port PCIe Fibre Channel Host Bus Adapter', 1, NULL),
+(18, 'P9D91A', NULL, 'USD', 'HPE StoreFabric 84Q 4-port 8Gb Fibre Channel Host Bus Adapter', 1, NULL),
+(19, 'AJ764A', NULL, 'USD', 'HPE 82Q 8Gb 2-port PCIe Fibre Channel Host Bus Adapter', 1, NULL),
+(20, 'AK344A', NULL, 'USD', 'HPE 81Q 8Gb 1-port PCIe Fibre Channel Host Bus Adapter', 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Network_Adapters`
+--
+
+CREATE TABLE `Network_Adapters` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `form_factor` varchar(100) NOT NULL COMMENT 'فقط: FlexibleLOM یا Standup PCIe',
+  `pcie_slots_used` int(11) DEFAULT 0,
+  `port_count` int(11) NOT NULL,
+  `speed_gbps` int(11) NOT NULL,
+  `port_type` varchar(50) NOT NULL COMMENT 'RJ45 | SFP+ | SFP28 | QSFP28',
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Network_Adapters`
+--
+
+INSERT INTO `Network_Adapters` (`id`, `part_number`, `price`, `currency`, `model_name`, `form_factor`, `pcie_slots_used`, `port_count`, `speed_gbps`, `port_type`, `compatible_chassis_ids`) VALUES
+(1, '811546-B21', NULL, 'USD', 'HPE Ethernet 1Gb 4-port BASE-T I350-T4V2 Adapter', 'Standup PCIe', 1, 4, 1, 'RJ45', NULL),
+(2, '813661-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port BASE-T BCM57416 Adapter', 'Standup PCIe', 1, 2, 10, 'RJ45', NULL),
+(3, 'P13188-B21', NULL, 'USD', 'Mellanox MCX512F-ACHT Ethernet 10/25Gb 2-port SFP28 Adapter for HPE', 'Standup PCIe', 1, 2, 25, 'SFP28', NULL),
+(4, '817753-B21', NULL, 'USD', 'HPE Ethernet 10/25Gb 2-port SFP28 MCX4121A-ACUT Adapter', 'Standup PCIe', 1, 2, 25, 'SFP28', NULL),
+(5, 'P08443-B21', NULL, 'USD', 'Intel E810-XXVDA2 Ethernet 10/25Gb 2-port SFP28 Adapter for HPE', 'Standup PCIe', 1, 2, 25, 'SFP28', NULL),
+(6, 'P08458-B21', NULL, 'USD', 'Intel E810-XXVDA4 Ethernet 10/25Gb 4-port SFP28 Adapter for HPE', 'Standup PCIe', 1, 4, 25, 'SFP28', NULL),
+(7, 'P21109-B21', NULL, 'USD', 'Xilinx X2522-25G-PLUS Ethernet 10/25Gb 2-port SFP28 Adapter for HPE', 'Standup PCIe', 1, 2, 25, 'SFP28', NULL),
+(8, '874253-B21', NULL, 'USD', 'HPE Ethernet 100Gb 1-port QSFP28 MCX515A-CCAT Adapter', 'Standup PCIe', 1, 1, 100, 'QSFP28', NULL),
+(9, '665240-B21', NULL, 'USD', 'HPE Ethernet 1Gb 4-port FLR-T I350-T4V2 Adapter', 'FlexibleLOM', 0, 4, 1, 'RJ45', '[1]'),
+(10, '629135-B22', NULL, 'USD', 'HPE Ethernet 1Gb 4-port FLR-T BCM5719 Adapter', 'FlexibleLOM', 0, 4, 1, 'RJ45', '[1]'),
+(11, '817721-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port FLR-T BCM57416 Adapter', 'FlexibleLOM', 0, 2, 10, 'RJ45', '[1]'),
+(12, 'P08440-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 537FLR-SFP+ Adapter', 'FlexibleLOM', 0, 2, 10, 'SFP+', '[1]'),
+(13, '817709-B21', NULL, 'USD', 'HPE Ethernet 10/25Gb 2-port FLR-SFP28 BCM57414 Adapter', 'FlexibleLOM', 0, 2, 25, 'SFP28', '[1]'),
+(14, '817749-B21', NULL, 'USD', 'HPE Ethernet 10/25Gb 2-port FLR-SFP28 MCX4121A-ACFT Adapter', 'FlexibleLOM', 0, 2, 25, 'SFP28', '[1]'),
+(15, '727054-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port FLR-SFP+ X710-DA2 Adapter', 'FlexibleLOM', 0, 2, 10, 'SFP+', '[1]'),
+(16, '817745-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port FLR-T X550-AT2 Adapter', 'FlexibleLOM', 0, 2, 10, 'RJ45', '[1]'),
+(17, '829335-B21', NULL, 'USD', 'HPE 100Gb 1-port OP101 QSFP28 x16 PCIe Gen3 with Intel Omni-Path Architecture Adapter', 'Standup PCIe', 1, 1, 100, 'QSFP28', NULL),
+(18, 'P06250-B21', NULL, 'USD', 'HPE InfiniBand HDR100/Ethernet 100Gb 1-port QSFP56 PCIe3 x16 MCX653105A-ECAT Adapter', 'Standup PCIe', 1, 1, 100, 'QSFP28', NULL),
+(19, 'P06251-B21', NULL, 'USD', 'HPE InfiniBand HDR100/Ethernet 100Gb 2-port QSFP56 PCIe3 x16 MCX653106A-ECAT Adapter', 'Standup PCIe', 1, 2, 100, 'QSFP28', NULL),
+(20, 'Q0F26A', NULL, 'USD', 'HPE CN1200R 10GBASE-T Converged Network Adapter', 'Standup PCIe', 1, 2, 10, 'RJ45', NULL),
+(21, 'Q0F09A', NULL, 'USD', 'HPE CN1300R 10/25Gb Dual Port Converged Network Adapter', 'Standup PCIe', 1, 2, 25, 'SFP28', NULL),
+(22, '727055-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 562SFP+ Adapter', 'Standup PCIe', 1, 2, 10, 'SFP+', NULL),
+(23, '652503-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 530SFP Adapter', 'Standup PCIe', 1, 2, 10, 'RJ45', NULL),
+(24, '656596-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 530T Adapter', 'Standup PCIe', 1, 2, 10, 'RJ45', NULL),
+(25, '716591-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 561T Adapter', 'Standup PCIe', 1, 2, 10, 'RJ45', NULL),
+(26, '665249-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 560SFP+ Adapter', 'Standup PCIe', 1, 2, 10, 'SFP+', NULL),
+(27, '779793-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 546SFP+ Adapter', 'Standup PCIe', 1, 2, 10, 'SFP+', NULL),
+(28, '647594-B21', NULL, 'USD', 'HPE Ethernet 1Gb 4-port 331T Adapter', 'Standup PCIe', 1, 4, 1, 'RJ45', NULL),
+(29, '652497-B21', NULL, 'USD', 'HPE Ethernet 1Gb 2-port 361T Adapter', 'Standup PCIe', 1, 2, 1, 'RJ45', NULL),
+(30, '615732-B21', NULL, 'USD', 'HPE Ethernet 1Gb 2-port 332T Adapter', 'Standup PCIe', 1, 2, 1, 'RJ45', NULL),
+(31, '764302-B21', NULL, 'USD', 'HPE FlexFabric 10Gb 4-port 536FLR-T Adapter', 'FlexibleLOM', 0, 4, 10, 'RJ45', '[3]'),
+(32, '700751-B21', NULL, 'USD', 'HPE FlexFabric 10Gb 2-port 534FLR-SFP+ Adapter', 'FlexibleLOM', 0, 2, 10, 'SFP+', '[3]'),
+(33, '700759-B21', NULL, 'USD', 'HPE FlexFabric 10Gb 2-port 533FLR-T Adapter', 'FlexibleLOM', 0, 2, 10, 'RJ45', '[3]'),
+(34, '700699-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 561FLR-T Adapter', 'FlexibleLOM', 0, 2, 10, 'RJ45', '[3]'),
+(35, '665243-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 560FLR-SFP+ Adapter', 'FlexibleLOM', 0, 2, 10, 'SFP+', '[3]'),
+(36, '727060-B21', NULL, 'USD', 'HPE FlexFabric 10Gb 2-port 556FLR-SFP+ Adapter', 'FlexibleLOM', 0, 2, 10, 'SFP+', '[3]'),
+(37, '779799-B21', NULL, 'USD', 'HPE Ethernet 10Gb 2-port 546FLR-SFP+ Adapter', 'FlexibleLOM', 0, 2, 10, 'SFP+', '[3]'),
+(38, '764284-B21', NULL, 'USD', 'HPE InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+QSFP Adapter', 'Standup PCIe', 1, 2, 40, 'QSFP28', NULL),
+(39, '764285-B21', NULL, 'USD', 'HPE InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+FLR-QSFP Adapter', 'FlexibleLOM', 0, 2, 40, 'QSFP28', '[3]'),
+(40, '872725-B21', NULL, 'USD', 'HPE InfiniBand EDR 100Gb 1-port 841QSFP28 Adapter', 'Standup PCIe', 1, 1, 100, 'QSFP28', NULL),
+(41, '872726-B21', NULL, 'USD', 'HPE InfiniBand EDR/Ethernet 100Gb 2-port 841QSFP28 Adapter', 'Standup PCIe', 1, 2, 100, 'QSFP28', NULL),
+(42, '825110-B21', NULL, 'USD', 'HPE InfiniBand EDR/Ethernet 100Gb 1-port 840QSFP28 Adapter', 'Standup PCIe', 1, 1, 100, 'QSFP28', NULL),
+(43, '825111-B21', NULL, 'USD', 'HPE InfiniBand EDR/Ethernet 100Gb 2-port 840QSFP28 Adapter', 'Standup PCIe', 1, 2, 100, 'QSFP28', NULL),
+(44, 'E7Y06A', NULL, 'USD', 'HPE StoreFabric CN1200E 10Gb Converged Network Adapter', 'Standup PCIe', 1, 2, 10, 'SFP+', NULL),
+(45, 'QW990A', NULL, 'USD', 'HPE StoreFabric CN1100R Dual Port Converged Network Adapter', 'Standup PCIe', 1, 2, 10, 'SFP+', NULL),
+(46, 'N3U51A', NULL, 'USD', 'HPE StoreFabric CN1200E 10GBASE-T Dual Port Converged Network Adapter', 'Standup PCIe', 1, 2, 10, 'RJ45', NULL),
+(47, 'N3U52A', NULL, 'USD', 'HPE StoreFabric CN1100R 10GBASE-T Dual Port Converged Network Adapter', 'Standup PCIe', 1, 2, 10, 'RJ45', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Optical_Drives`
+--
+
+CREATE TABLE `Optical_Drives` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `power_consumption_watts` int(11) DEFAULT 15,
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Optical_Drives`
+--
+
+INSERT INTO `Optical_Drives` (`id`, `part_number`, `price`, `currency`, `model_name`, `power_consumption_watts`, `compatible_chassis_ids`) VALUES
+(1, '726536-B21', NULL, 'USD', 'HPE 9.5mm SATA DVD-ROM Optical Drive', 6, '[1]'),
+(2, '726537-B21', NULL, 'USD', 'HPE 9.5mm SATA DVD-RW Optical Drive', 6, '[1]'),
+(3, '701498-B21', NULL, 'USD', 'HPE Mobile USB DVD-RW Optical Drive', 6, '[1]');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Power_Supplies`
+--
+
+CREATE TABLE `Power_Supplies` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `wattage` int(11) NOT NULL,
+  `efficiency` varchar(50) NOT NULL COMMENT 'Platinum | Titanium | Gold',
+  `hot_plug` tinyint(1) DEFAULT 1,
+  `input_voltage_support` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`input_voltage_support`)),
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Power_Supplies`
+--
+
+INSERT INTO `Power_Supplies` (`id`, `part_number`, `price`, `currency`, `model_name`, `wattage`, `efficiency`, `hot_plug`, `input_voltage_support`, `compatible_chassis_ids`) VALUES
+(1, '865408-B21', NULL, 'USD', 'HPE 500W Flex Slot Platinum Hot Plug Low Halogen Power Supply Kit', 500, 'Platinum', 1, '[\"100-240V\"]', '[1]'),
+(2, '865438-B21', NULL, 'USD', 'HPE 800W Flex Slot Titanium Hot Plug Low Halogen Power Supply Kit', 800, 'Titanium', 1, '[\"100-240V\"]', '[1]'),
+(3, '865414-B21', NULL, 'USD', 'HPE 800W Flex Slot Platinum Hot Plug Low Halogen Power Supply Kit', 800, 'Platinum', 1, '[\"100-240V\"]', '[1]'),
+(4, '865434-B21', NULL, 'USD', 'HPE 800W Flex Slot -48VDC Hot Plug Low Halogen Power Supply Kit', 800, '-48VDC', 1, '[\"-48VDC\"]', '[1]'),
+(5, '865428-B21', NULL, 'USD', 'HPE 800W Flex Slot Hot Plug Universal Low Halogen High Voltage AC/DC Power Supply Kit', 800, 'Universal', 1, '[\"277VAC\",\"380VDC\"]', '[1]'),
+(6, 'P44712-B21', NULL, 'USD', 'HPE 1800W-2200W Flex Slot Titanium Hot Plug Power Supply Kit', 2200, 'Titanium', 1, '[\"100-240V\"]', '[1]'),
+(7, '830272-B21', NULL, 'USD', 'HPE 1600W Flex Slot Platinum Hot Plug Low Halogen Power Supply Kit', 1600, 'Platinum', 1, '[\"100-240V\"]', '[1]'),
+(8, 'P17023-B21', NULL, 'USD', 'HPE 1600W Flex Slot -48VDC Hot Plug Power Supply Kit', 1600, '-48VDC', 1, '[\"-48VDC\"]', '[1]'),
+(9, 'P38995-B21', NULL, 'USD', 'HPE 800W Flex Slot Platinum Hot Plug Low Halogen Power Supply Kit', 800, 'Platinum', 1, '[\"100-240V\"]', '[2]'),
+(10, 'P03178-B21', NULL, 'USD', 'HPE 1000W Flex Slot Titanium Hot Plug Power Supply Kit', 1000, 'Titanium', 1, '[\"100-240V\"]', '[2]'),
+(11, 'P38997-B21', NULL, 'USD', 'HPE 1600W Flex Slot Platinum Hot Plug Low Halogen Power Supply Kit', 1600, 'Platinum', 1, '[\"200-240V\"]', '[2]'),
+(12, '720478-B21', NULL, 'USD', 'HPE 500W Flex Slot Platinum Hot Plug Power Supply Kit', 500, 'Platinum', 1, '[\"100-240V\"]', '[3]'),
+(13, '720479-B21', NULL, 'USD', 'HPE 800W Flex Slot Platinum Hot Plug Power Supply Kit', 800, 'Platinum', 1, '[\"100-240V\"]', '[3]'),
+(14, '720480-B21', NULL, 'USD', 'HPE 800W Flex Slot -48VDC Hot Plug Power Supply Kit', 800, '-48VDC', 1, '[\"-48VDC\"]', '[3]'),
+(15, '720484-B21', NULL, 'USD', 'HPE 800W Flex Slot Hot Plug Universal High Voltage AC/DC Power Supply Kit', 800, 'Universal', 1, '[\"227VAC\",\"380VDC\"]', '[3]'),
+(16, '720482-B21', NULL, 'USD', 'HPE 800W Flex Slot Titanium Hot Plug Power Supply Kit', 800, 'Titanium', 1, '[\"100-240V\"]', '[3]'),
+(17, '720620-B21', NULL, 'USD', 'HPE 1400W Flex Slot Platinum Plus Hot Plug Power Supply Kit', 1400, 'Platinum', 1, '[\"200-240V\"]', '[3]');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `RAMs`
+--
+
+CREATE TABLE `RAMs` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `capacity_gb` int(11) NOT NULL,
+  `ram_type` varchar(50) NOT NULL,
+  `memory_generation` varchar(20) NOT NULL DEFAULT 'DDR4',
+  `speed_mt` int(11) NOT NULL,
+  `power_consumption_watts` int(11) DEFAULT 5,
+  `compatible_cpu_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_cpu_ids` is null or json_valid(`compatible_cpu_ids`)),
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `RAMs`
+--
+
+INSERT INTO `RAMs` (`id`, `part_number`, `price`, `currency`, `model_name`, `capacity_gb`, `ram_type`, `memory_generation`, `speed_mt`, `power_consumption_watts`, `compatible_cpu_ids`, `compatible_chassis_ids`) VALUES
+(1, 'P00918-B21', NULL, 'USD', 'HPE 8GB (1x8GB) Single Rank x8 DDR4-2933 CAS-21-21-21 Registered Smart Memory Kit', 8, 'RDIMM', 'DDR4', 2933, 3, NULL, '[1]'),
+(2, 'P00920-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Single Rank x4 DDR4-2933 CAS-21-21-21 Registered Smart Memory Kit', 16, 'RDIMM', 'DDR4', 2933, 4, NULL, '[1]'),
+(3, 'P00922-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Dual Rank x8 DDR4-2933 CAS-21-21-21 Registered Smart Memory Kit', 16, 'RDIMM', 'DDR4', 2933, 4, NULL, '[1]'),
+(4, 'P00924-B21', NULL, 'USD', 'HPE 32GB (1x32GB) Dual Rank x4 DDR4-2933 CAS-21-21-21 Registered Smart Memory Kit', 32, 'RDIMM', 'DDR4', 2933, 5, NULL, '[1]'),
+(5, 'P00930-B21', NULL, 'USD', 'HPE 64GB (1x64GB) Dual Rank x4 DDR4-2933 CAS-21-21-21 Registered Smart Memory Kit', 64, 'RDIMM', 'DDR4', 2933, 8, NULL, '[1]'),
+(6, 'P00926-B21', NULL, 'USD', 'HPE 64GB 4Rx4 PC4-2933Y-L Smart Kit', 64, 'LRDIMM', 'DDR4', 2933, 9, NULL, '[1]'),
+(7, 'P00928-B21', NULL, 'USD', 'HPE 128GB 8Rx4 PC4-2933Y-L 3DS Smart Kit', 128, 'LRDIMM', 'DDR4', 2933, 12, NULL, '[1]'),
+(8, 'P11040-B21', NULL, 'USD', 'HPE 128GB 4Rx4 PC4-2933Y-L Smart Kit', 128, 'LRDIMM', 'DDR4', 2933, 12, NULL, '[1]'),
+(9, 'P43322-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Single Rank x8 DDR5-4800 CAS-40-39-39 EC8 Registered Smart Memory Kit', 16, 'RDIMM', 'DDR5', 4800, 5, NULL, '[2]'),
+(10, 'P43328-B21', NULL, 'USD', 'HPE 32GB (1x32GB) Dual Rank x8 DDR5-4800 CAS-40-39-39 EC8 Registered Smart Memory Kit', 32, 'RDIMM', 'DDR5', 4800, 7, NULL, '[2]'),
+(11, 'P43331-B21', NULL, 'USD', 'HPE 64GB (1x64GB) Dual Rank x4 DDR5-4800 CAS-40-39-39 EC8 Registered Smart Memory Kit', 64, 'RDIMM', 'DDR5', 4800, 9, NULL, '[2]'),
+(12, 'P64705-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Single Rank x8 DDR5-5600 CAS-46-45-45 EC8 Registered Smart Memory Kit', 16, 'RDIMM', 'DDR5', 5600, 5, NULL, '[2]'),
+(13, 'P64706-B21', NULL, 'USD', 'HPE 32GB (1x32GB) Dual Rank x8 DDR5-5600 CAS-46-45-45 EC8 Registered Smart Memory Kit', 32, 'RDIMM', 'DDR5', 5600, 7, NULL, '[2]'),
+(14, 'P64707-B21', NULL, 'USD', 'HPE 64GB (1x64GB) Dual Rank x4 DDR5-5600 CAS-46-45-45 EC8 Registered Smart Memory Kit', 64, 'RDIMM', 'DDR5', 5600, 9, NULL, '[2]'),
+(15, 'P64708-B21', NULL, 'USD', 'HPE 96GB (1x96GB) Dual Rank x4 DDR5-5600 CAS-46-45-45 EC8 Registered Smart Memory Kit', 96, 'RDIMM', 'DDR5', 5600, 12, NULL, '[2]'),
+(16, '805347-B21', NULL, 'USD', 'HPE 8GB (1x8GB) Single Rank x8 DDR4-2400 CAS-17-17-17 Registered Memory Kit', 8, 'RDIMM', 'DDR4', 2400, 3, NULL, '[3]'),
+(17, '805349-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Single Rank x4 DDR4-2400 CAS-17-17-17 Registered Memory Kit', 16, 'RDIMM', 'DDR4', 2400, 5, NULL, '[3]'),
+(18, '836220-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Dual Rank x4 DDR4-2400 CAS-17-17-17 Registered Memory Kit', 16, 'RDIMM', 'DDR4', 2400, 5, NULL, '[3]'),
+(19, 'P00423-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Dual Rank x8 DDR4-2400 CAS-17-17-17 Registered Smart Memory Kit', 16, 'RDIMM', 'DDR4', 2400, 5, NULL, '[3]'),
+(20, '805351-B21', NULL, 'USD', 'HPE 32GB (1x32GB) Dual Rank x4 DDR4-2400 CAS-17-17-17 Registered Memory Kit', 32, 'RDIMM', 'DDR4', 2400, 7, NULL, '[3]'),
+(21, '805353-B21', NULL, 'USD', 'HPE 32GB (1x32GB) Dual Rank x4 DDR4-2400 CAS-17-17-17 Load Reduced Memory Kit', 32, 'LRDIMM', 'DDR4', 2400, 7, NULL, '[3]'),
+(22, '805358-B21', NULL, 'USD', 'HPE 64GB (1x64GB) Quad Rank x4 DDR4-2400 CAS-17-17-17 Load Reduced Memory Kit', 64, 'LRDIMM', 'DDR4', 2400, 9, NULL, '[3]'),
+(23, '809208-B21', NULL, 'USD', 'HPE 128GB (1x128GB) Octal Rank x4 DDR4-2400 CAS-20-18-18 Load Reduced Memory Kit', 128, 'LRDIMM', 'DDR4', 2400, 14, NULL, '[3]'),
+(24, '726717-B21', NULL, 'USD', 'HPE 4GB (1x4GB) Single Rank x8 DDR4-2133 CAS-15-15-15 Registered Memory Kit', 4, 'RDIMM', 'DDR4', 2133, 2, NULL, '[3]'),
+(25, '726718-B21', NULL, 'USD', 'HPE 8GB (1x8GB) Single Rank x4 DDR4-2133 CAS-15-15-15 Registered Memory Kit', 8, 'RDIMM', 'DDR4', 2133, 3, NULL, '[3]'),
+(26, '726719-B21', NULL, 'USD', 'HPE 16GB (1x16GB) Dual Rank x4 DDR4-2133 CAS-15-15-15 Registered Memory Kit', 16, 'RDIMM', 'DDR4', 2133, 5, NULL, '[3]'),
+(27, '728629-B21', NULL, 'USD', 'HPE 32GB (1x32GB) Dual Rank x4 DDR4-2133 CAS-15-15-15 Registered Memory Kit', 32, 'RDIMM', 'DDR4', 2133, 7, NULL, '[3]'),
+(28, '726724-B21', NULL, 'USD', 'HPE 64GB (1x64GB) Quad Rank x4 DDR4-2133 CAS-15-15-15 Load Reduced Memory Kit', 64, 'LRDIMM', 'DDR4', 2133, 9, NULL, '[3]');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Risers`
+--
+
+CREATE TABLE `Risers` (
+  `id` int(11) NOT NULL,
+  `model_name` varchar(255) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `x16_slots` int(11) NOT NULL COMMENT 'تعداد اسلات x16 — برای GPU استفاده میشه',
+  `total_slots` int(11) NOT NULL COMMENT 'مجموع همه اسلات‌ها (x16 + x8)',
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Risers`
+--
+
+INSERT INTO `Risers` (`id`, `model_name`, `price`, `currency`, `x16_slots`, `total_slots`, `compatible_chassis_ids`) VALUES
+(1, 'HPE DL360 Gen9 Low Profile PCIe Slot CPU2 Kit (764642-B21)', NULL, 'USD', 1, 1, '[3]'),
+(2, 'HPE DL360 Gen9 2P Full Height PCIe Slot 2 GPU Enablement Kit (867249-B21)', NULL, 'USD', 1, 1, '[3]'),
+(3, 'HPE DL Gen10 x8/x16/x8 Riser Kit (870548-B21) - Secondary position', NULL, 'USD', 1, 3, '[1]'),
+(4, 'HPE DL38X Gen10 x16/x16 Riser Kit (826694-B21) - Secondary position', NULL, 'USD', 2, 2, '[1]'),
+(5, 'HPE DL38X Gen10 Slot 1/2 x16/x16 FIO Riser Kit (871674-B21) - Primary position', NULL, 'USD', 2, 2, '[1]'),
+(6, 'HPE DL38X Gen10 x16/x16 GPU Slot2/3 FIO Riser Kit (871676-B21) - Primary position', NULL, 'USD', 2, 2, '[1]'),
+(7, 'HPE DL38X Gen10 x16/x16/x16 Primary GPU FIO Riser Kit (P14374-B21)', NULL, 'USD', 3, 3, '[1]'),
+(8, 'HPE DL38X Gen10 x16/x16/x16 Secondary GPU FIO Riser Kit (P14373-B21)', NULL, 'USD', 3, 3, '[1]'),
+(9, 'HPE DL38X Gen10 x16 Tertiary Riser Kit (826700-B21)', NULL, 'USD', 1, 1, '[1]'),
+(10, 'HPE DL38X Gen10 2 x8 PCIe Tertiary Riser Kit (875780-B21)', NULL, 'USD', 0, 2, '[1]'),
+(11, 'HPE DL38X Gen10 x8/x8/x8 1-port 2 NVMe SlimSAS Riser (867806-B21) - Secondary', NULL, 'USD', 0, 3, '[1]'),
+(12, 'HPE DL38X Gen10 x8/x8/x8 1-port 2 NVMe SlimSAS FIO Riser Kit (871673-B21) - Primary', NULL, 'USD', 0, 3, '[1]'),
+(13, 'HPE DL38X Gen10 4-port 8 NVMe Primary SlimSAS Riser (867807-B21)', NULL, 'USD', 0, 0, '[1]'),
+(14, 'HPE DL38X Gen10 2-port 4 NVMe SlimSAS Riser (867808-B21) - Tertiary', NULL, 'USD', 0, 0, '[1]'),
+(15, 'HPE DL38X Gen10 4-port 8 NVMe Secondary SlimSAS Riser (873732-B21)', NULL, 'USD', 0, 0, '[1]'),
+(16, 'HPE DL38X Gen10 2SFF HDD SAS/SATA Riser Kit (826688-B21) - Primary/Secondary', NULL, 'USD', 1, 1, '[1]'),
+(17, 'HPE ProLiant DL38x Gen10 2SFF BC HDD SAS/SATA Riser Kit (P57772-B21) - Primary/Secondary', NULL, 'USD', 0, 0, '[1]'),
+(18, 'HPE ProLiant ML110 Gen11 GPU Riser Kit (P53487-B21)', NULL, 'USD', 1, 1, '[2]'),
+(19, 'HPE ProLiant ML110 Gen11 Second GPU Riser Kit (P53488-B21)', NULL, 'USD', 1, 1, '[2]');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Storage_Controllers`
+--
+
+CREATE TABLE `Storage_Controllers` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `form_factor` varchar(100) NOT NULL COMMENT 'فقط: Type-a Modular (AROC) یا Standup PCIe',
+  `pcie_slots_used` int(11) DEFAULT 0 COMMENT 'AROC=0, Standup PCIe=1',
+  `supported_interfaces` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`supported_interfaces`)),
+  `max_drives` int(11) NOT NULL,
+  `cache_gb` float DEFAULT 0,
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Storage_Controllers`
+--
+
+INSERT INTO `Storage_Controllers` (`id`, `part_number`, `price`, `currency`, `model_name`, `form_factor`, `pcie_slots_used`, `supported_interfaces`, `max_drives`, `cache_gb`, `compatible_chassis_ids`) VALUES
+(1, '804338-B21', NULL, 'USD', 'HPE Smart Array P816i-a SR Gen10 (16 Internal Lanes/4GB Cache/SmartCache) 12G SAS Modular Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 16, 4, '[1]'),
+(2, '804331-B21', NULL, 'USD', 'HPE Smart Array P408i-a SR Gen10 (8 Internal Lanes/2GB Cache) 12G SAS Modular Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 8, 2, '[1]'),
+(3, '804326-B21', NULL, 'USD', 'HPE Smart Array E208i-a SR Gen10 (8 Internal Lanes/No Cache) 12G SAS Modular Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 8, 0, '[1]'),
+(4, '830824-B21', NULL, 'USD', 'HPE Smart Array P408i-p SR Gen10 (8 Internal Lanes/2GB Cache) 12G SAS PCIe Plug-in Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 8, 2, NULL),
+(5, '804405-B21', NULL, 'USD', 'HPE Smart Array P408e-p SR Gen10 (8 External Lanes/4GB Cache) 12G SAS PCIe Plug-in Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 0, 4, NULL),
+(6, '804394-B21', NULL, 'USD', 'HPE Smart Array E208i-p SR Gen10 (8 Internal Lanes/No Cache) 12G SAS PCIe Plug-in Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 8, 0, NULL),
+(7, '804398-B21', NULL, 'USD', 'HPE Smart Array E208e-p SR Gen10 (8 External Lanes/No Cache) 12G SAS PCIe Plug-in Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 0, 0, NULL),
+(8, 'P26279-B21', NULL, 'USD', 'HPE MR416i-a Gen10 Plus x16 Lanes 4GB Cache NVMe/SAS 12G Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 16, 4, '[1]'),
+(9, 'P06367-B21', NULL, 'USD', 'HPE MR416i-p Gen10 Plus x16 Lanes 4GB Cache NVMe/SAS 12G Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 16, 4, NULL),
+(10, 'P26325-B21', NULL, 'USD', 'HPE MR216i-a Gen10 Plus x16 Lanes without Cache NVMe/SAS 12G Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 16, 0, '[1]'),
+(11, 'P26324-B21', NULL, 'USD', 'HPE MR216i-p Gen10 Plus x16 Lanes without Cache NVMe/SAS 12G Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 16, 0, NULL),
+(12, 'P47789-B21', NULL, 'USD', 'HPE MR216i-o Gen11 x16 Lanes without Cache OCP SPDM Storage Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\",\"NVMe\"]', 16, 0, '[2]'),
+(13, 'P47785-B21', NULL, 'USD', 'HPE MR216i-p Gen11 x16 Lanes without Cache PCI SPDM Plug-in Storage Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\",\"NVMe\"]', 16, 0, NULL),
+(14, 'P58335-B21', NULL, 'USD', 'HPE MR408i-o Gen11 x8 Lanes 4GB Cache OCP SPDM Storage Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\",\"NVMe\"]', 8, 4, '[2]'),
+(15, 'P74775-B21', NULL, 'USD', 'HPE MR408i-p Gen11 x8 Lanes 4GB Cache PCI SPDM Plug-in Storage Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\",\"NVMe\"]', 8, 4, NULL),
+(16, 'P47781-B21', NULL, 'USD', 'HPE MR416i-o Gen11 x16 Lanes 8GB Cache OCP SPDM Storage Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\",\"NVMe\"]', 16, 8, '[2]'),
+(17, 'P47777-B21', NULL, 'USD', 'HPE MR416i-p Gen11 x16 Lanes 8GB Cache PCI SPDM Plug-in Storage Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\",\"NVMe\"]', 16, 8, NULL),
+(18, '726897-B21', NULL, 'USD', 'HPE Smart Array P840/4GB FBWC 12Gb 2-ports Int SAS Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 10, 4, NULL),
+(19, '843199-B21', NULL, 'USD', 'HPE Smart Array P840ar/2GB FBWC 12Gb 2-port Internal SAS Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 8, 2, '[3]'),
+(20, '726821-B21', NULL, 'USD', 'HPE Smart Array P440/4GB FBWC 12Gb 1-port Int SAS Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 8, 4, NULL),
+(21, '726736-B21', NULL, 'USD', 'HPE Smart Array P440ar/2GB FBWC 12Gb 2-ports Int SAS Controller', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 8, 2, '[3]'),
+(22, '726740-B21', NULL, 'USD', 'HPE DL360 Gen9 Smart Array P440ar Controller for 2 GPU Configurations', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 8, 2, '[3]'),
+(23, '726903-B21', NULL, 'USD', 'HPE Smart Array P841/4GB FBWC 12Gb 4-ports Ext SAS Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 0, 4, NULL),
+(24, '726825-B21', NULL, 'USD', 'HPE Smart Array P441/4GB FBWC 12Gb 2-ports Ext SAS Controller', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 0, 4, NULL),
+(25, '726911-B21', NULL, 'USD', 'HPE H241 12Gb 2-ports Ext Smart Host Bus Adapter', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 0, 0, NULL),
+(26, '726757-B21', NULL, 'USD', 'HPE H240ar 12Gb 2-ports Int Smart Host Bus Adapter', 'Type-a Modular (AROC)', 0, '[\"SAS\",\"SATA\"]', 8, 0, '[3]'),
+(27, '726907-B21', NULL, 'USD', 'HPE H240 12Gb 2-ports Int Smart Host Bus Adapter', 'Standup PCIe', 1, '[\"SAS\",\"SATA\"]', 8, 0, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Storage_Drives`
+--
+
+CREATE TABLE `Storage_Drives` (
+  `id` int(11) NOT NULL,
+  `part_number` varchar(100) NOT NULL,
+  `price` decimal(12,2) DEFAULT NULL,
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
+  `model_name` varchar(255) NOT NULL,
+  `form_factor` varchar(50) NOT NULL COMMENT 'SFF | LFF',
+  `interface` varchar(50) NOT NULL COMMENT 'SAS | SATA | NVMe',
+  `drive_type` varchar(50) NOT NULL COMMENT 'HDD | SSD',
+  `capacity_gb` int(11) NOT NULL,
+  `power_consumption_watts` int(11) NOT NULL,
+  `requires_high_perf_fan` tinyint(1) DEFAULT 0 COMMENT 'NVMe=1, بقیه=0',
+  `compatible_chassis_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`compatible_chassis_ids` is null or json_valid(`compatible_chassis_ids`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Storage_Drives`
+--
+
+INSERT INTO `Storage_Drives` (`id`, `part_number`, `price`, `currency`, `model_name`, `form_factor`, `interface`, `drive_type`, `capacity_gb`, `power_consumption_watts`, `requires_high_perf_fan`, `compatible_chassis_ids`) VALUES
+(1, 'P28352-B21', NULL, 'USD', 'HPE 2.4TB SAS 12G Mission Critical 10K SFF BC 3-year Warranty 512e Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 2400, 6, 0, NULL),
+(2, 'P53562-B21', NULL, 'USD', 'HPE 1.8TB SAS 12G Mission Critical 10K SFF BC 3-year Warranty 512e Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 1800, 6, 0, NULL),
+(3, 'P28586-B21', NULL, 'USD', 'HPE 1.2TB SAS 12G Mission Critical 10K SFF BC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 1200, 6, 0, NULL),
+(4, 'P40432-B21', NULL, 'USD', 'HPE 900GB SAS 12G Mission Critical 15K SFF BC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 900, 7, 0, NULL),
+(5, 'P53560-B21', NULL, 'USD', 'HPE 600GB SAS 12G Mission Critical 15K SFF BC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 600, 7, 0, NULL),
+(6, 'P53561-B21', NULL, 'USD', 'HPE 600GB SAS 12G Mission Critical 10K SFF BC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 600, 6, 0, NULL),
+(7, 'P28028-B21', NULL, 'USD', 'HPE 300GB SAS 12G Mission Critical 15K SFF BC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 300, 7, 0, NULL),
+(8, 'P40430-B21', NULL, 'USD', 'HPE 300GB SAS 12G Mission Critical 10K SFF BC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 300, 6, 0, NULL),
+(9, '881457-B21', NULL, 'USD', 'HPE 2.4TB SAS 12G Mission Critical 10K SFF SC 3-year Warranty 512e Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 2400, 6, 0, NULL),
+(10, '872481-B21', NULL, 'USD', 'HPE 1.8TB SAS 12G Mission Critical 10K SFF SC 3-year Warranty 512e Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 1800, 6, 0, NULL),
+(11, '872479-B21', NULL, 'USD', 'HPE 1.2TB SAS 12G Mission Critical 10K SFF SC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 1200, 6, 0, NULL),
+(12, '872477-B21', NULL, 'USD', 'HPE 600GB SAS 12G Mission Critical 10K SFF SC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 600, 6, 0, NULL),
+(13, '872475-B21', NULL, 'USD', 'HPE 300GB SAS 12G Mission Critical 10K SFF SC 3-year Warranty Multi Vendor HDD', 'SFF', 'SAS', 'HDD', 300, 6, 0, NULL),
+(14, 'P53552-B21', NULL, 'USD', 'HPE 20TB SAS 12G Business Critical 7.2K LFF SC 1-year Warranty Helium 512e ISE Multi Vendor HDD', 'LFF', 'SAS', 'HDD', 20000, 9, 0, NULL),
+(15, 'P23863-B21', NULL, 'USD', 'HPE 16TB SAS 12G Business Critical 7.2K LFF SC 1-year Warranty Helium 512e ISE Multi Vendor HDD', 'LFF', 'SAS', 'HDD', 16000, 9, 0, NULL),
+(16, '881779-B21', NULL, 'USD', 'HPE 12TB SAS 12G Business Critical 7.2K LFF SC 1-year Warranty Helium 512e Multi Vendor HDD', 'LFF', 'SAS', 'HDD', 12000, 9, 0, NULL),
+(17, '819201-B21', NULL, 'USD', 'HPE 8TB SAS 12G Business Critical 7.2K LFF SC 1-year Warranty 512e Multi Vendor HDD', 'LFF', 'SAS', 'HDD', 8000, 9, 0, NULL),
+(18, '861754-B21', NULL, 'USD', 'HPE 6TB SAS 12G Business Critical 7.2K LFF SC 1-year Warranty 512e Multi Vendor HDD', 'LFF', 'SAS', 'HDD', 6000, 9, 0, NULL),
+(19, '872487-B21', NULL, 'USD', 'HPE 4TB SAS 12G Business Critical 7.2K LFF SC 1-year Warranty Multi Vendor HDD', 'LFF', 'SAS', 'HDD', 4000, 9, 0, NULL),
+(20, '872485-B21', NULL, 'USD', 'HPE 2TB SAS 12G Business Critical 7.2K LFF SC 1-year Warranty Multi Vendor HDD', 'LFF', 'SAS', 'HDD', 2000, 9, 0, NULL),
+(21, 'P53555-B21', NULL, 'USD', 'HPE 20TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty Helium 512e ISE Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 20000, 9, 0, NULL),
+(22, 'P23857-B21', NULL, 'USD', 'HPE 16TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty Helium 512e ISE Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 16000, 9, 0, NULL),
+(23, '881785-B21', NULL, 'USD', 'HPE 12TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty Helium 512e Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 12000, 9, 0, NULL),
+(24, '819203-B21', NULL, 'USD', 'HPE 8TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty 512e Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 8000, 9, 0, NULL),
+(25, '861750-B21', NULL, 'USD', 'HPE 6TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty 512e Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 6000, 9, 0, NULL),
+(26, '872491-B21', NULL, 'USD', 'HPE 4TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 4000, 9, 0, NULL),
+(27, '872489-B21', NULL, 'USD', 'HPE 2TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 2000, 9, 0, NULL),
+(28, '861691-B21', NULL, 'USD', 'HPE 1TB SATA 6G Business Critical 7.2K LFF SC 1-year Warranty Multi Vendor HDD', 'LFF', 'SATA', 'HDD', 1000, 9, 0, NULL),
+(29, 'P49035-B21', NULL, 'USD', 'HPE 3.84TB SAS 24G Read Intensive SFF BC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(30, 'P40508-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF BC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(31, 'P40507-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Read Intensive SFF BC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(32, 'P49044-B21', NULL, 'USD', 'HPE 15.36TB SAS 12G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 15360, 3, 0, NULL),
+(33, 'P49039-B21', NULL, 'USD', 'HPE 7.68TB SAS 12G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 7680, 3, 0, NULL),
+(34, 'P37001-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF SC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(35, 'P49034-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(36, 'P36999-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Read Intensive SFF SC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(37, 'P49030-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(38, 'P49028-B21', NULL, 'USD', 'HPE 960GB SAS 12G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 960, 3, 0, NULL),
+(39, 'P49057-B21', NULL, 'USD', 'HPE 6.4TB SAS 24G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 6400, 3, 0, NULL),
+(40, 'P49053-B21', NULL, 'USD', 'HPE 3.2TB SAS 24G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 3200, 3, 0, NULL),
+(41, 'P49049-B21', NULL, 'USD', 'HPE 1.6TB SAS 24G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 1600, 3, 0, NULL),
+(42, 'P49047-B21', NULL, 'USD', 'HPE 800GB SAS 24G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 800, 3, 0, NULL),
+(43, 'P40512-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Mixed Use SFF BC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(44, 'P40511-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Mixed Use SFF BC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(45, 'P40510-B21', NULL, 'USD', 'HPE 960GB SAS 12G Mixed Use SFF BC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 960, 3, 0, NULL),
+(46, 'P49056-B21', NULL, 'USD', 'HPE 6.4TB SAS 12G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 6400, 3, 0, NULL),
+(47, 'P49052-B21', NULL, 'USD', 'HPE 3.2TB SAS 12G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 3200, 3, 0, NULL),
+(48, 'P37011-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Mixed Use SFF SC Value SAS Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(49, 'P49048-B21', NULL, 'USD', 'HPE 1.6TB SAS 12G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 1600, 3, 0, NULL),
+(50, 'P49046-B21', NULL, 'USD', 'HPE 800GB SAS 12G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SAS', 'SSD', 800, 3, 0, NULL),
+(51, 'P63875-B21', NULL, 'USD', 'HPE 3.84TB SAS Read Intensive SFF BC Self-encrypting FIPS 140-2 PM7 SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(52, 'P63871-B21', NULL, 'USD', 'HPE 1.6TB SAS Mixed Use SFF BC Self-encrypting FIPS 140-2 PM7 SSD', 'SFF', 'SAS', 'SSD', 1600, 3, 0, NULL),
+(53, 'P40500-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Read Intensive SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(54, 'P40499-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Read Intensive SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(55, 'P40498-B21', NULL, 'USD', 'HPE 960GB SATA 6G Read Intensive SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(56, 'P58236-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF BC Self-encrypting 5400P SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(57, 'P40497-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(58, 'P40496-B21', NULL, 'USD', 'HPE 240GB SATA 6G Read Intensive SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 240, 3, 0, NULL),
+(59, 'P18428-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(60, 'P18426-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(61, 'P18424-B21', NULL, 'USD', 'HPE 960GB SATA 6G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(62, 'P18422-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(63, 'P63890-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF SC PM893a SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(64, 'P18420-B21', NULL, 'USD', 'HPE 240GB SATA 6G Read Intensive SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 240, 3, 0, NULL),
+(65, 'P40505-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(66, 'P40504-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(67, 'P58244-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use SFF BC Self-encrypting 5400M SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(68, 'P40503-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(69, 'P40502-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use SFF BC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(70, 'P18438-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(71, 'P18436-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(72, 'P18434-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(73, 'P18432-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use SFF SC Multi Vendor SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(74, 'P47807-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive LFF SCC Multi Vendor SSD', 'LFF', 'SATA', 'SSD', 480, 4, 0, NULL),
+(75, 'P47419-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use LFF SCC Multi Vendor SSD', 'LFF', 'SATA', 'SSD', 960, 4, 0, NULL),
+(76, 'P22274-B21', NULL, 'USD', 'HPE 12.8TB NVMe Gen4 High Performance Mixed Use SFF SCN U.3 PM1735 SSD', 'SFF', 'NVMe', 'SSD', 12800, 10, 1, NULL),
+(77, 'P51460-B21', NULL, 'USD', 'HPE 3.2TB NVMe Gen4 High Performance Mixed Use SFF SCN U.2 P5620 SSD', 'SFF', 'NVMe', 'SSD', 3200, 9, 1, NULL),
+(78, 'P50225-B21', NULL, 'USD', 'HPE 1.6TB NVMe Gen4 High Performance Mixed Use SFF SCN U.3 PM1735a SSD', 'SFF', 'NVMe', 'SSD', 1600, 8, 1, NULL),
+(80, '870759-B21', NULL, 'USD', 'HPE 900GB SAS 12G Enterprise 15K SFF (2.5in) SC 3yr Wty Digitally Signed Firmware HDD', 'SFF', 'SAS', 'HDD', 900, 7, 0, NULL),
+(81, '870757-B21', NULL, 'USD', 'HPE 600GB SAS 12G Enterprise 15K SFF (2.5in) SC 3yr Wty Digitally Signed Firmware HDD', 'SFF', 'SAS', 'HDD', 600, 7, 0, NULL),
+(82, '870753-B21', NULL, 'USD', 'HPE 300GB SAS 12G Enterprise 15K SFF (2.5in) SC 3yr Wty Digitally Signed Firmware HDD', 'SFF', 'SAS', 'HDD', 300, 7, 0, NULL),
+(83, '832514-B21', NULL, 'USD', 'HPE 1TB SAS 12G Midline 7.2K SFF (2.5in) SC 1yr Wty Digitally Signed Firmware HDD', 'SFF', 'SAS', 'HDD', 1000, 9, 0, NULL),
+(84, '765466-B21', NULL, 'USD', 'HPE 2TB SAS 12G Midline 7.2K SFF (2.5in) SC 1yr Wty 512e HDD', 'SFF', 'SAS', 'HDD', 2000, 9, 0, NULL),
+(85, '765464-B21', NULL, 'USD', 'HPE 1TB SAS 12G Midline 7.2K SFF (2.5in) SC 1yr Wty 512e Digitally Signed Firmware HDD', 'SFF', 'SAS', 'HDD', 1000, 9, 0, NULL),
+(86, '857644-B21', NULL, 'USD', 'HPE 10TB SAS 12G Midline 7.2K LFF (3.5in) SC 1yr Wty Helium 512e Digitally Signed Firmware HDD', 'LFF', 'SAS', 'HDD', 10000, 9, 0, NULL),
+(87, 'P09163-B21', NULL, 'USD', 'HPE 14TB SATA 6G Midline 7.2K LFF (3.5in) SC 1yr Wty Helium 512e Digitally Signed Firmware HDD', 'LFF', 'SATA', 'HDD', 14000, 9, 0, NULL),
+(88, 'P09153-B21', NULL, 'USD', 'HPE 14TB SAS 12G Midline 7.2K LFF (3.5in) SC 1yr Wty Helium 512e Digitally Signed Firmware HDD', 'LFF', 'SAS', 'HDD', 14000, 9, 0, NULL),
+(89, 'P04695-B21', NULL, 'USD', 'HPE 600GB SAS 12G Enterprise 15K LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware HDD', 'LFF', 'SAS', 'HDD', 600, 7, 0, NULL),
+(90, 'P04693-B21', NULL, 'USD', 'HPE 300GB SAS 12G Enterprise 15K LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware HDD', 'LFF', 'SAS', 'HDD', 300, 7, 0, NULL),
+(91, '846514-B21', NULL, 'USD', 'HPE 6TB SAS 12G Midline 7.2K LFF (3.5in) SC 1yr Wty Digitally Signed Firmware HDD', 'LFF', 'SAS', 'HDD', 6000, 9, 0, NULL),
+(92, '846524-B21', NULL, 'USD', 'HPE 1TB SAS 12G Midline 7.2K LFF (3.5in) SC 1yr Wty Digitally Signed Firmware HDD', 'LFF', 'SAS', 'HDD', 1000, 9, 0, NULL),
+(93, 'P04547-B21', NULL, 'USD', 'HPE 3.2TB SAS 12G Write Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3200, 3, 0, NULL),
+(94, 'P04545-B21', NULL, 'USD', 'HPE 1.6TB SAS 12G Write Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1600, 3, 0, NULL),
+(95, 'P09102-B21', NULL, 'USD', 'HPE 1.6TB SAS 12G Write Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1600, 3, 0, NULL),
+(96, 'P09100-B21', NULL, 'USD', 'HPE 800GB SAS 12G Write Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 800, 3, 0, NULL),
+(97, 'P04543-B21', NULL, 'USD', 'HPE 800GB SAS 12G Write Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 800, 3, 0, NULL),
+(98, 'P09098-B21', NULL, 'USD', 'HPE 400GB SAS 12G Write Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 400, 3, 0, NULL),
+(99, 'P04541-B21', NULL, 'USD', 'HPE 400GB SAS 12G Write Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 400, 3, 0, NULL),
+(100, 'P04523-B21', NULL, 'USD', 'HPE 7.68TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 7680, 3, 0, NULL),
+(101, 'P04521-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(102, 'P04519-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(103, 'P04517-B21', NULL, 'USD', 'HPE 960GB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 960, 3, 0, NULL),
+(104, 'P06592-B21', NULL, 'USD', 'HPE 15.3TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 15300, 3, 0, NULL),
+(105, 'P06590-B21', NULL, 'USD', 'HPE 7.68TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 7680, 3, 0, NULL),
+(106, 'P06588-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(107, 'P06586-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(108, 'P06584-B21', NULL, 'USD', 'HPE 960GB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 960, 3, 0, NULL),
+(109, '872394-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(110, '872392-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(111, '872390-B21', NULL, 'USD', 'HPE 960GB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 960, 3, 0, NULL),
+(112, '870148-B21', NULL, 'USD', 'HPE 15.3TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 15300, 3, 0, NULL),
+(113, '870144-B21', NULL, 'USD', 'HPE 7.68TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 7680, 3, 0, NULL),
+(114, '875330-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(115, 'P09096-B21', NULL, 'USD', 'HPE 6.4TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 6400, 3, 0, NULL),
+(116, 'P09094-B21', NULL, 'USD', 'HPE 3.2TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3200, 3, 0, NULL),
+(117, 'P09092-B21', NULL, 'USD', 'HPE 1.6TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1600, 3, 0, NULL),
+(118, 'P09090-B21', NULL, 'USD', 'HPE 800GB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 800, 3, 0, NULL),
+(119, 'P09088-B21', NULL, 'USD', 'HPE 400GB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 400, 3, 0, NULL),
+(120, 'P04539-B21', NULL, 'USD', 'HPE 6.4TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 6400, 3, 0, NULL),
+(121, 'P04537-B21', NULL, 'USD', 'HPE 3.2TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3200, 3, 0, NULL),
+(122, 'P04533-B21', NULL, 'USD', 'HPE 1.6TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1600, 3, 0, NULL),
+(123, 'P04527-B21', NULL, 'USD', 'HPE 800GB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 800, 3, 0, NULL),
+(124, 'P04525-B21', NULL, 'USD', 'HPE 400GB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 400, 3, 0, NULL),
+(125, 'P04529-B21', NULL, 'USD', 'HPE 800GB SAS 12G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SAS', 'SSD', 800, 4, 0, NULL),
+(126, '655710-B21', NULL, 'USD', 'HPE 1TB SATA 6G Midline 7.2K SFF (2.5in) SC 1yr Wty Digitally Signed Firmware HDD', 'SFF', 'SATA', 'HDD', 1000, 9, 0, NULL),
+(127, '765455-B21', NULL, 'USD', 'HPE 2TB SATA 6G Midline 7.2K SFF (2.5in) SC 1yr Wty 512e Digitally Signed Firmware HDD', 'SFF', 'SATA', 'HDD', 2000, 9, 0, NULL),
+(128, '857648-B21', NULL, 'USD', 'HPE 10TB SATA 6G Midline 7.2K LFF (3.5in) SC 1yr Wty Helium 512e Digitally Signed Firmware HDD', 'LFF', 'SATA', 'HDD', 10000, 9, 0, NULL),
+(129, 'P04482-B21', NULL, 'USD', 'HPE 7.68TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 7680, 3, 0, NULL),
+(130, 'P04480-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(131, 'P04478-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(132, 'P04476-B21', NULL, 'USD', 'HPE 960GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(133, 'P04474-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(134, 'P04570-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(135, 'P06198-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(136, 'P04566-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(137, 'P04564-B21', NULL, 'USD', 'HPE 960GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(138, 'P06196-B21', NULL, 'USD', 'HPE 960GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(139, 'P04560-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(140, 'P06194-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(141, '875503-B21', NULL, 'USD', 'HPE 240GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 240, 3, 0, NULL),
+(142, 'P04556-B21', NULL, 'USD', 'HPE 240GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 240, 3, 0, NULL),
+(143, 'P06200-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(144, '872344-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(145, 'P09722-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(146, 'P09716-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(147, 'P09712-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(148, 'P07930-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(149, 'P07926-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(150, 'P07922-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(151, 'P00896-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(152, 'P09693-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Read Intensive LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 1920, 4, 0, NULL),
+(153, 'P09689-B21', NULL, 'USD', 'HPE 960GB SATA 6G Read Intensive LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 960, 4, 0, NULL),
+(154, 'P09687-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 480, 4, 0, NULL),
+(155, 'P09724-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 1920, 4, 0, NULL),
+(156, 'P09718-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 960, 4, 0, NULL),
+(157, 'P07932-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 1920, 4, 0, NULL),
+(158, 'P07928-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 960, 4, 0, NULL),
+(159, 'P07924-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 480, 4, 0, NULL),
+(160, '875476-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 960, 4, 0, NULL),
+(161, '872346-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use LFF (3.5in) SCC 3yr Wty Digitally Signed Firmware SSD', 'LFF', 'SATA', 'SSD', 480, 4, 0, NULL),
+(162, 'P10218-B21', NULL, 'USD', 'HPE 7.68TB NVMe x4 Lanes Read Intensive SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 7680, 10, 1, NULL),
+(163, 'P10216-B21', NULL, 'USD', 'HPE 3.84TB NVMe x4 Lanes Read Intensive SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 3840, 10, 1, NULL),
+(164, 'P10214-B21', NULL, 'USD', 'HPE 1.92TB NVMe x4 Lanes Read Intensive SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 1920, 10, 1, NULL),
+(165, '877986-B21', NULL, 'USD', 'HPE 2TB NVMe x4 Lanes Read Intensive SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 2000, 10, 1, NULL),
+(166, '878014-B21', NULL, 'USD', 'HPE 375GB NVMe x4 Lanes Write Intensive SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 375, 8, 1, NULL),
+(167, 'P07198-B21', NULL, 'USD', 'HPE 15.36TB NVMe x4 Lanes Read Intensive SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 15360, 10, 1, NULL),
+(168, 'P05976-B21', NULL, 'USD', 'HPE 480GB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(169, 'P05980-B21', NULL, 'USD', 'HPE 960GB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(170, 'P05986-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(171, 'P05994-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Mixed Use SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(172, 'P05924-B21', NULL, 'USD', 'HPE 240GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 240, 3, 0, NULL),
+(173, 'P05928-B21', NULL, 'USD', 'HPE 480GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 480, 3, 0, NULL),
+(174, 'P05932-B21', NULL, 'USD', 'HPE 960GB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 960, 3, 0, NULL),
+(175, 'P05938-B21', NULL, 'USD', 'HPE 1.92TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 1920, 3, 0, NULL),
+(176, 'P05946-B21', NULL, 'USD', 'HPE 3.84TB SATA 6G Read Intensive SFF (2.5in) SC 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'SATA', 'SSD', 3840, 3, 0, NULL),
+(177, 'P10448-B21', NULL, 'USD', 'HPE 960GB SAS 12G Mixed Use SC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 960, 3, 0, NULL),
+(178, 'P10450-B21', NULL, 'USD', 'HPE 960GB SAS 12G Mixed Use LFF (3.5in) SCC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'LFF', 'SAS', 'SSD', 960, 4, 0, NULL),
+(179, 'P10454-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(180, 'P10456-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Mixed Use LFF (3.5in) SCC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'LFF', 'SAS', 'SSD', 1920, 4, 0, NULL),
+(181, 'P10460-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Mixed Use SFF (2.5in) SC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(182, 'P10440-B21', NULL, 'USD', 'HPE 960GB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 960, 3, 0, NULL),
+(183, 'P10442-B21', NULL, 'USD', 'HPE 1.92TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 1920, 3, 0, NULL),
+(184, 'P10444-B21', NULL, 'USD', 'HPE 3.84TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 3840, 3, 0, NULL),
+(185, 'P10446-B21', NULL, 'USD', 'HPE 7.68TB SAS 12G Read Intensive SFF (2.5in) SC 3yr Wty Value SAS Digitally Signed Firmware SSD', 'SFF', 'SAS', 'SSD', 7680, 3, 0, NULL),
+(186, 'P10226-B21', NULL, 'USD', 'HPE 6.4TB NVMe x4 Lanes Mixed Use SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 6400, 10, 1, NULL),
+(187, 'P10224-B21', NULL, 'USD', 'HPE 3.2TB NVMe x4 Lanes Mixed Use SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 3200, 10, 1, NULL),
+(188, 'P10222-B21', NULL, 'USD', 'HPE 1.6TB NVMe x4 Lanes Mixed Use SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 1600, 8, 1, NULL),
+(189, '877998-B21', NULL, 'USD', 'HPE 3.2TB NVMe x4 Lanes Mixed Use SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 3200, 10, 1, NULL),
+(190, '877994-B21', NULL, 'USD', 'HPE 1.6TB NVMe x4 Lanes Mixed Use SFF (2.5in) SCN 3yr Wty Digitally Signed Firmware SSD', 'SFF', 'NVMe', 'SSD', 1600, 8, 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `User_Configurations`
+--
+
+CREATE TABLE `User_Configurations` (
+  `id` int(11) NOT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `workload_type` varchar(100) DEFAULT NULL,
+  `form_factor_pref` varchar(50) DEFAULT NULL,
+  `min_cores` int(11) DEFAULT NULL,
+  `min_ram_gb` int(11) DEFAULT NULL,
+  `min_storage_gb` int(11) DEFAULT NULL,
+  `budget_range` varchar(100) DEFAULT NULL,
+  `selected_components` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`selected_components`)),
+  `total_power` int(11) DEFAULT 0,
+  `total_price` decimal(12,2) DEFAULT NULL,
+  `status` enum('Draft','Completed','Ordered') DEFAULT 'Draft',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `User_Configurations`
+--
+
+INSERT INTO `User_Configurations` (`id`, `session_id`, `user_id`, `workload_type`, `form_factor_pref`, `min_cores`, `min_ram_gb`, `min_storage_gb`, `budget_range`, `selected_components`, `total_power`, `total_price`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'HPE-3A6D77', NULL, 'Custom', NULL, 16, 64, 2000, NULL, '{\"chassis_id\":1,\"cpu\":{\"id\":3,\"qty\":1},\"ram\":{\"id\":5,\"qty\":2},\"drives\":[{\"id\":4,\"qty\":3}],\"controller\":{\"id\":5},\"sas_expander\":true,\"gpu\":{\"id\":14,\"qty\":1},\"networks\":[],\"riser2\":{\"id\":6},\"riser3\":null,\"psu\":{\"id\":4,\"qty\":2},\"fan_type\":\"Standard\",\"hbas\":[{\"id\":4,\"qty\":1}],\"optical_drives\":[]}', 552, NULL, 'Completed', '2026-08-03 08:12:16', '2026-08-03 08:12:16'),
+(2, 'HPE-E59472', NULL, 'Custom', NULL, 16, 64, 2000, NULL, '{\"chassis_id\":1,\"cpu\":{\"id\":3,\"qty\":1},\"ram\":{\"id\":5,\"qty\":2},\"drives\":[{\"id\":4,\"qty\":3}],\"controller\":{\"id\":5},\"sas_expander\":true,\"gpu\":{\"id\":14,\"qty\":1},\"networks\":[],\"riser2\":{\"id\":6},\"riser3\":null,\"psu\":{\"id\":4,\"qty\":2},\"fan_type\":\"Standard\",\"hbas\":[{\"id\":4,\"qty\":1}],\"optical_drives\":[]}', 552, NULL, 'Completed', '2026-08-03 08:13:25', '2026-08-03 08:13:25'),
+(3, 'HPE-4DB3CD', NULL, 'Custom', NULL, NULL, NULL, NULL, NULL, '{\"chassis_id\":1,\"cpu\":{\"id\":3,\"qty\":1},\"ram\":{\"id\":2,\"qty\":1},\"drives\":[{\"id\":5,\"qty\":2}],\"controller\":null,\"sas_expander\":true,\"gpu\":null,\"networks\":[],\"riser2\":null,\"riser3\":null,\"psu\":{\"id\":2,\"qty\":2},\"fan_type\":\"Standard\",\"hbas\":[],\"optical_drives\":[]}', 283, NULL, 'Completed', '2026-09-02 11:19:45', '2026-09-02 11:19:45'),
+(4, 'HPE-73D89D', NULL, 'Custom', NULL, 0, 0, 0, NULL, '{\"chassis_id\":2,\"cpu\":{\"id\":39,\"qty\":1},\"ram\":{\"id\":11,\"qty\":1},\"drives\":[],\"controller\":null,\"sas_expander\":false,\"gpu\":{\"id\":7,\"qty\":1},\"networks\":[],\"riser2\":{\"id\":18},\"riser3\":null,\"psu\":{\"id\":9,\"qty\":2},\"fan_type\":\"Standard\",\"hbas\":[],\"optical_drives\":[]}', 424, NULL, 'Completed', '2026-09-02 12:34:45', '2026-09-02 12:34:45'),
+(5, 'HPE-FE0CA9', NULL, 'Custom', NULL, 0, 0, 0, NULL, '{\"chassis_id\":2,\"cpu\":{\"id\":39,\"qty\":1},\"ram\":{\"id\":11,\"qty\":1},\"drives\":[],\"controller\":null,\"sas_expander\":false,\"gpu\":{\"id\":7,\"qty\":1},\"networks\":[],\"riser2\":{\"id\":18},\"riser3\":null,\"psu\":{\"id\":9,\"qty\":2},\"fan_type\":\"Standard\",\"hbas\":[],\"optical_drives\":[]}', 424, NULL, 'Completed', '2026-09-02 12:35:57', '2026-09-02 12:35:57'),
+(6, 'HPE-DF813B', NULL, 'Custom', NULL, 0, 0, 0, NULL, '{\"chassis_id\":2,\"cpu\":{\"id\":39,\"qty\":1},\"ram\":{\"id\":11,\"qty\":1},\"drives\":[],\"controller\":null,\"sas_expander\":false,\"gpu\":{\"id\":7,\"qty\":1},\"networks\":[],\"riser2\":{\"id\":18},\"riser3\":null,\"psu\":{\"id\":9,\"qty\":2},\"fan_type\":\"Standard\",\"hbas\":[],\"optical_drives\":[]}', 424, NULL, 'Completed', '2026-09-02 12:36:07', '2026-09-02 12:36:07'),
+(7, 'HPE-FAAE33', NULL, 'Custom', NULL, 0, 0, 0, NULL, '{\"chassis_id\":2,\"cpu\":{\"id\":39,\"qty\":1},\"ram\":{\"id\":11,\"qty\":1},\"drives\":[],\"controller\":null,\"sas_expander\":false,\"gpu\":{\"id\":7,\"qty\":1},\"networks\":[],\"riser2\":{\"id\":18},\"riser3\":null,\"psu\":{\"id\":9,\"qty\":2},\"fan_type\":\"Standard\",\"hbas\":[],\"optical_drives\":[]}', 424, NULL, 'Completed', '2026-09-02 12:36:20', '2026-09-02 12:36:20');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `Chassis`
+--
+ALTER TABLE `Chassis`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `CPUs`
+--
+ALTER TABLE `CPUs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`),
+  ADD KEY `idx_socket_type` (`socket_type`);
+
+--
+-- Indexes for table `GPUs`
+--
+ALTER TABLE `GPUs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `HBAs`
+--
+ALTER TABLE `HBAs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `Network_Adapters`
+--
+ALTER TABLE `Network_Adapters`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `Optical_Drives`
+--
+ALTER TABLE `Optical_Drives`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `Power_Supplies`
+--
+ALTER TABLE `Power_Supplies`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `RAMs`
+--
+ALTER TABLE `RAMs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`),
+  ADD KEY `idx_memory_generation` (`memory_generation`);
+
+--
+-- Indexes for table `Risers`
+--
+ALTER TABLE `Risers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_model_name` (`model_name`);
+
+--
+-- Indexes for table `Storage_Controllers`
+--
+ALTER TABLE `Storage_Controllers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `Storage_Drives`
+--
+ALTER TABLE `Storage_Drives`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_part_number` (`part_number`);
+
+--
+-- Indexes for table `User_Configurations`
+--
+ALTER TABLE `User_Configurations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `Chassis`
+--
+ALTER TABLE `Chassis`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `CPUs`
+--
+ALTER TABLE `CPUs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+
+--
+-- AUTO_INCREMENT for table `GPUs`
+--
+ALTER TABLE `GPUs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `HBAs`
+--
+ALTER TABLE `HBAs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `Network_Adapters`
+--
+ALTER TABLE `Network_Adapters`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+
+--
+-- AUTO_INCREMENT for table `Optical_Drives`
+--
+ALTER TABLE `Optical_Drives`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `Power_Supplies`
+--
+ALTER TABLE `Power_Supplies`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT for table `RAMs`
+--
+ALTER TABLE `RAMs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT for table `Risers`
+--
+ALTER TABLE `Risers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `Storage_Controllers`
+--
+ALTER TABLE `Storage_Controllers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `Storage_Drives`
+--
+ALTER TABLE `Storage_Drives`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=191;
+
+--
+-- AUTO_INCREMENT for table `User_Configurations`
+--
+ALTER TABLE `User_Configurations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
