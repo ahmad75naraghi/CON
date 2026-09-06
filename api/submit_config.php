@@ -132,7 +132,7 @@ try {
         'drives'         => ['table' => 'Storage_Drives',      'idField' => 'driveId',   'label' => 'درایو'],
         'networks'       => ['table' => 'Network_Adapters',    'idField' => 'networkId', 'label' => 'کارت شبکه'],
         'hbas'           => ['table' => 'HBAs',                'idField' => 'hbaId',     'label' => 'HBA'],
-        'opticalDrives'  => ['table' => 'Optical_Drives',      'idField' => 'id',        'label' => 'دی‌وی‌دی درایو'],
+        'opticalDrives'  => ['table' => 'Optical_Drives',      'idField' => 'opticalId', 'label' => 'دی‌وی‌دی درایو'],
     ];
     $fetchedArrays = [];
     if ($chassis) {

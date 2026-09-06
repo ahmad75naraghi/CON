@@ -866,11 +866,21 @@ const wizard = {
         wizard.launchConfigurator();
     },
 
-    launchConfigurator: () => {
+    launchConfigurator: async () => {
         state.activeMode = 'pro';
         wizard.showView('view-pro-configurator');
-        proWizard.init();
-        api.fetchData();
+
+        if (state.currentConfig?.chassis) {
+            if (!state.db?.chassis) {
+                await api.fetchData();
+            } else {
+                configurator.initDropdowns();
+            }
+            await sessionManager.hydrateProConfig({ stateDump: { proStep: 1 } });
+        } else {
+            proWizard.init();
+            await api.fetchData();
+        }
     },
 
     initGuidance: () => {
@@ -1183,9 +1193,8 @@ const configurator = {
         if (ctrlSelect && state.db.controllers) {
             ctrlSelect.innerHTML = '<option value="">استفاده از کنترلر پیش‌فرض مادربرد</option>';
             state.db.controllers.forEach(c => {
-                if (c.form_factor === 'Standup PCIe') {
-                    ctrlSelect.innerHTML += `<option value="${c.id}">${c.model_name}</option>`;
-                }
+                const formFactor = c.form_factor ? ` — ${c.form_factor}` : '';
+                ctrlSelect.innerHTML += `<option value="${c.id}">${c.model_name}${formFactor}</option>`;
             });
         }
         populate('gpu-select', state.db.gpus);
@@ -1915,6 +1924,8 @@ const smartAssistant = {
             wizard.renderOfferDetails(offer);
         }
 
+        smartAssistant.lastContext = smartAssistant.getCurrentContext();
+
         const summary = document.getElementById('ai-context-summary');
         if (summary) summary.innerText = `سرور ${offer.recommendation_label} انتخاب شد و فیلدهای کانفیگ پر شدند.`;
         smartAssistant.addChatMessage('assistant', `سرور «${offer.recommendation_label}» انتخاب شد و قطعات آن داخل کانفیگ فعلی قرار گرفت. اگر خواستید می‌تونیم همین کانفیگ رو با هم بررسی یا اصلاح کنیم.`);
@@ -1995,5 +2006,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = false;
             }
         });
+    });
+
+    const aiModal = document.getElementById('ai-assistant-modal');
+    if (aiModal) {
+        aiModal.addEventListener('click', event => {
+            if (event.target === aiModal) smartAssistant.close();
+        });
+    }
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            smartAssistant.close();
+            document.getElementById('success-modal')?.classList.add('hidden');
+            document.getElementById('modal-final-success')?.classList.add('hidden');
+        }
     });
 });

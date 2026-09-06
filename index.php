@@ -298,6 +298,7 @@
                                     <input type="checkbox" id="sas-expander-checkbox" class="ml-2 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="configurator.handlePCIeChange()" disabled>
                                     <label for="sas-expander-checkbox" class="text-sm text-gray-700">افزودن کارت SAS Expander (اشغال ۱ اسلات PCIe x8)</label>
                                 </div>
+                                <div id="hw-raid-warning" class="hidden mt-3 text-sm bg-red-50 border border-red-200 text-red-700 rounded p-3 font-bold">⚠️ برای RAID پیشرفته، انتخاب کنترلر سخت‌افزاری یا SAS Expander ضروری است.</div>
                                 <div id="validator-raid-controller" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
                         </details>
