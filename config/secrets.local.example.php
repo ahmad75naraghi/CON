@@ -13,7 +13,7 @@ return [
     ],
 
     'ai' => [
-        'endpoint' => 'http://YOUR_AI_HOST:PORT/v1/chat/completions',
+        'endpoint' => 'YOUR_AI_ENDPOINT',
         'api_key' => 'CHANGE_AI_API_KEY',
         'model' => 'Antigravity-Gemini',
         'timeout' => 25,

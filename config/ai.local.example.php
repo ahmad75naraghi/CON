@@ -4,7 +4,7 @@
 // The real ai.local.php file is ignored by Git.
 
 return [
-    'endpoint' => 'http://YOUR_AI_HOST:PORT/v1/chat/completions',
+    'endpoint' => 'YOUR_AI_ENDPOINT',
     'api_key' => 'CHANGE_ME',
     'model' => 'Antigravity-Gemini',
     'timeout' => 25,
