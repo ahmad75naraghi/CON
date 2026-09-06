@@ -374,7 +374,8 @@ mysql -u <db_user> -p falnicc1_server_configurator < falnicc1_server_configurato
 اتصال دیتابیس فقط از `config/database.php` و تابع `databaseConnection()` ساخته می‌شود. برای محیط واقعی، یکی از این دو روش را استفاده کنید:
 
 1. تعریف متغیرهای محیطی `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`, `DB_CHARSET`
-2. کپی کردن `config/database.local.example.php` به `config/database.local.php` و تنظیم مقادیر محلی. فایل local در Git ذخیره نمی‌شود.
+2. کپی کردن `config/secrets.local.example.php` به `config/secrets.local.php` و تنظیم همه رمزها در یک فایل local
+3. یا کپی کردن `config/database.local.example.php` به `config/database.local.php` برای تنظیم جداگانه دیتابیس. فایل‌های local در Git ذخیره نمی‌شوند.
 
 
 ### 4. تنظیم سرویس AI
@@ -382,7 +383,8 @@ mysql -u <db_user> -p falnicc1_server_configurator < falnicc1_server_configurato
 چت هوشمند از طریق `api/ai_chat.php` به یک سرویس OpenAI-compatible وصل می‌شود. کلید واقعی نباید داخل Repository ذخیره شود. روی سرور یکی از این دو روش را استفاده کنید:
 
 1. تعریف متغیرهای محیطی `AI_API_URL`, `AI_API_KEY`, `AI_MODEL`, `AI_TIMEOUT`, `AI_MAX_TOKENS`, `AI_TEMPERATURE`
-2. کپی کردن `config/ai.local.example.php` به `config/ai.local.php` و تنظیم endpoint/model/key واقعی. فایل local در Git ذخیره نمی‌شود.
+2. کپی کردن `config/secrets.local.example.php` به `config/secrets.local.php` و تنظیم همه رمزها در یک فایل local
+3. یا کپی کردن `config/ai.local.example.php` به `config/ai.local.php` برای تنظیم جداگانه AI. فایل‌های local در Git ذخیره نمی‌شوند.
 
 Endpoint فقط خلاصه‌ی whitelist شده از مرحله فعلی، هدف کاربر، قطعات منتخب، پیام‌های اخیر و چند سیگنال محدود از دیتابیس را برای AI ارسال می‌کند؛ کل دیتابیس یا Secretها ارسال نمی‌شوند.
 

@@ -4,6 +4,18 @@
 
 declare(strict_types=1);
 
+$sharedSecretsFile = __DIR__ . '/secrets.local.php';
+if (file_exists($sharedSecretsFile)) {
+    /**
+     * Optional shared secrets file for all local credentials.
+     * Shape: ['database' => [...], 'ai' => [...]]
+     */
+    $sharedSecrets = require $sharedSecretsFile;
+    if (is_array($sharedSecrets) && isset($sharedSecrets['database']) && is_array($sharedSecrets['database'])) {
+        $GLOBALS['LOCAL_DATABASE_CONFIG'] = array_merge($GLOBALS['LOCAL_DATABASE_CONFIG'] ?? [], $sharedSecrets['database']);
+    }
+}
+
 if (file_exists(__DIR__ . '/database.local.php')) {
     /**
      * Optional local override file. This file is intentionally ignored by Git.

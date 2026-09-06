@@ -4,6 +4,18 @@
 
 declare(strict_types=1);
 
+$sharedSecretsFile = __DIR__ . '/secrets.local.php';
+if (file_exists($sharedSecretsFile)) {
+    /**
+     * Optional shared secrets file for all local credentials.
+     * Shape: ['database' => [...], 'ai' => [...]]
+     */
+    $sharedSecrets = require $sharedSecretsFile;
+    if (is_array($sharedSecrets) && isset($sharedSecrets['ai']) && is_array($sharedSecrets['ai'])) {
+        $GLOBALS['LOCAL_AI_CONFIG'] = array_merge($GLOBALS['LOCAL_AI_CONFIG'] ?? [], $sharedSecrets['ai']);
+    }
+}
+
 if (file_exists(__DIR__ . '/ai.local.php')) {
     /**
      * Optional local override file. This file is intentionally ignored by Git.

@@ -246,11 +246,11 @@ http://localhost:8000
 ## تنظیمات دیتابیس
 
 - اتصال دیتابیس فقط از `config/database.php` و تابع `databaseConnection()` ساخته شود.
-- Secret واقعی را در کد Commit نکنید؛ از Environment Variable یا `config/database.local.php` استفاده کنید.
+- Secret واقعی را در کد Commit نکنید؛ از Environment Variable، `config/secrets.local.php` یا `config/database.local.php` استفاده کنید.
 
 
 ## تنظیمات AI
 
-- کلید واقعی AI را هرگز Commit نکنید؛ از Environment Variable یا `config/ai.local.php` استفاده کنید.
+- کلید واقعی AI را هرگز Commit نکنید؛ از Environment Variable، `config/secrets.local.php` یا `config/ai.local.php` استفاده کنید.
 - `api/ai_chat.php` نباید کل دیتابیس یا کل state فرانت‌اند را ارسال کند؛ فقط Context خلاصه و whitelist شده مجاز است.
 - در صورت تغییر قرارداد AI، UI چت، مستندات و نمونه local config را هم به‌روزرسانی کنید.

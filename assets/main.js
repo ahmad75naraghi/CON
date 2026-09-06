@@ -1094,7 +1094,7 @@ const wizard = {
                             <div class="bg-gray-50 rounded-lg p-2"><span class="text-gray-400 block">Storage</span><b>${(offer.usable_storage_gb / 1000).toFixed(1)} TB</b></div>
                             <div class="bg-gray-50 rounded-lg p-2"><span class="text-gray-400 block">نسل</span><b>Gen${offer.generation_rank}</b></div>
                         </div>
-                        <ul class="space-y-3 mb-6">${bullets}</ul>
+                        <ul>${bullets}</ul>
                     </div>
                     <button onclick="wizard.selectOffer('${offer.recommendation_tier}')" class="w-full py-3 ${theme.button} font-bold rounded-lg transition">جزییات سرور</button>
                 </div>`;
@@ -1102,9 +1102,12 @@ const wizard = {
     },
 
     mergeOfferDb: (offerDb) => {
+        const dbKeys = ['chassis', 'cpus', 'rams', 'drives', 'controllers', 'gpus', 'networks', 'risers', 'hbas', 'optical_drives', 'psus'];
         state.db = state.db || {};
+        dbKeys.forEach(key => { if (!Array.isArray(state.db[key])) state.db[key] = []; });
         Object.entries(offerDb || {}).forEach(([key, rows]) => {
-            state.db[key] = state.db[key] || [];
+            if (!Array.isArray(rows)) return;
+            if (!Array.isArray(state.db[key])) state.db[key] = [];
             rows.forEach(row => {
                 if (!row || !row.id) return;
                 const idx = state.db[key].findIndex(existing => existing.id == row.id);
@@ -1970,30 +1973,51 @@ const smartAssistant = {
     },
 
     applyOffer: async (tier) => {
-        const offer = state.readyOffers.find(item => item.recommendation_tier === tier) || state.readyOffers.find(item => item.id == tier);
-        if (!offer?.config) {
-            alert('کانفیگ آماده انتخابی پیدا نشد.');
-            return;
+        try {
+            const offer = state.readyOffers.find(item => item.recommendation_tier === tier) || state.readyOffers.find(item => item.id == tier);
+            if (!offer?.config) {
+                smartAssistant.addChatMessage('assistant', 'کانفیگ آماده انتخابی پیدا نشد. لطفاً دوباره پیشنهادها را دریافت کنید.');
+                return;
+            }
+
+            state.selectedOffer = offer;
+            state.currentConfig = offer.config;
+            state.target = offer.target || state.target;
+            wizard.mergeOfferDb(offer.db || {});
+
+            const offersPanel = document.getElementById('ai-offers-panel');
+            const chatPanel = document.getElementById('ai-chat-panel');
+            const startBtn = document.getElementById('ai-start-chat-btn');
+            if (offersPanel) offersPanel.classList.add('hidden');
+            if (chatPanel) chatPanel.classList.remove('hidden');
+            if (startBtn) startBtn.classList.add('hidden');
+            smartAssistant.chatStarted = true;
+
+            if (state.currentView === 'view-pro-configurator') {
+                configurator.initDropdowns();
+                await sessionManager.hydrateProConfig({ stateDump: { proStep: proWizard.currentStep || 1 } });
+            } else {
+                wizard.renderOfferDetails(offer);
+                wizard.showView('view-server-details');
+            }
+
+            sessionManager.save('draft');
+            smartAssistant.lastContext = smartAssistant.getCurrentContext();
+
+            const summary = document.getElementById('ai-context-summary');
+            if (summary) summary.innerText = `سرور ${offer.recommendation_label} انتخاب شد و فیلدهای کانفیگ پر شدند.`;
+            smartAssistant.addChatMessage('assistant', `سرور «${offer.recommendation_label}» انتخاب شد. قطعات داخل کانفیگ قرار گرفت و جزئیات باز شد.`, {
+                question: 'می‌خواهید همین کانفیگ را بررسی کنیم یا بخشی را تغییر دهیم؟',
+                quickReplies: [
+                    { label: 'بررسی همین کانفیگ', message: 'همین کانفیگ را کوتاه بررسی کن' },
+                    { label: 'اقتصادی‌ترش کن', message: 'چطور این کانفیگ را اقتصادی‌تر کنم؟' },
+                    { label: 'برای رشد آینده', message: 'برای رشد آینده کدام بخش را ارتقا بدهم؟' }
+                ]
+            });
+        } catch (error) {
+            console.error('Smart assistant apply offer error:', error);
+            smartAssistant.addChatMessage('assistant', 'در انتخاب این سرور خطایی رخ داد. لطفاً یک بار صفحه را رفرش کنید یا پیشنهادها را دوباره دریافت کنید.');
         }
-
-        state.selectedOffer = offer;
-        state.currentConfig = offer.config;
-        state.target = offer.target || state.target;
-        wizard.mergeOfferDb(offer.db);
-        sessionManager.save('draft');
-
-        if (state.currentView === 'view-pro-configurator') {
-            configurator.initDropdowns();
-            await sessionManager.hydrateProConfig({ stateDump: { proStep: proWizard.currentStep || 1 } });
-        } else if (state.currentView === 'view-server-details') {
-            wizard.renderOfferDetails(offer);
-        }
-
-        smartAssistant.lastContext = smartAssistant.getCurrentContext();
-
-        const summary = document.getElementById('ai-context-summary');
-        if (summary) summary.innerText = `سرور ${offer.recommendation_label} انتخاب شد و فیلدهای کانفیگ پر شدند.`;
-        smartAssistant.addChatMessage('assistant', `سرور «${offer.recommendation_label}» انتخاب شد و قطعات آن داخل کانفیگ فعلی قرار گرفت. اگر خواستید می‌تونیم همین کانفیگ رو با هم بررسی یا اصلاح کنیم.`);
     },
 
     startChat: async () => {

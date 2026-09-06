@@ -58,16 +58,23 @@ function sanitizeAssocRecursive($value, int $depth = 0)
 function cleanCustomerReply(string $text): string
 {
     $text = sanitizeText($text, 900);
+    $text = preg_replace('/\*\*(.*?)\*\*/u', '$1', $text) ?? $text;
+    $text = preg_replace('/(^|\s)#{1,6}\s*/u', '$1', $text) ?? $text;
+    $text = preg_replace('/\|[^\n]*\|/u', '', $text) ?? $text; // remove markdown tables if provider ignores JSON contract
     $lines = preg_split('/\R/u', $text) ?: [];
     $clean = [];
     foreach ($lines as $line) {
         $line = trim($line);
         if ($line === '') continue;
         if (strpos($line, '|') === 0 || preg_match('/^[-:| ]{5,}$/u', $line)) continue;
-        $line = preg_replace('/^#{1,6}\s*/u', '', $line) ?? $line;
-        $line = preg_replace('/\*\*(.*?)\*\*/u', '$1', $line) ?? $line;
-        $clean[] = $line;
-        if (count($clean) >= 5) break;
+        $lineLength = function_exists('mb_strlen') ? mb_strlen($line, 'UTF-8') : strlen($line);
+        $chunks = $lineLength > 220 ? (preg_split('/(?<=[.!؟])\s+/u', $line) ?: [$line]) : [$line];
+        foreach ($chunks as $chunk) {
+            $chunk = trim($chunk);
+            if ($chunk === '' || preg_match('/^[-:| ]{5,}$/u', $chunk)) continue;
+            $clean[] = $chunk;
+            if (count($clean) >= 4) break 2;
+        }
     }
     return implode("\n", $clean);
 }
@@ -318,7 +325,7 @@ function normalizeAiPayload(string $raw): array
     ];
 }
 
-function enrichWithSafeActions(array $payload, array $compactContext): array
+function enrichWithSafeActions(array $payload, array $compactContext, string $focusText = ''): array
 {
     $config = $compactContext['selected_config'] ?? [];
     $target = $compactContext['target'] ?? [];
@@ -327,7 +334,7 @@ function enrichWithSafeActions(array $payload, array $compactContext): array
     $currentTotalRam = $ram ? ((int)($ram['capacity_gb'] ?? 0) * max(1, $ramQty)) : 0;
     $targetRam = max((int)($target['ram_gb'] ?? 0), $currentTotalRam);
 
-    $replyText = ($payload['reply'] ?? '') . ' ' . ($payload['question'] ?? '');
+    $replyText = $focusText . ' ' . ($payload['reply'] ?? '') . ' ' . ($payload['question'] ?? '');
     $isRamFocused = stripos($replyText, 'RAM') !== false || strpos($replyText, 'رم') !== false;
     if ($isRamFocused && $ram && $currentTotalRam > 0) {
         $capacity = max(1, (int)($ram['capacity_gb'] ?? 1));
@@ -450,7 +457,7 @@ try {
     );
 
     $rawReply = callAiProvider($messages);
-    $payload = enrichWithSafeActions(normalizeAiPayload($rawReply), $compactContext);
+    $payload = enrichWithSafeActions(normalizeAiPayload($rawReply), $compactContext, $userQuestion);
 
     echo json_encode([
         'status' => 'success',
