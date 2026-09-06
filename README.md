@@ -1,8 +1,8 @@
 # کانفیگوراتور حرفه‌ای سرور HPE فالنیک
 
-یک وب‌اپلیکیشن راست‌به‌چپ برای نیازسنجی، انتخاب قطعات، اعتبارسنجی سازگاری سخت‌افزاری و ثبت درخواست پیش‌فاکتور سرورهای HPE ProLiant.
+وب‌اپلیکیشن فارسی و راست‌به‌چپ برای نیازسنجی، پیشنهاد سرور آماده، انتخاب قطعات HPE ProLiant، اعتبارسنجی سازگاری سخت‌افزاری و ثبت درخواست پیش‌فاکتور.
 
-> وضعیت فعلی پروژه: نمونه‌ی اجرایی PHP + JavaScript با دیتابیس MySQL/MariaDB و داده‌های اولیه‌ی قطعات HPE.
+> وضعیت فعلی: پروژه با PHP، Vanilla JavaScript، CSS لوکال و MySQL/MariaDB اجرا می‌شود. Tailwind CDN و وابستگی‌های runtime خارجی UI حذف شده‌اند. اتصال دیتابیس و AI از فایل‌های تنظیمات امن یا متغیرهای محیطی خوانده می‌شود.
 
 ---
 
@@ -15,73 +15,85 @@
 - [ساختار فایل‌ها](#ساختار-فایلها)
 - [مدل داده و دیتابیس](#مدل-داده-و-دیتابیس)
 - [APIها](#apiها)
+- [دستیار هوشمند AI](#دستیار-هوشمند-ai)
 - [منطق اعتبارسنجی](#منطق-اعتبارسنجی)
-- [راه‌اندازی محلی](#راهاندازی-محلی)
+- [راه‌اندازی و استقرار](#راهاندازی-و-استقرار)
+- [فونت و فایل‌های لوکال](#فونت-و-فایلهای-لوکال)
 - [نکات امنیتی و عملیاتی](#نکات-امنیتی-و-عملیاتی)
-- [محدودیت‌های فعلی](#محدودیتهای-فعلی)
-- [مسیر توسعه پیشنهادی](#مسیر-توسعه-پیشنهادی)
+- [چک‌لیست تست قبل از انتشار](#چکلیست-تست-قبل-از-انتشار)
+- [محدودیت‌ها و مسیر توسعه](#محدودیتها-و-مسیر-توسعه)
 
 ---
 
 ## معرفی محصول
 
-این پروژه برای ساخت کانفیگ سخت‌افزاری سرورهای HPE طراحی شده است. کاربر می‌تواند از دو مسیر وارد شود:
+کاربر می‌تواند با دو مسیر اصلی کانفیگ سرور را بسازد:
 
-1. **مسیر راهنمایی**: پاسخ به چند سؤال ساده درباره سرویس‌ها، تعداد کاربران، سطح عملکرد، توسعه آینده، وضعیت Storage و زیرساخت شبکه.
-2. **مسیر حرفه‌ای**: انتخاب دستی شاسی، CPU، RAM، دیسک، RAID Controller، HBA، GPU، کارت شبکه، رایزر، درایو نوری و PSU.
+1. **مسیر راهنمایی**: کاربر به سؤال‌های ساده درباره سرویس‌ها، تعداد کاربران، سطح عملکرد، توسعه آینده، Storage و زیرساخت پاسخ می‌دهد. سیستم دقیقاً سه پیشنهاد آماده اقتصادی، مدیریت‌شده و پیشرفته را از دیتابیس انتخاب می‌کند.
+2. **مسیر حرفه‌ای**: کاربر قطعات را مرحله‌به‌مرحله انتخاب می‌کند: شاسی، CPU، RAM، Storage، RAID Controller، HBA، GPU، Network Adapter، Riser، Optical Drive و PSU.
 
-در انتهای مسیر حرفه‌ای، سیستم سازگاری قطعات را بررسی می‌کند، خلاصه‌ی کانفیگ را نمایش می‌دهد و درخواست پیش‌فاکتور را در دیتابیس ثبت می‌کند.
+در پایان، سیستم سازگاری قطعات را بررسی می‌کند، خلاصه کانفیگ را نشان می‌دهد و درخواست پیش‌فاکتور را با کد رهگیری ثبت می‌کند.
 
 ---
 
 ## قابلیت‌های اصلی
 
-- رابط کاربری فارسی و RTL.
-- مسیر دوگانه برای کاربران مبتدی و حرفه‌ای.
-- انتخاب مرحله‌ای قطعات سرور.
-- دریافت قطعات سازگار بر اساس شاسی انتخاب‌شده.
-- محاسبه‌ی زنده‌ی منابع و توان مصرفی:
-  - مجموع Coreها
+- رابط کاربری فارسی، RTL و بدون وابستگی runtime به CDN.
+- دو مسیر کاربری: راهنمایی و حرفه‌ای.
+- پیشنهاد دقیقاً سه سرور آماده از جدول `Prepared_Server_Offers`.
+- نمایش وضعیت موجودی، تعداد موجود و زمان تأمین برای پیشنهادهای آماده.
+- انتخاب سرور آماده و تبدیل آن به ساختار واقعی `currentConfig` قابل ویرایش.
+- دریافت مرحله‌ای قطعات سازگار بر اساس شاسی.
+- محاسبه زنده:
+  - مجموع Core
   - مجموع RAM
-  - ظرفیت Storage قابل استفاده با توجه به RAID
-  - نوع فن مورد نیاز
-  - توان تقریبی سیستم
+  - ظرفیت قابل استفاده Storage با توجه به RAID
+  - مصرف تقریبی برق
+  - نیاز به فن High Performance
   - وضعیت PSU
-- اعتبارسنجی سازگاری سخت‌افزاری در فرانت‌اند و بک‌اند.
-- ذخیره‌ی کانفیگ‌های ناتمام در `localStorage` مرورگر.
-- ثبت کانفیگ نهایی در جدول `User_Configurations`.
-- تولید کد رهگیری با قالب `HPE-XXXXXX`.
-- نمایش پیش‌فاکتور قابل چاپ / PDF از طریق `window.print()`.
-- دستیار هوشمند داخل Modal برای نمایش سه پیشنهاد آماده قبل از چت و ارسال Context کانفیگ فعلی به Endpoint چت لوکال.
+  - وضعیت Backplane / Drive Bay
+  - وضعیت PCIe / Riser
+- اعتبارسنجی دو لایه در فرانت‌اند و بک‌اند.
+- ذخیره Draft و کانفیگ‌های تکمیل‌شده در `localStorage` مرورگر.
+- ثبت نهایی در جدول `User_Configurations` با کد رهگیری `HPE-XXXXXX`.
+- پیش‌فاکتور قابل چاپ با `window.print()`.
+- دستیار هوشمند AI داخل Modal با Context محدود، history چت، quick replies و actionهای قابل اعمال روی کانفیگ.
+- فایل یکپارچه local برای رمزها و کلیدها: `config/secrets.local.php`.
 
 ---
 
 ## جریان‌های کاربری
 
-### 1. مسیر راهنمایی
+### مسیر راهنمایی
 
 ```text
 صفحه شروع
   ↓
 پرسش‌های نیازسنجی
   ↓
-پیشنهاد سه سطحی: اقتصادی / مدیریت‌شده / پیشرفته
+محاسبه Target فنی
+  ↓
+دریافت دقیقاً سه پیشنهاد آماده از API
+  ↓
+نمایش اقتصادی / مدیریت‌شده / پیشرفته
   ↓
 مشاهده جزئیات سرور پیشنهادی
   ↓
-امکان ورود به مسیر انتخاب دستی قطعات
+امکان ویرایش همان کانفیگ در مسیر حرفه‌ای
+  ↓
+ثبت درخواست پیش‌فاکتور
 ```
 
-> نکته: در وضعیت فعلی، پیشنهادهای مسیر راهنمایی بیشتر حالت نمونه/دمو دارند و هنوز به موتور پیشنهاددهی داده‌محور کامل متصل نشده‌اند.
-
-### 2. مسیر حرفه‌ای
+### مسیر حرفه‌ای
 
 ```text
 صفحه شروع
   ↓
-اهداف اولیه: حداقل Core، RAM، Storage، نیاز به GPU
+اهداف اولیه اختیاری: Core / RAM / Storage / GPU
   ↓
 انتخاب شاسی
+  ↓
+Load قطعات سازگار با شاسی
   ↓
 انتخاب CPU و RAM
   ↓
@@ -89,52 +101,63 @@
   ↓
 انتخاب HBA و GPU
   ↓
-انتخاب Network Adapter و PCIe Riser
+انتخاب Network Adapter و Riser
   ↓
 انتخاب Optical Drive و PSU
   ↓
-بررسی نهایی
+بررسی نهایی و چاپ خلاصه
   ↓
 ثبت درخواست پیش‌فاکتور
 ```
+
+### دستیار هوشمند در هر مرحله
+
+دکمه «راهنمایی هوشمند» در صفحات اصلی کانفیگ در دسترس است. هنگام کلیک، مرحله فعلی، انتخاب‌های کاربر، هشدارهای Validator و سیگنال‌های محدود دیتابیس به AI ارسال می‌شود تا پاسخ مرحله‌محور بدهد.
 
 ---
 
 ## معماری فنی
 
-پروژه یک ساختار ساده و مستقیم دارد:
-
 ```text
 Browser
   │
-  │  HTML + Tailwind CDN + Vanilla JavaScript
+  │ HTML + CSS Local + Vanilla JavaScript
   ▼
 index.php
   │
+  ├── assets/style.css
+  ├── assets/js/security.js
   ├── assets/main.js
-  │     ├── مدیریت state
-  │     ├── مدیریت wizardها
-  │     ├── دریافت داده از API
-  │     ├── رندر فرم‌ها و summary
-  │     └── اعتبارسنجی سمت کلاینت
+  │     ├── state
+  │     ├── sessionManager
+  │     ├── api client
+  │     ├── validator
+  │     ├── wizard / proWizard
+  │     ├── configurator
+  │     ├── smartAssistant
+  │     └── invoice renderer
   │
-  └── api/*.php
-        ├── get_data.php
-        └── submit_config.php
-              │
-              ▼
-        MySQL / MariaDB
+  ├── api/get_data.php
+  ├── api/recommend_servers.php
+  ├── api/submit_config.php
+  └── api/ai_chat.php
+        │
+        ├── config/database.php
+        ├── config/ai.php
+        └── MySQL/MariaDB + AI Provider
 ```
 
 ### تکنولوژی‌ها
 
 | لایه | تکنولوژی |
 |---|---|
-| UI | HTML و CSS لوکال در `assets/style.css` |
+| UI | HTML + CSS لوکال در `assets/style.css` |
 | Client Logic | Vanilla JavaScript |
-| Backend | PHP با PDO |
+| Security Helpers | `assets/js/security.js` |
+| Backend | PHP با PDO و cURL |
 | Database | MySQL / MariaDB |
-| State سمت کاربر | `localStorage` |
+| AI | سرویس OpenAI-compatible از طریق `api/ai_chat.php` |
+| State مرورگر | `localStorage` و `sessionStorage` |
 
 ---
 
@@ -142,61 +165,94 @@ index.php
 
 ```text
 .
-├── README.md                         # مستند اصلی پروژه
-├── AGENTS.md                         # راهنمای اجرایی برای توسعه‌دهندگان/Agentها
-├── DECISIONS.md                      # دفترچه تصمیمات معماری ADR
-├── index.php                         # صفحه اصلی و markup تمام viewها
+├── README.md
+├── AGENTS.md
+├── DECISIONS.md
+├── .gitignore
+├── index.php
 ├── api/
-│   ├── get_data.php                  # API دریافت شاسی‌ها و قطعات سازگار
-│   ├── recommend_servers.php         # API پیشنهاد سه سرور آماده بر اساس پاسخ‌های مسیر راهنمایی
-│   ├── ai_chat.php                   # Gateway چت AI با Context محدود و امن
-│   └── submit_config.php             # API اعتبارسنجی و ثبت کانفیگ نهایی
+│   ├── get_data.php
+│   ├── recommend_servers.php
+│   ├── submit_config.php
+│   └── ai_chat.php
 ├── assets/
-│   ├── main.js                       # منطق اصلی اپلیکیشن در سمت کلاینت
-│   └── style.css                     # فایل CSS فعلاً خالی/رزرو شده
-└── falnicc1_server_configurator.sql  # اسکیمای دیتابیس و داده‌های اولیه
+│   ├── main.js
+│   ├── style.css
+│   ├── js/
+│   │   └── security.js
+│   ├── falnic-logo.svg
+│   └── hpe-logo.svg
+├── config/
+│   ├── database.php
+│   ├── database.local.example.php
+│   ├── ai.php
+│   ├── ai.local.example.php
+│   └── secrets.local.example.php
+├── database/
+│   └── migrations/
+│       └── 2026_09_06_create_prepared_server_offers.sql
+└── falnicc1_server_configurator.sql
+```
+
+### فایل‌های local که نباید وارد Git شوند
+
+```text
+.env
+config/database.local.php
+config/ai.local.php
+config/secrets.local.php
 ```
 
 ---
 
 ## مدل داده و دیتابیس
 
-فایل `falnicc1_server_configurator.sql` شامل اسکیمای اصلی و Seed Data است.
-
-### جدول‌های اصلی
+فایل `falnicc1_server_configurator.sql` اسکیمای کامل و داده‌های اولیه را دارد.
 
 | جدول | کاربرد |
 |---|---|
-| `Chassis` | شاسی‌ها، نسل، فرم‌فاکتور، سوکت CPU، ظرفیت RAM، PCIe، Storage Rules |
-| `CPUs` | مدل‌های پردازنده، Core، TDP، سوکت، نسل، سرعت RAM پشتیبانی‌شده |
-| `RAMs` | ماژول‌های RAM، ظرفیت، نسل حافظه، سرعت، مصرف توان |
-| `Storage_Drives` | دیسک‌های HDD/SSD با فرم‌فاکتور، Interface، ظرفیت و توان |
-| `Storage_Controllers` | کنترلرهای RAID، فرم‌فاکتور، Interfaceهای پشتیبانی‌شده، تعداد Drive |
-| `GPUs` | کارت‌های گرافیک، VRAM، TDP، تعداد Slot مصرفی |
-| `Network_Adapters` | کارت‌های شبکه Standup PCIe و FlexibleLOM |
-| `Risers` | رایزرهای PCIe و ظرفیت Slotها |
-| `HBAs` | کارت‌های Host Bus Adapter |
+| `Chassis` | شاسی، نسل، فرم‌فاکتور، سوکت، RAM، PCIe، Storage Rules |
+| `CPUs` | پردازنده‌ها، Core، TDP، سوکت و سرعت RAM پشتیبانی‌شده |
+| `RAMs` | ماژول‌های RAM، ظرفیت، نسل، سرعت و سازگاری CPU |
+| `Storage_Drives` | HDD/SSD/NVMe، ظرفیت، فرم‌فاکتور، Interface و توان |
+| `Storage_Controllers` | کنترلرهای RAID، فرم‌فاکتور، تعداد Drive و Interface |
+| `GPUs` | کارت‌های گرافیک، VRAM، TDP و Slot مصرفی |
+| `Network_Adapters` | کارت‌های شبکه Standup و FlexibleLOM |
+| `Risers` | رایزرهای PCIe و تعداد Slotها |
+| `HBAs` | کارت‌های اتصال به Storage خارجی |
 | `Optical_Drives` | درایوهای نوری |
-| `Power_Supplies` | پاورها، Wattage، Efficiency و ورودی ولتاژ |
-| `Prepared_Server_Offers` | کاتالوگ سرورهای آماده برای پیشنهاد اقتصادی/مدیریت‌شده/پیشرفته |
+| `Power_Supplies` | پاورها، Wattage، Efficiency و ولتاژ ورودی |
+| `Prepared_Server_Offers` | سرورهای آماده برای پیشنهاد اقتصادی/مدیریت‌شده/پیشرفته |
 | `User_Configurations` | کانفیگ‌های ثبت‌شده و کد رهگیری |
 
-### قرارداد سازگاری با شاسی
+### Prepared Server Offers
 
-در بسیاری از جدول‌ها ستون `compatible_chassis_ids` وجود دارد:
+جدول `Prepared_Server_Offers` شامل سه Seed اصلی است:
 
-- `NULL` یا آرایه خالی: سازگار با همه‌ی شاسی‌ها.
-- آرایه JSON مثل `[1, 3]`: فقط سازگار با شاسی‌های مشخص‌شده.
+1. `DL360 Gen9 اقتصادی`
+2. `DL380 Gen10 مدیریت‌شده`
+3. `ML110 Gen11 پیشرفته`
 
-### فیلدهای JSON مهم
+فیلدهای مهم:
 
-| جدول | فیلدها |
+| فیلد | توضیح |
 |---|---|
-| `Chassis` | `storage_rules`, `cooling_rules` |
-| `CPUs` | `cooling_requirements`, `compatible_chassis_ids` |
-| `RAMs` | `compatible_cpu_ids`, `compatible_chassis_ids` |
-| `Storage_Controllers` | `supported_interfaces`, `compatible_chassis_ids` |
-| `Power_Supplies` | `input_voltage_support`, `compatible_chassis_ids` |
+| `selected_components` | JSON قطعات انتخاب‌شده برای تبدیل به `currentConfig` |
+| `bullets` | نکات کوتاه نمایشی |
+| `stock_status` | `Available`, `Limited`, `Unavailable` |
+| `stock_qty` | تعداد موجود |
+| `lead_time_days` | زمان تأمین تقریبی |
+| `performance_score` | امتیاز کلی برای مرتب‌سازی |
+| `generation_rank` | رتبه نسل |
+| `expansion_score` | امتیاز توسعه‌پذیری |
+
+### قرارداد سازگاری
+
+- `compatible_chassis_ids = NULL` یا `[]`: سازگار با همه شاسی‌ها.
+- آرایه JSON مثل `[1, 3]`: فقط سازگار با همان شاسی‌ها.
+- CPU باید `socket_type` برابر `cpu_socket_type` شاسی داشته باشد.
+- RAM باید `memory_generation` برابر `ram_generation` شاسی داشته باشد.
+- RAM در صورت داشتن `compatible_cpu_ids` باید با CPU انتخابی هم سازگار باشد.
 
 ---
 
@@ -204,30 +260,19 @@ index.php
 
 ### `GET /api/get_data.php`
 
-#### حالت 1: دریافت لیست شاسی‌ها
+بدون `chassis_id` فقط لیست شاسی‌ها را برمی‌گرداند:
 
 ```http
 GET /api/get_data.php
 ```
 
-پاسخ نمونه:
-
-```json
-{
-  "status": "success",
-  "data": {
-    "chassis": []
-  }
-}
-```
-
-#### حالت 2: دریافت قطعات سازگار با شاسی
+با `chassis_id` قطعات سازگار همان شاسی را برمی‌گرداند:
 
 ```http
 GET /api/get_data.php?chassis_id=1
 ```
 
-خروجی شامل شاسی انتخابی و قطعات سازگار است:
+خروجی کلی:
 
 ```json
 {
@@ -248,16 +293,9 @@ GET /api/get_data.php?chassis_id=1
 }
 ```
 
-
 ### `POST /api/recommend_servers.php`
 
-سه سرور آماده را بر اساس نیاز محاسبه‌شده کاربر از جدول `Prepared_Server_Offers` انتخاب می‌کند:
-
-- **اقتصادی**: ضعیف‌ترین/کم‌هزینه‌ترین سرور آماده‌ای که حداقل نیاز را پوشش دهد.
-- **مدیریت‌شده**: گزینه استاندارد با کمی ظرفیت توسعه و منابع بالاتر.
-- **پیشرفته**: گزینه نسل جدیدتر و قوی‌تر با ظرفیت نزدیک به دو برابر نیاز، در صورت موجود بودن.
-
-درخواست نمونه:
+ورودی مسیر راهنمایی و Target فعلی را می‌گیرد و دقیقاً سه پیشنهاد آماده برمی‌گرداند.
 
 ```json
 {
@@ -266,39 +304,54 @@ GET /api/get_data.php?chassis_id=1
 }
 ```
 
-پاسخ شامل `target` نرمال‌شده، دقیقاً سه `offers`، کانفیگ کامل قابل ثبت، ردیف‌های نمایشی پیش‌فاکتور و وضعیت موجودی/زمان تامین است.
+خروجی شامل:
 
-### `POST /api/submit_config.php`
+- `target` نرمال‌شده
+- `offers` دقیقاً سه مورد
+- `config` قابل استفاده در فرانت‌اند
+- `display_rows` برای جزئیات
+- `db` محدود برای merge شدن در `state.db`
+- وضعیت موجودی و زمان تأمین
 
-ثبت کانفیگ نهایی پس از اعتبارسنجی سمت سرور.
+### `POST /api/ai_chat.php`
 
-درخواست نمونه:
+Gateway امن برای سرویس AI. پاسخ آماده داخلی حذف شده و endpoint به سرویس OpenAI-compatible وصل می‌شود.
+
+ورودی:
 
 ```json
 {
-  "target": {
-    "cores": 16,
-    "ram": 64,
-    "storage": 2000,
-    "gpu": false
-  },
-  "config": {
-    "chassis": { "id": 1 },
-    "cpu": { "id": 3 },
-    "cpuQty": 1,
-    "ram": { "id": 5 },
-    "ramQty": 2,
-    "drives": [],
-    "networks": [],
-    "hbas": [],
-    "opticalDrives": [],
-    "psu": { "id": 2 },
-    "psuQty": 2
-  }
+  "message": "رم بیشتری می‌خوام",
+  "context": {},
+  "history": []
 }
 ```
 
-پاسخ موفق:
+خروجی موفق:
+
+```json
+{
+  "status": "success",
+  "reply": "پاسخ کوتاه و مرحله‌محور",
+  "question": "سؤال بعدی از کاربر",
+  "quick_replies": [
+    { "label": "بله، اصلاح کن", "message": "بله، اول CPU و رم را اصلاح کن" }
+  ],
+  "actions": [
+    {
+      "label": "اعمال اصلاح CPU/RAM",
+      "type": "set_cpu_ram",
+      "payload": { "cpu_id": 10, "cpu_qty": 2, "ram_id": 20, "ram_qty": 4 }
+    }
+  ]
+}
+```
+
+### `POST /api/submit_config.php`
+
+کانفیگ نهایی را دوباره از دیتابیس اعتبارسنجی می‌کند، توان و قیمت را محاسبه می‌کند و در `User_Configurations` ثبت می‌کند.
+
+خروجی موفق:
 
 ```json
 {
@@ -312,50 +365,109 @@ GET /api/get_data.php?chassis_id=1
 
 ---
 
-## منطق اعتبارسنجی
+## دستیار هوشمند AI
 
-اعتبارسنجی‌ها دو لایه دارند:
+دستیار هوشمند در `smartAssistant` داخل `assets/main.js` و endpoint `api/ai_chat.php` پیاده‌سازی شده است.
 
-1. **فرانت‌اند (`assets/main.js`)** برای بازخورد لحظه‌ای و راهنمایی کاربر.
-2. **بک‌اند (`api/submit_config.php`)** برای جلوگیری از ثبت کانفیگ نامعتبر.
+### داده‌هایی که به AI ارسال می‌شود
 
-### نمونه کنترل‌های سمت کلاینت
+به AI کل دیتابیس یا کل state خام ارسال نمی‌شود. فقط context محدود و whitelist شده ارسال می‌شود:
 
-- انتخاب شدن شاسی، CPU، RAM و PSU.
-- همخوانی تعداد CPU با ظرفیت شاسی.
-- رسیدن مجموع Core و RAM به هدف اولیه کاربر.
-- ظرفیت RAM نسبت به تعداد Slotهای شاسی.
-- هشدار عدم تقارن RAM بین پردازنده‌ها.
-- هشدار گلوگاه سرعت RAM نسبت به CPU.
-- محاسبه ظرفیت قابل استفاده RAID.
-- نیاز RAID پیشرفته به کنترلر سخت‌افزاری یا SAS Expander.
-- ظرفیت پورت‌های کنترلر نسبت به تعداد Drive.
-- ظرفیت فیزیکی Bayها و Backplaneها.
-- محدودیت کارت FlexibleLOM به یک کارت.
-- محدودیت Slotهای PCIe، GPU و Riser.
-- نیاز رایزر سوم به CPU دوم.
-- توان PSU با حاشیه ایمنی 20٪.
+- صفحه و مرحله فعلی کاربر؛ مثل انتخاب CPU/RAM یا Storage.
+- Target فنی کاربر: Core، RAM، Storage، GPU، Network و Form Factor.
+- قطعات انتخاب‌شده با فیلدهای ضروری و غیرمحرمانه.
+- خطاها و هشدارهای Validator.
+- چند گزینه سازگار از دیتابیس برای شاسی انتخاب‌شده.
+- سه پیشنهاد آماده فعال و وضعیت موجودی آن‌ها.
+- حداکثر چند پیام اخیر چت.
 
-### نمونه کنترل‌های سمت سرور
+### کنترل کیفیت پاسخ AI
 
-- معتبر بودن ID قطعات.
-- سازگاری CPU Socket با شاسی.
-- سازگاری نسل RAM با شاسی.
-- سازگاری RAM با CPU در صورت تعریف `compatible_cpu_ids`.
-- سازگاری قطعات اختیاری با شاسی.
-- محاسبه مجدد توان مصرفی بدون اعتماد به مقدار ارسال‌شده از کلاینت.
-- محاسبه قیمت نهایی بر اساس فیلد `price` قطعات.
+Prompt سمت سرور از AI می‌خواهد:
+
+- پاسخ کوتاه بدهد.
+- جدول Markdown، thinking، داده خام دیتابیس و متن طولانی ندهد.
+- فقط JSON معتبر با `reply`, `question`, `quick_replies`, `actions` برگرداند.
+- همیشه بر اساس مرحله فعلی پاسخ بدهد.
+- در پایان سؤال کوتاه بپرسد.
+- اگر تغییر قابل اعمال وجود دارد، action امن پیشنهاد دهد.
+
+### History چت
+
+- پیام‌های چت در `sessionStorage` با کلید `falnic_ai_chat_history` نگهداری می‌شوند.
+- با بستن و باز کردن Modal، چت در همان tab ادامه پیدا می‌کند.
+- دکمه «گفتگوی جدید» history را پاک می‌کند.
+
+### Quick Replies و Actions
+
+زیر جواب AI دکمه‌های پیشنهادی نمایش داده می‌شود. دو نوع دکمه داریم:
+
+1. **Quick Reply**: پیام آماده را داخل همان چت ارسال می‌کند.
+2. **Action Button**: تغییر امن و کنترل‌شده را روی کانفیگ اعمال می‌کند.
+
+Actionهای مجاز:
+
+| نوع Action | کاربرد |
+|---|---|
+| `set_cpu` | تغییر CPU و تعداد آن |
+| `set_ram` | تغییر RAM و تعداد آن |
+| `set_cpu_ram` | اصلاح ترکیبی CPU و RAM |
+| `set_ram_qty` | تغییر تعداد ماژول RAM فعلی |
+| `set_ram_total` | رساندن RAM به ظرفیت کل موردنظر |
+| `set_cpu_qty` | تغییر تعداد CPU فعلی |
+| `set_psu_qty` | تغییر تعداد PSU |
+| `add_drive_raid10` | افزودن Drive با RAID 10 در صورت داشتن `drive_id` معتبر |
+
+اگر کاربر روی گزینه‌ای مثل «بله، اول CPU و رم را اصلاح کن» کلیک کند، سیستم یا action همراه همان دکمه را اعمال می‌کند یا پیام را به AI می‌فرستد و action برگشتی را به‌صورت کنترل‌شده اعمال می‌کند.
 
 ---
 
-## راه‌اندازی محلی
+## منطق اعتبارسنجی
+
+اعتبارسنجی در دو لایه انجام می‌شود:
+
+1. **فرانت‌اند** برای راهنمایی لحظه‌ای.
+2. **بک‌اند** برای جلوگیری از ثبت کانفیگ نامعتبر.
+
+### کنترل‌های فرانت‌اند
+
+- انتخاب شاسی، CPU، RAM و PSU.
+- تطبیق تعداد CPU با ظرفیت شاسی.
+- رسیدن مجموع Core و RAM به Target.
+- ظرفیت RAM نسبت به Slotهای فعال و تعداد CPU.
+- هشدار تقارن RAM بین پردازنده‌ها.
+- هشدار سرعت RAM نسبت به CPU.
+- ظرفیت قابل استفاده RAID.
+- نیاز RAID پیشرفته به Controller سخت‌افزاری یا SAS Expander.
+- محدودیت تعداد Drive نسبت به Bayها و Controller.
+- محدودیت FlexibleLOM به یک کارت.
+- محدودیت PCIe، GPU و Riser.
+- نیاز Riser سوم به CPU دوم.
+- توان PSU با حاشیه امن ۲۰٪.
+
+### کنترل‌های بک‌اند
+
+- اعتبار ID قطعات با خواندن مجدد از دیتابیس.
+- سازگاری CPU Socket با شاسی.
+- سازگاری RAM Generation با شاسی و CPU.
+- سازگاری قطعات اختیاری با شاسی.
+- اعتبار تعداد CPU/RAM/Drive.
+- اعتبار RAID و ظرفیت قابل استفاده Storage.
+- کنترل ظرفیت Bay و Controller.
+- کنترل Riser سوم، GPU و PCIe.
+- کنترل PSU با حاشیه امن.
+- محاسبه مجدد توان و قیمت بدون اعتماد به کلاینت.
+
+---
+
+## راه‌اندازی و استقرار
 
 ### پیش‌نیازها
 
-- PHP 8.x
-- Extensionهای PHP: `PDO`, `pdo_mysql`, `curl`, `json`
-- MySQL یا MariaDB
-- وب‌سرور Apache/Nginx یا سرور داخلی PHP برای توسعه
+- PHP 8.x پیشنهاد می‌شود.
+- Extensionهای PHP: `PDO`, `pdo_mysql`, `curl`, `json`.
+- MySQL یا MariaDB.
+- وب‌سرور Apache/Nginx یا سرور داخلی PHP برای توسعه.
 
 ### 1. ساخت دیتابیس
 
@@ -363,108 +475,162 @@ GET /api/get_data.php?chassis_id=1
 CREATE DATABASE falnicc1_server_configurator CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 2. Import فایل SQL
+### 2. Import اولیه
 
 ```bash
-mysql -u <db_user> -p falnicc1_server_configurator < falnicc1_server_configurator.sql
+mysql --default-character-set=utf8mb4 -u <db_user> -p falnicc1_server_configurator < falnicc1_server_configurator.sql
 ```
 
-### 3. تنظیم امن اتصال دیتابیس
+### 3. Migration برای دیتابیس موجود
 
-اتصال دیتابیس فقط از `config/database.php` و تابع `databaseConnection()` ساخته می‌شود. برای محیط واقعی، یکی از این دو روش را استفاده کنید:
+اگر دیتابیس قبلاً وجود داشته و فقط فایل‌ها را جایگزین می‌کنید، این Migration را اجرا کنید:
 
-1. تعریف متغیرهای محیطی `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`, `DB_CHARSET`
-2. کپی کردن `config/secrets.local.example.php` به `config/secrets.local.php` و تنظیم همه رمزها در یک فایل local
-3. یا کپی کردن `config/database.local.example.php` به `config/database.local.php` برای تنظیم جداگانه دیتابیس. فایل‌های local در Git ذخیره نمی‌شوند.
+```bash
+mysql --default-character-set=utf8mb4 -u <db_user> -p falnicc1_server_configurator < database/migrations/2026_09_06_create_prepared_server_offers.sql
+```
 
+### 4. تنظیم رمزها و کلیدها
 
-### 4. تنظیم سرویس AI
+روش پیشنهادی، استفاده از یک فایل local یکپارچه است:
 
-چت هوشمند از طریق `api/ai_chat.php` به یک سرویس OpenAI-compatible وصل می‌شود. کلید واقعی نباید داخل Repository ذخیره شود. روی سرور یکی از این دو روش را استفاده کنید:
+```bash
+cp config/secrets.local.example.php config/secrets.local.php
+chmod 644 config/secrets.local.php
+```
 
-1. تعریف متغیرهای محیطی `AI_API_URL`, `AI_API_KEY`, `AI_MODEL`, `AI_TIMEOUT`, `AI_MAX_TOKENS`, `AI_TEMPERATURE`
-2. کپی کردن `config/secrets.local.example.php` به `config/secrets.local.php` و تنظیم همه رمزها در یک فایل local
-3. یا کپی کردن `config/ai.local.example.php` به `config/ai.local.php` برای تنظیم جداگانه AI. فایل‌های local در Git ذخیره نمی‌شوند.
+سپس مقادیر واقعی دیتابیس و AI را در `config/secrets.local.php` وارد کنید. این فایل توسط Git ignore می‌شود.
 
-Endpoint فقط خلاصه‌ی whitelist شده از مرحله فعلی، هدف کاربر، قطعات منتخب، پیام‌های اخیر و چند سیگنال محدود از دیتابیس را برای AI ارسال می‌کند؛ کل دیتابیس یا Secretها ارسال نمی‌شوند.
-
-### 5. Migration دیتابیس‌های موجود
-
-برای محیط‌هایی که دیتابیس قبلاً Import شده، Migration جداگانه زیر اضافه شده است:
+همچنین می‌توانید به جای فایل یکپارچه، از این فایل‌های جدا استفاده کنید:
 
 ```text
-database/migrations/2026_09_06_create_prepared_server_offers.sql
+config/database.local.php
+config/ai.local.php
 ```
 
-این Migration جدول `Prepared_Server_Offers`، ستون‌های موجودی (`stock_status`, `stock_qty`, `lead_time_days`) و سه Seed پیشنهاد آماده را به‌روزرسانی می‌کند.
+یا متغیرهای محیطی زیر را تعریف کنید:
 
-### 6. اجرای پروژه با سرور داخلی PHP
+```text
+DB_HOST
+DB_NAME
+DB_USER
+DB_PASS
+DB_CHARSET
+AI_API_URL
+AI_API_KEY
+AI_MODEL
+AI_TIMEOUT
+AI_MAX_TOKENS
+AI_TEMPERATURE
+```
+
+### 5. اجرای توسعه‌ای
 
 ```bash
 php -S 0.0.0.0:8000
 ```
 
-سپس در مرورگر باز کنید:
+سپس صفحه پروژه را از همان میزبان توسعه باز کنید.
 
-```text
-http://localhost:8000
+### 6. تست سریع روی سرور
+
+```bash
+curl -i /api/get_data.php
 ```
+
+```bash
+curl -i -X POST /api/recommend_servers.php \
+  -H "Content-Type: application/json" \
+  -d '{"target":{"cores":16,"ram":64,"storage":2000,"gpu":false},"answers":{"1":["db"],"2":["2"],"3":["med"]}}'
+```
+
+```bash
+curl -i -X POST /api/ai_chat.php \
+  -H "Content-Type: application/json" \
+  -d '{"message":"کانفیگ فعلی را کوتاه بررسی کن","context":{"target":{"cores":16,"ram":64,"storage":2000,"gpu":false},"currentConfig":{}},"history":[]}'
+```
+
+> در دستورهای بالا اگر از دامنه واقعی استفاده می‌کنید، مسیر کامل دامنه را قبل از `/api/...` قرار دهید.
 
 ---
 
 ## فونت و فایل‌های لوکال
 
-وابستگی‌های خارجی UI حذف شده‌اند. فونت اصلی با `@font-face` از مسیر `assets/falnic-font.woff2` خوانده می‌شود و لوگوی HPE به صورت فایل لوکال `assets/hpe-logo.svg` استفاده شده است.
+- CSS اصلی در `assets/style.css` است.
+- helperهای امنیتی JS در `assets/js/security.js` هستند.
+- لوگوی فالنیک در `assets/falnic-logo.svg` است.
+- لوگوی HPE در `assets/hpe-logo.svg` است.
+- فونت اصلی از `assets/falnic-font.woff2` با `@font-face` خوانده می‌شود.
+- Tailwind CDN، تصویر خارجی و وابستگی runtime خارجی UI نباید دوباره اضافه شود.
 
 ---
 
 ## نکات امنیتی و عملیاتی
 
-- اطلاعات اتصال دیتابیس نباید در کد نسخه‌گذاری‌شده باقی بماند. پیشنهاد: استفاده از `.env` یا کانفیگ خارج از Repository.
-- خروجی‌های JSON باید همیشه با `Content-Type: application/json; charset=utf-8` ارسال شوند که در APIهای فعلی رعایت شده است.
-- بک‌اند نباید به محاسبات فرانت‌اند اعتماد کند؛ در `submit_config.php` محاسبه توان و اعتبارسنجی اصلی مجدداً انجام می‌شود.
-- برای Production بهتر است Tailwind از حالت CDN خارج و Build اختصاصی استفاده شود.
-- برای جلوگیری از XSS، رندر رشته‌های دیتابیس در HTML باید escape شود؛ در فرانت‌اند فعلی بسیاری از مقادیر با Template String مستقیم تزریق می‌شوند.
-- داده‌های تستی موجود در جدول `User_Configurations` در صورت انتشار نسخه Production بهتر است حذف یا جدا شوند.
+- Secret واقعی را در Repository، Markdown، Issue، PR یا Log ذخیره نکنید.
+- `config/secrets.local.php`, `config/database.local.php`, `config/ai.local.php` و `.env` نباید وارد Git شوند.
+- API Key سرویس AI فقط از config local یا Environment خوانده شود.
+- داده ارسالی به AI باید محدود، whitelist شده و بدون Secret باشد.
+- خروجی‌های JSON با `Content-Type: application/json; charset=utf-8` ارسال می‌شوند.
+- داده‌های dynamic در HTML با `assets/js/security.js` escape شوند.
+- بک‌اند منبع نهایی اعتبارسنجی است و نباید به محاسبات مرورگر اعتماد کند.
+- در Production بهتر است نمایش جزئیات خطاهای داخلی به کاربر محدودتر شود.
+- بعد از آپلود JS/CSS جدید، در مرورگر `Ctrl + F5` بزنید تا cache پاک شود.
 
 ---
 
-## محدودیت‌های فعلی
+## چک‌لیست تست قبل از انتشار
 
-- پیشنهادهای مسیر راهنمایی اکنون با Ruleهای کامل‌تر ظرفیت، workload، GPU، رشد آینده، موجودی و زمان تامین از `Prepared_Server_Offers` انتخاب می‌شوند.
-- وابستگی Tailwind CDN حذف شده و استایل‌ها در `assets/style.css` نگهداری می‌شوند؛ برای تغییر ظاهر باید همین فایل به‌روزرسانی شود.
-- قیمت اکثر قطعات `NULL` است؛ بنابراین `total_price` معمولاً `null` و `price_incomplete=true` می‌شود.
-- اعتبارسنجی سمت سرور برای RAID، ظرفیت Bay، PCIe/Riser و PSU تقویت شده و باید با هر تغییر جدید در فرانت‌اند همگام بماند.
-- اتصال دیتابیس Hard-coded است و باید امن‌سازی شود.
-- تست خودکار، CI و ابزار Lint/Format در پروژه تعریف نشده‌اند.
+### تست‌های خط فرمان
+
+```bash
+node --check assets/js/security.js
+node --check assets/main.js
+git diff --check
+```
+
+اگر PHP CLI روی سرور در دسترس است:
+
+```bash
+php -l api/get_data.php
+php -l api/recommend_servers.php
+php -l api/submit_config.php
+php -l api/ai_chat.php
+php -l config/database.php
+php -l config/ai.php
+```
+
+### تست UI
+
+- صفحه شروع باز شود.
+- مسیر حرفه‌ای شروع شود و شاسی‌ها Load شوند.
+- با انتخاب شاسی، قطعات سازگار Load شوند.
+- Summary با تغییر CPU/RAM/Storage/GPU/PSU آپدیت شود.
+- Validatorها خطا و هشدار را درست نشان دهند.
+- مسیر راهنمایی تا سه پیشنهاد ادامه پیدا کند.
+- هر پیشنهاد صفحه جزئیات را درست باز کند.
+- راهنمای هوشمند در هر مرحله مرحله فعلی را بفهمد.
+- history چت با بستن و باز کردن Modal حفظ شود.
+- Quick Reply پیام را در همان چت ادامه دهد.
+- Actionهایی مثل اصلاح CPU/RAM واقعاً روی کانفیگ اعمال شوند.
+- ثبت نهایی کد رهگیری تولید کند.
 
 ---
 
-## مسیر توسعه پیشنهادی
+## محدودیت‌ها و مسیر توسعه
 
-1. انتقال تنظیمات اتصال دیتابیس به `.env` یا فایل Config خارج از Git.
-2. نگهداری و تکمیل Design System لوکال در `assets/style.css` و استفاده از فونت `falnic-font.woff2`.
-3. تقسیم `assets/main.js` به ماژول‌های کوچک‌تر:
-   - `state`
-   - `api`
-   - `session-manager`
-   - `wizard-guidance`
-   - `wizard-pro`
-   - `validator`
-   - `invoice-renderer`
-4. دقیق‌تر کردن موتور پیشنهاددهی مسیر راهنمایی و امتیازدهی سرورهای آماده بر اساس Ruleهای تجاری/فنی.
-5. همسان‌سازی کامل اعتبارسنجی سمت سرور با منطق فرانت‌اند.
-6. اضافه کردن تست‌های API و سناریوهای اعتبارسنجی سخت‌افزاری.
-7. اضافه کردن سیستم مدیریت قیمت‌گذاری و ارز.
-8. پیاده‌سازی خروجی PDF واقعی سمت سرور یا کلاینت.
-9. اضافه کردن احراز هویت/پنل مدیریت برای مدیریت قطعات و قیمت‌ها.
+- قیمت بسیاری از قطعات هنوز `NULL` است؛ در این حالت `total_price=null` و `price_incomplete=true` می‌شود.
+- `assets/main.js` هنوز بزرگ است و فقط بخشی از ساختار JS جدا شده؛ ماژولار شدن تدریجی توصیه می‌شود.
+- تست خودکار و CI در پروژه تعریف نشده است.
+- Ruleهای پیشنهاددهی و AI باید با تجربه فروش و داده واقعی موجودی تکمیل‌تر شوند.
+- PDF واقعی قابل آرشیو هنوز پیاده‌سازی نشده و فعلاً از چاپ مرورگر استفاده می‌شود.
+- پنل مدیریت قطعات، قیمت‌ها، موجودی و پیشنهادهای آماده هنوز وجود ندارد.
 
 ---
 
 ## نگهداری مستندات
 
-هر تغییری در رفتار محصول، اسکیمای دیتابیس، API یا تصمیم معماری باید همزمان در یکی از فایل‌های زیر ثبت شود:
+هر تغییری در رفتار محصول، دیتابیس، API، امنیت یا تصمیم معماری باید همزمان در این فایل‌ها ثبت شود:
 
-- `README.md`: راهنمای محصول، نصب و معماری جاری.
-- `AGENTS.md`: دستورالعمل عملیاتی برای توسعه‌دهندگان و Agentها.
+- `README.md`: راهنمای محصول، نصب، استقرار و معماری جاری.
+- `AGENTS.md`: دستورالعمل عملیاتی توسعه و QA.
 - `DECISIONS.md`: تصمیمات معماری و دلیل انتخاب‌ها.
