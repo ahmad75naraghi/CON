@@ -5,102 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>کانفیگوراتور حرفه‌ای سرور HPE</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: Tahoma, Arial, sans-serif;
-            background-color: #f8fafc;
-        }
-
-        .tooltip-icon {
-            cursor: help;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            background: #3b82f6;
-            color: white;
-            border-radius: 50%;
-            font-size: 12px;
-            font-weight: bold;
-            margin-right: 5px;
-            position: relative;
-            top: -2px;
-        }
-
-        .tooltip-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip-text {
-            visibility: hidden;
-            width: max-content;
-            max-width: 350px;
-            background-color: #1f2937;
-            color: #fff;
-            text-align: right;
-            border-radius: 8px;
-            padding: 10px;
-            position: absolute;
-            z-index: 50;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-            font-weight: normal;
-            line-height: 1.6;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #1f2937 transparent transparent transparent;
-        }
-
-        .tooltip-container:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            #success-modal,
-            #success-modal * {
-                visibility: visible;
-            }
-
-            #success-modal {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-
-            /* مخفی کردن بک‌گراند تیره مودال در نسخه چاپ */
-            .bg-opacity-50 {
-                background-opacity: 0;
-                background: transparent;
-            }
-        }
-    </style>
+    <link rel="icon" type="image/svg+xml" href="assets/falnic-logo.svg">
+    <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
 </head>
 
 <body class="text-gray-800 pb-20">
@@ -108,10 +14,8 @@
     <!-- بخش انتخاب مسیر (Intro) -->
     <div id="view-intro" class="container mx-auto p-4 max-w-3xl mt-12 transition-all duration-500">
         <div class="text-center mb-10">
-            <div class="flex justify-center items-center gap-2 mb-6">
-                <span class="text-xl font-bold text-blue-900">فالنیک</span>
-                <span class="text-sm text-gray-500">(ایران اچ پی)</span>
-                <!-- لوگو فالنیک در اینجا قرار گیرد -->
+            <div class="flex justify-center items-center gap-3 mb-6">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-16 w-auto">
             </div>
             <h1 class="text-2xl font-bold text-gray-900 mb-2">سرورتون رو چطور میسازیم؟</h1>
             <p class="text-gray-600 text-sm mb-4">بسته به اینکه چقدر با مشخصات فنی سرور آشنایید، یکی از دو مسیر زیر رو انتخاب کنید.</p>
@@ -158,7 +62,10 @@
     <!-- مسیر تعیین اهداف اولیه حرفه‌ای (Pro Goals) -->
     <div id="view-pro" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-10">
-            <span class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1">✨ راهنمایی هوشمند</span>
+            <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <div class="flex items-center gap-4">
                 <span class="text-orange-500 font-bold flex items-center gap-2">⚙️ مسیر حرفه ای</span>
                 <button onclick="wizard.showView('view-intro')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
@@ -224,7 +131,10 @@
 
         <!-- هدر و نوار پیشرفت چندمرحله‌ای -->
         <div class="flex justify-between items-center mb-8">
-            <span class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1">✨ راهنمایی هوشمند</span>
+            <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <div class="flex items-center gap-4">
                 <span class="text-orange-500 font-bold flex items-center gap-2">⚙️ مسیر حرفه ای</span>
                 <button onclick="wizard.showView('view-pro')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
@@ -393,6 +303,7 @@
                                     <input type="checkbox" id="sas-expander-checkbox" class="ml-2 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="configurator.handlePCIeChange()" disabled>
                                     <label for="sas-expander-checkbox" class="text-sm text-gray-700">افزودن کارت SAS Expander (اشغال ۱ اسلات PCIe x8)</label>
                                 </div>
+                                <div id="hw-raid-warning" class="hidden mt-3 text-sm bg-red-50 border border-red-200 text-red-700 rounded p-3 font-bold">⚠️ برای RAID پیشرفته، انتخاب کنترلر سخت‌افزاری یا SAS Expander ضروری است.</div>
                                 <div id="validator-raid-controller" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
                         </details>
@@ -525,7 +436,10 @@
     <!-- صفحه نتیجه نهایی مسیر حرفه‌ای (Invoice) -->
     <div id="view-pro-results" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-8">
-            <span class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1">✨ راهنمایی هوشمند</span>
+            <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <button onclick="wizard.showView('view-pro-configurator')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
         </div>
 
@@ -560,7 +474,10 @@
     <!-- مسیر راهنمایی (Guidance Wizard) -->
     <div id="view-guidance" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-8">
-            <span class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1">✨ راهنمایی هوشمند</span>
+            <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <div class="flex items-center gap-4">
                 <span class="text-teal-600 font-bold flex items-center gap-2">💡 مسیر راهنمایی</span>
                 <button onclick="wizard.prevStep()" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
@@ -589,6 +506,10 @@
     <!-- صفحه پیشنهادات (Offers) -->
     <div id="view-offers" class="hidden container mx-auto p-4 max-w-5xl mt-8">
         <div class="flex justify-between items-center mb-8">
+            <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <button onclick="wizard.showView('view-guidance')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
         </div>
 
@@ -597,57 +518,12 @@
             <p class="text-sm text-gray-500">میتونید هر کدوم رو بپسندید یا نپسندید تا پیشنهادهای بهتری بگیرید، یا مستقیم یکی رو انتخاب کنید.</p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
-            <!-- اقتصادی -->
-            <div class="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col justify-between hover:shadow-lg transition">
-                <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-gray-800">اقتصادی</h3>
-                        <span class="text-2xl">🖨️</span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-6 line-clamp-3">برای شروع کار یا تیم های کوچک، بدون هزینه اضافه روی امکاناتی که فعلا بهش نیاز ندارید.</p>
-                    <ul class="space-y-3 mb-6">
-                        <li class="flex items-start gap-2 text-sm text-gray-700"><span class="text-green-500 text-base">✔</span> برای تا ۵۰ کاربر همزمان بدون افت سرعت</li>
-                        <li class="flex items-start gap-2 text-sm text-gray-700"><span class="text-green-500 text-base">✔</span> امکان نصب مستقیم سرویس‌ها بدون محدودیت</li>
-                        <li class="flex items-start gap-2 text-sm text-gray-700"><span class="text-green-500 text-base">✔</span> قابل ارتقا در آینده، بدون نیاز به تعویض</li>
-                    </ul>
-                </div>
-                <button onclick="wizard.selectOffer('eco')" class="w-full py-3 border-2 border-blue-900 text-blue-900 font-bold rounded-lg hover:bg-blue-50 transition">جزییات سرور</button>
-            </div>
+        <div id="offers-target-summary" class="text-center text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 rounded-xl p-3 mb-8">
+            در حال محاسبه نیاز شما...
+        </div>
 
-            <!-- مدیریت شده -->
-            <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 flex flex-col justify-between transform scale-105 shadow-md">
-                <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-blue-900">مدیریت شده</h3>
-                        <span class="text-2xl">🏢</span>
-                    </div>
-                    <p class="text-sm text-gray-700 mb-6">بهترین تعادل بین قیمت و عملکرد برای نیاز شما. نه کمبود منابع دارید، نه پول اضافه می‌دید برای چیزی که استفاده نمی‌کنید.</p>
-                    <ul class="space-y-3 mb-6">
-                        <li class="flex items-start gap-2 text-sm text-gray-800"><span class="text-green-600 text-base">✔</span> تا ۲۰۰ کاربر همزمان رو بدون کندی پشتیبانی میکنه</li>
-                        <li class="flex items-start gap-2 text-sm text-gray-800"><span class="text-green-600 text-base">✔</span> فضای خالی برای توسعه ۳ سال آینده در نظر گرفته شده</li>
-                        <li class="flex items-start gap-2 text-sm text-gray-800"><span class="text-green-600 text-base">✔</span> زمان پاسخ‌دهی سریع‌تر برای سرویس‌هایی مثل دیتابیس</li>
-                    </ul>
-                </div>
-                <button onclick="wizard.selectOffer('managed')" class="w-full py-3 bg-blue-900 text-white font-bold rounded-lg hover:bg-blue-800 transition shadow-lg">جزییات سرور</button>
-            </div>
-
-            <!-- پیشرفته -->
-            <div class="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col justify-between hover:shadow-lg transition">
-                <div>
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-gray-800">پیشرفته</h3>
-                        <span class="text-2xl">🚀</span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-6">اگه می‌خواید یه بار برای همیشه خیالتون از محدودیت راحت باشه و آماده رشد سریع سازمان باشید.</p>
-                    <ul class="space-y-3 mb-6">
-                        <li class="flex items-start gap-2 text-sm text-gray-700"><span class="text-green-500 text-base">✔</span> ظرفیتی که حتی با رشد چندبرابری کاربران نیاز به ارتقا نداره</li>
-                        <li class="flex items-start gap-2 text-sm text-gray-700"><span class="text-green-500 text-base">✔</span> عملکرد کافی برای اجرای همزمان چند سرویس سنگین</li>
-                        <li class="flex items-start gap-2 text-sm text-gray-700"><span class="text-green-500 text-base">✔</span> زیرساخت آماده برای مجازی‌سازی یا افزودن سرویس‌های جدید</li>
-                    </ul>
-                </div>
-                <button onclick="wizard.selectOffer('pro')" class="w-full py-3 border-2 border-blue-900 text-blue-900 font-bold rounded-lg hover:bg-blue-50 transition">جزییات سرور</button>
-            </div>
+        <div id="offers-list" class="grid md:grid-cols-3 gap-6 mb-8">
+            <!-- کارت‌های پیشنهاد از جدول Prepared_Server_Offers و توسط جاوااسکریپت رندر می‌شوند -->
         </div>
 
         <div class="flex justify-between items-center border-t pt-6">
@@ -663,13 +539,16 @@
     <!-- صفحه جزییات سرور (Server Details) -->
     <div id="view-server-details" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-8">
-            <span class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1">✨ راهنمایی هوشمند</span>
+            <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <button onclick="wizard.showView('view-offers')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
         </div>
 
         <div class="text-right mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">سرور پیشنهادی</h2>
-            <p class="text-sm text-gray-500">بهترین تعادل بین قیمت و عملکرد برای نیاز شما. نه کمبود منابع دارید، نه پول اضافه می‌دید برای چیزی که استفاده نمی‌کنید.</p>
+            <h2 id="server-details-title" class="text-2xl font-bold text-gray-900 mb-2">سرور پیشنهادی</h2>
+            <p id="server-details-desc" class="text-sm text-gray-500">بهترین تعادل بین قیمت و عملکرد برای نیاز شما. نه کمبود منابع دارید، نه پول اضافه می‌دید برای چیزی که استفاده نمی‌کنید.</p>
         </div>
 
         <div class="bg-gray-50 rounded-xl border border-gray-200 p-6">
@@ -682,13 +561,13 @@
             </div>
 
             <div class="mt-6 flex justify-end">
-                <button class="flex items-center gap-2 border border-orange-500 text-orange-500 px-4 py-2 rounded font-bold hover:bg-orange-50">خلاصه کانفیگ PDF 📥</button>
+                <button onclick="window.print()" class="flex items-center gap-2 border border-orange-500 text-orange-500 px-4 py-2 rounded font-bold hover:bg-orange-50">خلاصه کانفیگ PDF 📥</button>
             </div>
         </div>
 
         <div class="flex justify-end gap-3 mt-6 items-center">
             <span class="text-xs text-gray-500 flex items-center gap-1">✉ پیش فاکتور تا ۲۴ ساعت کاری براتون آماده و ارسال میشه. تعهدی برای خرید وجود نداره.</span>
-            <button onclick="wizard.launchConfigurator()" class="px-6 py-3 border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 flex items-center gap-2">✎ ویرایش سرور</button>
+            <button onclick="wizard.editSelectedOffer()" class="px-6 py-3 border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 flex items-center gap-2">✎ ویرایش سرور</button>
             <button onclick="configurator.submitFinal()" class="px-6 py-3 bg-blue-900 text-white font-bold rounded-lg hover:bg-blue-800 transition">درخواست پیش فاکتور</button>
         </div>
     </div>
@@ -714,7 +593,7 @@
                         <p class="text-gray-500">تاریخ: <span id="invoice-date"></span></p>
                     </div>
                     <div class="text-left">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Hewlett_Packard_Enterprise_logo.svg" alt="HPE Logo" class="h-10 opacity-80">
+                        <img src="assets/hpe-logo.svg" alt="HPE Logo" class="h-10 opacity-80">
                     </div>
                 </div>
 
@@ -757,6 +636,53 @@
         </div>
     </div>
 
+
+
+    <!-- مودال راهنمایی هوشمند و چت AI -->
+    <div id="ai-assistant-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10 rounded-2xl">
+                <div class="flex items-center gap-3">
+                    <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+                    <div>
+                    <h3 class="text-xl font-bold text-gray-900">✨ راهنمایی هوشمند کانفیگ سرور</h3>
+                    <p class="text-sm text-gray-500 mt-1">قبل از شروع چت می‌تونید یکی از سه کانفیگ آماده پیشنهادی رو انتخاب کنید.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="smartAssistant.close()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold">×</button>
+            </div>
+
+            <div class="p-6">
+                <div id="ai-offers-panel">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-gray-800">پیشنهادهای آماده بر اساس اطلاعات فعلی شما</h4>
+                        <span id="ai-context-summary" class="text-xs text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-3 py-1">در حال آماده‌سازی...</span>
+                    </div>
+                    <div id="ai-offers-list" class="grid md:grid-cols-3 gap-4 mb-6">
+                        <!-- پیشنهادهای آماده قبل از شروع چت -->
+                    </div>
+                </div>
+
+                <div id="ai-chat-panel" class="hidden">
+                    <div id="ai-chat-log" class="h-96 overflow-y-auto bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 mb-4 text-sm">
+                        <!-- پیام‌های چت -->
+                    </div>
+                    <form onsubmit="smartAssistant.sendMessage(event)" class="flex gap-2">
+                        <input id="ai-chat-input" type="text" class="flex-1 border border-gray-300 p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-200" placeholder="سوال یا نیازتون رو بنویسید...">
+                        <button id="ai-chat-send-btn" type="submit" class="px-6 py-3 bg-blue-900 text-white rounded-lg font-bold hover:bg-blue-800 transition">ارسال</button>
+                        <button type="button" onclick="smartAssistant.resetChat()" class="px-4 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition text-xs">گفتگوی جدید</button>
+                    </form>
+                </div>
+
+                <div class="flex justify-between items-center border-t pt-4 mt-4">
+                    <p class="text-xs text-gray-500">با شروع چت، پیشنهادهای آماده مخفی می‌شن و تمام اطلاعات انتخاب‌شده تا این لحظه برای AI ارسال می‌شه.</p>
+                    <button id="ai-start-chat-btn" type="button" onclick="smartAssistant.startChat()" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-bold hover:opacity-80 transition">شروع چت با AI</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/security.js?v=<?= time() ?>"></script>
     <script src="assets/main.js?v=<?= time() ?>"></script>
 </body>
 
