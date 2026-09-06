@@ -149,7 +149,7 @@ index.php
 ├── api/
 │   ├── get_data.php                  # API دریافت شاسی‌ها و قطعات سازگار
 │   ├── recommend_servers.php         # API پیشنهاد سه سرور آماده بر اساس پاسخ‌های مسیر راهنمایی
-│   ├── ai_chat.php                   # Endpoint لوکال چت/دریافت Context دستیار هوشمند
+│   ├── ai_chat.php                   # Gateway چت AI با Context محدود و امن
 │   └── submit_config.php             # API اعتبارسنجی و ثبت کانفیگ نهایی
 ├── assets/
 │   ├── main.js                       # منطق اصلی اپلیکیشن در سمت کلاینت
@@ -353,6 +353,7 @@ GET /api/get_data.php?chassis_id=1
 ### پیش‌نیازها
 
 - PHP 8.x
+- Extensionهای PHP: `PDO`, `pdo_mysql`, `curl`, `json`
 - MySQL یا MariaDB
 - وب‌سرور Apache/Nginx یا سرور داخلی PHP برای توسعه
 
@@ -375,7 +376,17 @@ mysql -u <db_user> -p falnicc1_server_configurator < falnicc1_server_configurato
 1. تعریف متغیرهای محیطی `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`, `DB_CHARSET`
 2. کپی کردن `config/database.local.example.php` به `config/database.local.php` و تنظیم مقادیر محلی. فایل local در Git ذخیره نمی‌شود.
 
-### 4. Migration دیتابیس‌های موجود
+
+### 4. تنظیم سرویس AI
+
+چت هوشمند از طریق `api/ai_chat.php` به یک سرویس OpenAI-compatible وصل می‌شود. کلید واقعی نباید داخل Repository ذخیره شود. روی سرور یکی از این دو روش را استفاده کنید:
+
+1. تعریف متغیرهای محیطی `AI_API_URL`, `AI_API_KEY`, `AI_MODEL`, `AI_TIMEOUT`, `AI_MAX_TOKENS`, `AI_TEMPERATURE`
+2. کپی کردن `config/ai.local.example.php` به `config/ai.local.php` و تنظیم endpoint/model/key واقعی. فایل local در Git ذخیره نمی‌شود.
+
+Endpoint فقط خلاصه‌ی whitelist شده از مرحله فعلی، هدف کاربر، قطعات منتخب، پیام‌های اخیر و چند سیگنال محدود از دیتابیس را برای AI ارسال می‌کند؛ کل دیتابیس یا Secretها ارسال نمی‌شوند.
+
+### 5. Migration دیتابیس‌های موجود
 
 برای محیط‌هایی که دیتابیس قبلاً Import شده، Migration جداگانه زیر اضافه شده است:
 
@@ -385,7 +396,7 @@ database/migrations/2026_09_06_create_prepared_server_offers.sql
 
 این Migration جدول `Prepared_Server_Offers`، ستون‌های موجودی (`stock_status`, `stock_qty`, `lead_time_days`) و سه Seed پیشنهاد آماده را به‌روزرسانی می‌کند.
 
-### 5. اجرای پروژه با سرور داخلی PHP
+### 6. اجرای پروژه با سرور داخلی PHP
 
 ```bash
 php -S 0.0.0.0:8000
@@ -421,7 +432,7 @@ http://localhost:8000
 - پیشنهادهای مسیر راهنمایی اکنون با Ruleهای کامل‌تر ظرفیت، workload، GPU، رشد آینده، موجودی و زمان تامین از `Prepared_Server_Offers` انتخاب می‌شوند.
 - وابستگی Tailwind CDN حذف شده و استایل‌ها در `assets/style.css` نگهداری می‌شوند؛ برای تغییر ظاهر باید همین فایل به‌روزرسانی شود.
 - قیمت اکثر قطعات `NULL` است؛ بنابراین `total_price` معمولاً `null` و `price_incomplete=true` می‌شود.
-- اعتبارسنجی سمت سرور هنوز همه‌ی محدودیت‌های پیچیده‌ی فرانت‌اند مثل PCIe Slot، RAID Level دقیق، ظرفیت Bay و توان PSU را به‌صورت کامل بازسازی نکرده است.
+- اعتبارسنجی سمت سرور برای RAID، ظرفیت Bay، PCIe/Riser و PSU تقویت شده و باید با هر تغییر جدید در فرانت‌اند همگام بماند.
 - اتصال دیتابیس Hard-coded است و باید امن‌سازی شود.
 - تست خودکار، CI و ابزار Lint/Format در پروژه تعریف نشده‌اند.
 

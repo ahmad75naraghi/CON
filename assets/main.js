@@ -1813,6 +1813,32 @@ const smartAssistant = {
         document.getElementById('ai-assistant-modal')?.classList.add('hidden');
     },
 
+    getCurrentStep: () => {
+        if (state.currentView === 'view-pro-configurator') {
+            const cfg = proWizard.stepsConfig.find(step => step.id === proWizard.currentStep);
+            return cfg ? { type: 'professional', number: cfg.id, title: cfg.title, label: cfg.label } : { type: 'professional', number: proWizard.currentStep };
+        }
+        if (state.currentView === 'view-guidance') {
+            const step = wizard.steps[wizard.currentStepIndex];
+            return step ? { type: 'guidance', number: wizard.currentStepIndex + 1, question: step.q, option_type: step.type } : { type: 'guidance', number: wizard.currentStepIndex + 1 };
+        }
+        return { type: 'page', view: state.currentView };
+    },
+
+    getValidationSummary: () => {
+        const items = [];
+        document.querySelectorAll('[id^="validator-"] > div').forEach(el => {
+            const text = (el.innerText || '').replace(/\s+/g, ' ').trim();
+            if (!text) return;
+            let status = 'info';
+            if (text.includes('❌')) status = 'error';
+            else if (text.includes('⚠️')) status = 'warning';
+            else if (text.includes('✅')) status = 'ok';
+            items.push({ status, text: text.replace(/[✅❌⚠️⬜]/g, '').trim().slice(0, 220) });
+        });
+        return items.slice(0, 14);
+    },
+
     getCurrentContext: () => {
         const guidanceTarget = Object.keys(wizard.answers || {}).length ? wizard.buildTargetFromGuidance() : null;
         const target = Object.keys(state.target || {}).length ? state.target : (guidanceTarget || { cores: 16, ram: 64, storage: 2000, gpu: false, network: 'any', formFactor: 'any' });
@@ -1820,6 +1846,8 @@ const smartAssistant = {
         return {
             activeView: state.currentView,
             activeMode: state.activeMode,
+            currentStep: smartAssistant.getCurrentStep(),
+            validation: smartAssistant.getValidationSummary(),
             target,
             guidanceAnswers: wizard.answers,
             selectedOffer: state.selectedOffer ? {
@@ -1941,14 +1969,19 @@ const smartAssistant = {
         document.getElementById('ai-start-chat-btn')?.classList.add('hidden');
 
         const log = document.getElementById('ai-chat-log');
-        if (log) log.innerHTML = '';
-        smartAssistant.addChatMessage('assistant', 'چت شروع شد. اطلاعات انتخاب‌شده تا اینجا برای AI ارسال شد. حالا بفرمایید چه تغییری در کانفیگ می‌خواید یا چه سوالی دارید؟');
+        if (log) {
+            log.innerHTML = '<div class="text-center text-xs text-gray-500 bg-white border border-gray-200 rounded-lg p-3">در حال دریافت پاسخ اختصاصی از AI بر اساس همین مرحله و کانفیگ...</div>';
+        }
 
         try {
             const result = await api.sendAIMessage('__context_init__', smartAssistant.lastContext, smartAssistant.chatHistory);
-            if (result.status === 'success' && result.reply) smartAssistant.addChatMessage('assistant', result.reply);
+            if (log) log.innerHTML = '';
+            if (result.status !== 'success') throw new Error(result.message || 'AI init failed');
+            if (result.reply) smartAssistant.addChatMessage('assistant', result.reply);
         } catch (error) {
             console.error('AI Context Init Error:', error);
+            if (log) log.innerHTML = '';
+            smartAssistant.addChatMessage('assistant', 'اتصال AI برقرار نشد. تنظیمات سرویس AI یا cURL/PHP سرور را بررسی کنید.');
         }
 
         document.getElementById('ai-chat-input')?.focus();
@@ -1984,10 +2017,11 @@ const smartAssistant = {
         try {
             smartAssistant.lastContext = smartAssistant.getCurrentContext();
             const result = await api.sendAIMessage(message, smartAssistant.lastContext, smartAssistant.chatHistory);
+            if (result.status !== 'success') throw new Error(result.message || 'AI request failed');
             smartAssistant.addChatMessage('assistant', result.reply || 'پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.');
         } catch (error) {
             console.error('AI Chat Error:', error);
-            smartAssistant.addChatMessage('assistant', 'فعلاً ارتباط با سرویس AI برقرار نشد، اما اطلاعات کانفیگ آماده ارسال است.');
+            smartAssistant.addChatMessage('assistant', 'ارتباط با سرویس AI برقرار نشد. لطفاً تنظیمات AI روی سرور را بررسی کنید.');
         } finally {
             if (btn) { btn.disabled = false; btn.innerText = 'ارسال'; }
         }

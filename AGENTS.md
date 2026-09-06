@@ -215,14 +215,11 @@ http://localhost:8000
 
 ## بدهی‌های فنی شناخته‌شده
 
-- Hard-code بودن اتصال دیتابیس در APIها.
-- یکپارچه نبودن تمام منطق اعتبارسنجی فرانت‌اند و بک‌اند.
-- بزرگ بودن `assets/main.js` و نیاز به ماژولار شدن.
+- بزرگ بودن `assets/main.js` و نیاز به ماژولار شدن تدریجی بدون تغییر رفتار اصلی.
 - استایل‌های پروژه به صورت Utility CSS لوکال در `assets/style.css` نگهداری می‌شوند و نباید Tailwind CDN دوباره اضافه شود.
-- وابستگی به Tailwind CDN برای Production.
 - نبود تست خودکار و CI.
 - پیشنهادهای مسیر راهنمایی از `Prepared_Server_Offers` خوانده می‌شوند و Ruleهای انتخاب باید ظرفیت، workload، GPU، رشد آینده و موجودی/زمان تامین را حفظ کنند.
-- احتمال XSS در رندر مستقیم داده‌های دیتابیس در Template Stringها.
+- مسیرهای Dynamic HTML باید همچنان با `assets/js/security.js` escape شوند.
 
 ---
 
@@ -250,3 +247,10 @@ http://localhost:8000
 
 - اتصال دیتابیس فقط از `config/database.php` و تابع `databaseConnection()` ساخته شود.
 - Secret واقعی را در کد Commit نکنید؛ از Environment Variable یا `config/database.local.php` استفاده کنید.
+
+
+## تنظیمات AI
+
+- کلید واقعی AI را هرگز Commit نکنید؛ از Environment Variable یا `config/ai.local.php` استفاده کنید.
+- `api/ai_chat.php` نباید کل دیتابیس یا کل state فرانت‌اند را ارسال کند؛ فقط Context خلاصه و whitelist شده مجاز است.
+- در صورت تغییر قرارداد AI، UI چت، مستندات و نمونه local config را هم به‌روزرسانی کنید.

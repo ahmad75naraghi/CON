@@ -1,6 +1,7 @@
 # Local environment / secrets
 .env
 config/database.local.php
+config/ai.local.php
 
 # OS/editor
 .DS_Store
