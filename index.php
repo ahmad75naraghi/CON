@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>کانفیگوراتور حرفه‌ای سرور HPE</title>
+    <link rel="icon" type="image/svg+xml" href="assets/falnic-logo.svg">
     <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
 </head>
 
@@ -13,10 +14,8 @@
     <!-- بخش انتخاب مسیر (Intro) -->
     <div id="view-intro" class="container mx-auto p-4 max-w-3xl mt-12 transition-all duration-500">
         <div class="text-center mb-10">
-            <div class="flex justify-center items-center gap-2 mb-6">
-                <span class="text-xl font-bold text-blue-900">فالنیک</span>
-                <span class="text-sm text-gray-500">(ایران اچ پی)</span>
-                <!-- لوگو فالنیک در اینجا قرار گیرد -->
+            <div class="flex justify-center items-center gap-3 mb-6">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-16 w-auto">
             </div>
             <h1 class="text-2xl font-bold text-gray-900 mb-2">سرورتون رو چطور میسازیم؟</h1>
             <p class="text-gray-600 text-sm mb-4">بسته به اینکه چقدر با مشخصات فنی سرور آشنایید، یکی از دو مسیر زیر رو انتخاب کنید.</p>
@@ -64,6 +63,9 @@
     <div id="view-pro" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-10">
             <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <div class="flex items-center gap-4">
                 <span class="text-orange-500 font-bold flex items-center gap-2">⚙️ مسیر حرفه ای</span>
                 <button onclick="wizard.showView('view-intro')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
@@ -130,6 +132,9 @@
         <!-- هدر و نوار پیشرفت چندمرحله‌ای -->
         <div class="flex justify-between items-center mb-8">
             <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <div class="flex items-center gap-4">
                 <span class="text-orange-500 font-bold flex items-center gap-2">⚙️ مسیر حرفه ای</span>
                 <button onclick="wizard.showView('view-pro')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
@@ -432,6 +437,9 @@
     <div id="view-pro-results" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-8">
             <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <button onclick="wizard.showView('view-pro-configurator')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
         </div>
 
@@ -467,6 +475,9 @@
     <div id="view-guidance" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-8">
             <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <div class="flex items-center gap-4">
                 <span class="text-teal-600 font-bold flex items-center gap-2">💡 مسیر راهنمایی</span>
                 <button onclick="wizard.prevStep()" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
@@ -496,6 +507,9 @@
     <div id="view-offers" class="hidden container mx-auto p-4 max-w-5xl mt-8">
         <div class="flex justify-between items-center mb-8">
             <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <button onclick="wizard.showView('view-guidance')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
         </div>
 
@@ -526,6 +540,9 @@
     <div id="view-server-details" class="hidden container mx-auto p-4 max-w-4xl mt-8">
         <div class="flex justify-between items-center mb-8">
             <button type="button" onclick="smartAssistant.open()" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:opacity-80 transition">✨ راهنمایی هوشمند</button>
+            <a href="index.php" class="flex items-center gap-2 text-right hover:opacity-80 transition" aria-label="فالنیک - بازگشت به شروع">
+                <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+            </a>
             <button onclick="wizard.showView('view-offers')" class="text-blue-900 text-sm font-bold flex items-center gap-1 hover:text-blue-700">بازگشت →</button>
         </div>
 
@@ -625,9 +642,12 @@
     <div id="ai-assistant-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10 rounded-2xl">
-                <div>
+                <div class="flex items-center gap-3">
+                    <img src="assets/falnic-logo.svg" alt="لوگوی فالنیک" class="h-10 w-auto">
+                    <div>
                     <h3 class="text-xl font-bold text-gray-900">✨ راهنمایی هوشمند کانفیگ سرور</h3>
                     <p class="text-sm text-gray-500 mt-1">قبل از شروع چت می‌تونید یکی از سه کانفیگ آماده پیشنهادی رو انتخاب کنید.</p>
+                    </div>
                 </div>
                 <button type="button" onclick="smartAssistant.close()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold">×</button>
             </div>

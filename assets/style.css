@@ -699,3 +699,10 @@ td {
         transition-duration: .01ms !important;
     }
 }
+
+/* Brand assets */
+.w-auto { width: auto; }
+.brand-logo-link img,
+img[alt="لوگوی فالنیک"] {
+    object-fit: contain;
+}
