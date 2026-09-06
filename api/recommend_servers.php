@@ -1,6 +1,7 @@
 <?php
 // api/recommend_servers.php
 header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../config/database.php';
 
 $inputJSON = file_get_contents('php://input');
 $request = json_decode($inputJSON, true) ?: [];
@@ -8,10 +9,6 @@ $request = json_decode($inputJSON, true) ?: [];
 $target = $request['target'] ?? [];
 $answers = $request['answers'] ?? [];
 
-$host = 'localhost';
-$db   = 'falnicc1_server_configurator';
-$user = 'falnicc1_server_configurator';
-$pass = ']Mq@b8tIGsCvCbB';
 
 $jsonFieldsMap = [
     'Chassis'             => ['storage_rules', 'cooling_rules'],
@@ -50,32 +47,48 @@ function fetchRow(PDO $pdo, string $table, $id, array $jsonFieldsMap): ?array
 
 function normalizeTarget(array $target, array $answers): array
 {
-    $cores = max(1, (int)($target['cores'] ?? 0));
-    $ram = max(1, (int)($target['ram'] ?? 0));
-    $storage = max(0, (int)($target['storage'] ?? 0));
+    $services = $answers['1'] ?? $answers[1] ?? [];
+    $users = (int)(($answers['2'][0] ?? $answers[2][0] ?? 1));
+    $perf = $answers['3'][0] ?? $answers[3][0] ?? 'med';
+    $wantsGrowth = (($answers['4'][0] ?? $answers[4][0] ?? 'no') === 'yes');
+    $localStorage = (($answers['5'][0] ?? $answers[5][0] ?? 'no') === 'no');
+    $infrastructure = $answers['6'] ?? $answers[6] ?? [];
+
+    $cores = (int)($target['cores'] ?? 0);
+    $ram = (int)($target['ram'] ?? 0);
+    $storage = (int)($target['storage'] ?? 0);
     $gpu = !empty($target['gpu']);
+    $usecase = $target['usecase'] ?? 'Guidance';
 
-    // اگر فرانت‌اند target نفرستاد، از پاسخ‌های مسیر راهنمایی یک حداقل محافظه‌کارانه می‌سازیم.
     if ($cores <= 1 || $ram <= 1) {
-        $services = $answers['1'] ?? $answers[1] ?? [];
-        $users = (int)(($answers['2'][0] ?? $answers[2][0] ?? 1));
-        $perf = $answers['3'][0] ?? $answers[3][0] ?? 'med';
-        $localStorage = ($answers['5'][0] ?? $answers[5][0] ?? 'no') === 'no';
-
         $cores = 8 * max(1, $users);
         $ram = 32 * max(1, $users);
-        if (in_array('db', $services, true) || in_array('virt', $services, true)) { $cores += 8; $ram += 64; }
-        if (in_array('ai', $services, true)) { $cores += 8; $ram += 64; $gpu = true; }
-        if ($perf === 'max') { $cores = (int)ceil($cores * 1.5); $ram = (int)ceil($ram * 1.5); }
-        if ($perf === 'min') { $cores = (int)ceil($cores * 0.75); $ram = (int)ceil($ram * 0.75); }
-        $storage = $localStorage ? max($storage, 2000 * max(1, $users)) : max($storage, 500);
+        $storage = $localStorage ? 2000 * max(1, $users) : 500;
     }
 
+    if (in_array('db', $services, true)) { $cores += 8; $ram += 64; $storage += $localStorage ? 1000 : 500; $usecase = 'Database'; }
+    if (in_array('virt', $services, true)) { $cores += 8; $ram += 96; $usecase = 'Virtualization'; }
+    if (in_array('ai', $services, true)) { $cores += 8; $ram += 64; $gpu = true; $usecase = 'AI'; }
+    if (in_array('storage', $services, true)) { $storage += 4000; $usecase = 'File Server'; }
+    if (in_array('web', $services, true)) { $cores += 4; $ram += 16; }
+    if (in_array('accounting', $services, true) || in_array('crm', $services, true)) { $ram += 16; }
+
+    if ($perf === 'max') { $cores = (int)ceil($cores * 1.5); $ram = (int)ceil($ram * 1.5); $storage = (int)ceil($storage * 1.25); }
+    if ($perf === 'min') { $cores = (int)ceil($cores * 0.75); $ram = (int)ceil($ram * 0.75); }
+    if ($wantsGrowth) { $cores = (int)ceil($cores * 1.25); $ram = (int)ceil($ram * 1.25); $storage = (int)ceil($storage * 1.25); }
+
     return [
-        'cores' => $cores,
-        'ram' => $ram,
-        'storage' => $storage,
+        'usecase' => $usecase,
+        'services' => array_values($services),
+        'user_factor' => max(1, $users),
+        'performance' => $perf,
+        'wants_growth' => $wantsGrowth,
+        'cores' => max(4, $cores),
+        'ram' => max(16, $ram),
+        'storage' => max(500, $storage),
         'gpu' => $gpu,
+        'network' => in_array('fiber', $infrastructure, true) ? 'fiber' : 'any',
+        'formFactor' => in_array('rack', $infrastructure, true) ? 'rack' : 'any',
     ];
 }
 
@@ -100,6 +113,9 @@ function getCatalogOffers(PDO $pdo): array
             $row['generation_rank'] = (int)$row['generation_rank'];
             $row['expansion_score'] = (int)$row['expansion_score'];
             $row['performance_score'] = (int)$row['performance_score'];
+            $row['stock_status'] = $row['stock_status'] ?? 'Available';
+            $row['stock_qty'] = (int)($row['stock_qty'] ?? 1);
+            $row['lead_time_days'] = (int)($row['lead_time_days'] ?? 0);
             $row['bullets'] = json_decode($row['bullets'] ?? '[]', true) ?: [];
             $row['selected_components'] = json_decode($row['selected_components'] ?? '{}', true) ?: [];
             return $row;
@@ -109,8 +125,21 @@ function getCatalogOffers(PDO $pdo): array
     }
 }
 
+function isAvailableOffer(array $offer): bool
+{
+    return ($offer['stock_status'] ?? 'Available') !== 'Unavailable' && (int)($offer['stock_qty'] ?? 1) > 0;
+}
+
+function offerHasFiberNetwork(array $offer): bool
+{
+    $encoded = json_encode($offer['selected_components'] ?? []);
+    // Network part numbers are hydrated later; for catalog scoring we use selected network presence as a soft signal.
+    return strpos($encoded ?: '', 'network') !== false || strpos(strtolower($offer['title'] ?? ''), 'fiber') !== false;
+}
+
 function meetsTarget(array $offer, array $target, float $multiplier = 1.0): bool
 {
+    if (!isAvailableOffer($offer)) return false;
     if ($offer['cpu_cores'] < ($target['cores'] * $multiplier)) return false;
     if ($offer['ram_gb'] < ($target['ram'] * $multiplier)) return false;
     if ($target['storage'] > 0 && $offer['usable_storage_gb'] < ($target['storage'] * $multiplier)) return false;
@@ -118,44 +147,67 @@ function meetsTarget(array $offer, array $target, float $multiplier = 1.0): bool
     return true;
 }
 
+function workloadBonus(array $offer, array $target): float
+{
+    $bonus = 0;
+    $services = $target['services'] ?? [];
+
+    if (in_array('ai', $services, true) && (int)$offer['gpu_memory_gb'] > 0) $bonus -= 120;
+    if (in_array('storage', $services, true) && (int)$offer['usable_storage_gb'] >= (int)$target['storage'] * 1.5) $bonus -= 80;
+    if (in_array('virt', $services, true) && (int)$offer['ram_gb'] >= (int)$target['ram'] * 1.25) $bonus -= 70;
+    if (in_array('db', $services, true) && (int)$offer['raw_storage_gb'] > 0) $bonus -= 45;
+    if (($target['network'] ?? 'any') === 'fiber' && offerHasFiberNetwork($offer)) $bonus -= 25;
+    if (!empty($target['wants_growth']) && (int)$offer['expansion_score'] >= 70) $bonus -= 60;
+
+    $stockStatus = $offer['stock_status'] ?? 'Available';
+    if ($stockStatus === 'Limited') $bonus += 20;
+    $bonus += min(60, max(0, (int)($offer['lead_time_days'] ?? 0)) * 4);
+
+    return $bonus;
+}
+
 function scoreDistance(array $offer, array $target, float $multiplier): float
 {
     return abs($offer['cpu_cores'] - ($target['cores'] * $multiplier))
         + abs(($offer['ram_gb'] - ($target['ram'] * $multiplier)) / 4)
-        + abs(($offer['usable_storage_gb'] - (($target['storage'] ?: 1) * $multiplier)) / 250);
+        + abs(($offer['usable_storage_gb'] - (($target['storage'] ?: 1) * $multiplier)) / 250)
+        + workloadBonus($offer, $target);
 }
 
 function chooseRecommendations(array $offers, array $target): array
 {
-    $eligible = array_values(array_filter($offers, fn($o) => meetsTarget($o, $target, 1.0)));
-    if (!$eligible) $eligible = $offers;
+    $available = array_values(array_filter($offers, fn($o) => isAvailableOffer($o)));
+    if (!$available) $available = $offers;
 
-    usort($eligible, fn($a, $b) => [$a['performance_score'], $a['ram_gb'], $a['usable_storage_gb']] <=> [$b['performance_score'], $b['ram_gb'], $b['usable_storage_gb']]);
+    $eligible = array_values(array_filter($available, fn($o) => meetsTarget($o, $target, 1.0)));
+    if (!$eligible) $eligible = $available;
+
+    usort($eligible, fn($a, $b) => [scoreDistance($a, $target, 1.0), $a['performance_score'], $a['ram_gb'], $a['usable_storage_gb']] <=> [scoreDistance($b, $target, 1.0), $b['performance_score'], $b['ram_gb'], $b['usable_storage_gb']]);
     $eco = $eligible[0];
 
-    $managedPool = array_values(array_filter($eligible, fn($o) => $o['id'] != $eco['id'] && $o['expansion_score'] >= 50));
-    if (!$managedPool) $managedPool = array_values(array_filter($eligible, fn($o) => $o['id'] != $eco['id']));
+    $managedPool = array_values(array_filter($eligible, fn($o) => $o['id'] != $eco['id'] && (int)$o['expansion_score'] >= 50));
+    if (!$managedPool) $managedPool = array_values(array_filter($available, fn($o) => $o['id'] != $eco['id']));
     usort($managedPool, fn($a, $b) => scoreDistance($a, $target, 1.35) <=> scoreDistance($b, $target, 1.35));
     $managed = $managedPool[0] ?? $eco;
 
-    $advancedPool = array_values(array_filter($offers, fn($o) => $o['id'] != $eco['id'] && $o['id'] != $managed['id'] && meetsTarget($o, $target, 2.0)));
+    $advancedPool = array_values(array_filter($available, fn($o) => $o['id'] != $eco['id'] && $o['id'] != $managed['id'] && meetsTarget($o, $target, 2.0)));
     if (!$advancedPool) {
-        $advancedPool = array_values(array_filter($offers, fn($o) => $o['id'] != $eco['id'] && $o['id'] != $managed['id']));
+        $advancedPool = array_values(array_filter($available, fn($o) => $o['id'] != $eco['id'] && $o['id'] != $managed['id']));
     }
-    usort($advancedPool, fn($a, $b) => [$b['generation_rank'], $b['expansion_score'], $b['performance_score']] <=> [$a['generation_rank'], $a['expansion_score'], $a['performance_score']]);
+    usort($advancedPool, fn($a, $b) => [scoreDistance($a, $target, 2.0), -$a['generation_rank'], -$a['expansion_score']] <=> [scoreDistance($b, $target, 2.0), -$b['generation_rank'], -$b['expansion_score']]);
     $advanced = $advancedPool[0] ?? $managed;
 
     $eco['recommendation_tier'] = 'eco';
     $eco['recommendation_label'] = 'اقتصادی';
-    $eco['recommendation_reason'] = 'اولین سرور آماده‌ای که نیاز شما را با کمترین منابع اضافه پوشش می‌دهد.';
+    $eco['recommendation_reason'] = 'اولین سرور آماده‌ای که نیاز شما را با کمترین منابع اضافه و موجودی قابل سفارش پوشش می‌دهد.';
 
     $managed['recommendation_tier'] = 'managed';
     $managed['recommendation_label'] = 'مدیریت‌شده';
-    $managed['recommendation_reason'] = 'انتخاب استاندارد با کارایی بهتر و فضای توسعه منطقی.';
+    $managed['recommendation_reason'] = 'انتخاب استاندارد با کارایی بهتر، ریسک کمتر و فضای توسعه منطقی.';
 
     $advanced['recommendation_tier'] = 'advanced';
     $advanced['recommendation_label'] = 'پیشرفته';
-    $advanced['recommendation_reason'] = 'ظرفیت بالاتر، نسل جدیدتر و مناسب رشد آینده.';
+    $advanced['recommendation_reason'] = 'ظرفیت بالاتر، نسل جدیدتر و مناسب رشد آینده با کمترین نگرانی ارتقا.';
 
     return [$eco, $managed, $advanced];
 }
@@ -252,6 +304,7 @@ function hydrateOffer(PDO $pdo, array $offer, array $target, array $jsonFieldsMa
     if ($riser3) $displayRows[] = ['title' => 'رایزر سوم', 'desc' => $riser3['model_name']];
     if ($psu) $displayRows[] = ['title' => 'منبع تغذیه (Power Supply)', 'desc' => $config['psuQty'] . 'X ' . $psu['model_name']];
     $displayRows[] = ['title' => 'توان تقریبی', 'desc' => $totalWatts . ' W'];
+    $displayRows[] = ['title' => 'وضعیت موجودی', 'desc' => ($offer['stock_status'] ?? 'Available') . ' — تعداد: ' . (int)($offer['stock_qty'] ?? 1) . ' — زمان تامین: ' . (int)($offer['lead_time_days'] ?? 0) . ' روز'];
 
     $offer['config'] = $config;
     $offer['display_rows'] = $displayRows;
@@ -275,10 +328,7 @@ function hydrateOffer(PDO $pdo, array $offer, array $target, array $jsonFieldsMa
 }
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
+    $pdo = databaseConnection();
 
     $normalizedTarget = normalizeTarget($target, $answers);
     $catalog = getCatalogOffers($pdo);

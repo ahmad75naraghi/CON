@@ -342,8 +342,8 @@ assets/js/
 
 ## ADR-0011 — انتقال تنظیمات اتصال دیتابیس به Config امن
 
-**وضعیت:** Proposed
-**تاریخ:** 2026-09-05
+**وضعیت:** Accepted
+**تاریخ:** 2026-09-06
 
 ### زمینه
 
@@ -351,9 +351,10 @@ assets/js/
 
 ### تصمیم پیشنهادی
 
-- ساخت فایل Config نمونه مثل `config.example.php`.
-- نگهداری فایل واقعی Config خارج از Git.
-- یا استفاده از Environment Variableها:
+- ساخت `config/database.php` به عنوان تنها نقطه ساخت PDO.
+- نگهداری Override واقعی در `config/database.local.php` که در Git Ignore شده است.
+- ارائه نمونه قابل کپی در `config/database.local.example.php`.
+- پشتیبانی از Environment Variableها:
   - `DB_HOST`
   - `DB_NAME`
   - `DB_USER`
@@ -447,7 +448,7 @@ assets/js/
 
 - انتخاب یا عدم انتخاب Framework فرانت‌اند.
 - انتخاب ابزار Build برای CSS/JS.
-- طراحی Migration System برای دیتابیس.
+- اجرای Migration جداگانه‌ی `database/migrations/2026_09_06_create_prepared_server_offers.sql` در محیط‌های موجود، پیش از فعال‌سازی پیشنهادهای آماده.
 - طراحی پنل مدیریت قطعات و قیمت‌ها.
 - انتقال Draftها از `localStorage` به ذخیره سمت سرور.
 - مدل‌سازی دقیق‌تر RAID/Controller/Backplane/NVMe.

@@ -18,6 +18,8 @@ const state = {
     currentView: 'view-intro'
 };
 
+// Security helpers are loaded from assets/js/security.js
+
 // ==========================================
 // 1. Session Manager (ذخیره و بازیابی کانفیگ‌ها)
 // ==========================================
@@ -83,10 +85,10 @@ const sessionManager = {
                 const modeName = item.stateDump.activeMode === 'pro' ? 'مسیر حرفه‌ای' : 'مسیر راهنمایی';
 
                 return `
-                <button onclick="sessionManager.load('${item.id}')" class="w-full bg-white border border-gray-200 hover:border-blue-400 hover:shadow-md text-gray-800 py-4 px-6 rounded-xl flex justify-between items-center transition text-right">
+                <button onclick="sessionManager.load(${security.inlineJson(item.id)})" class="w-full bg-white border border-gray-200 hover:border-blue-400 hover:shadow-md text-gray-800 py-4 px-6 rounded-xl flex justify-between items-center transition text-right">
                     <div>
-                        <div class="font-bold text-sm text-gray-800">${isCompleted ? `کد رهگیری: ${item.trackingCode}` : chassisName}</div>
-                        <div class="text-xs text-gray-400 mt-1">${modeName} | بروزرسانی: ${date}</div>
+                        <div class="font-bold text-sm text-gray-800">${isCompleted ? `کد رهگیری: ${h(item.trackingCode)}` : h(chassisName)}</div>
+                        <div class="text-xs text-gray-400 mt-1">${h(modeName)} | بروزرسانی: ${h(date)}</div>
                     </div>
                     <span class="font-bold text-sm ${actionClass}">${actionText}</span>
                 </button>`;
@@ -152,7 +154,7 @@ const sessionManager = {
                 cpuSelect.innerHTML = '<option value="">پردازنده را انتخاب کنید...</option>';
                 state.db.cpus.forEach(c => {
                     if (c.cores * config.chassis.max_cpus >= (state.target.cores || 0)) {
-                        cpuSelect.innerHTML += `<option value="${c.id}">${c.model_name} (${c.cores} Cores)</option>`;
+                        cpuSelect.innerHTML += `<option value="${c.id}">${h(c.model_name)} (${h(c.cores)} Cores)</option>`;
                     }
                 });
                 if (config.cpu) cpuSelect.value = config.cpu.id;
@@ -176,7 +178,7 @@ const sessionManager = {
                 state.db.rams.forEach(r => {
                     const cpuOk = !r.compatible_cpu_ids || r.compatible_cpu_ids.length === 0 || r.compatible_cpu_ids.includes(config.cpu.id);
                     if (cpuOk && (r.capacity_gb * maxRam) >= (state.target.ram || 0)) {
-                        ramSelect.innerHTML += `<option value="${r.id}">${r.model_name}</option>`;
+                        ramSelect.innerHTML += `<option value="${r.id}">${h(r.model_name)}</option>`;
                     }
                 });
                 if (config.ram) ramSelect.value = config.ram.id;
@@ -233,9 +235,9 @@ const uiRenderer = {
             tbody.innerHTML += `
                 <tr class="border-b hover:bg-gray-50 transition">
                     <td class="border p-2 text-center font-bold">${rowIndex++}</td>
-                    <td class="border p-2 font-semibold text-blue-900">${name}</td>
-                    <td class="border p-2 text-center font-mono">${qty}</td>
-                    <td class="border p-2 text-xs text-gray-600">${desc}</td>
+                    <td class="border p-2 font-semibold text-blue-900">${h(name)}</td>
+                    <td class="border p-2 text-center font-mono">${h(qty)}</td>
+                    <td class="border p-2 text-xs text-gray-600">${h(desc)}</td>
                 </tr>`;
         };
 
@@ -453,7 +455,7 @@ const validator = {
             statusText = msgWait; icon = '⬜'; textColor = 'text-gray-400';
             validator.removeHighlight(highlightFields);
         }
-        return `<div class="flex items-start gap-2 ${textColor} mb-1.5"><span class="text-base leading-none mt-1">${icon}</span> <span class="text-sm">${statusText}</span></div>`;
+        return `<div class="flex items-start gap-2 ${textColor} mb-1.5"><span class="text-base leading-none mt-1">${icon}</span> <span class="text-sm">${h(statusText)}</span></div>`;
     },
 
     addHighlight: (fields) => {
@@ -805,8 +807,8 @@ const proWizard = {
         const addRow = (title, desc) => {
             html += `<div class="flex justify-between items-center py-4 hover:bg-white transition px-2 rounded border-b last:border-0">
                         <button onclick="wizard.showView('view-pro-configurator')" class="text-blue-600 flex items-center gap-1 text-sm font-bold"><span class="text-lg">✎</span> ویرایش</button>
-                        <div class="text-right flex-1 pr-6 font-bold text-gray-800" dir="ltr">${desc}</div>
-                        <div class="text-gray-500 text-sm w-1/4 text-right">${title}</div>
+                        <div class="text-right flex-1 pr-6 font-bold text-gray-800" dir="ltr">${h(desc)}</div>
+                        <div class="text-gray-500 text-sm w-1/4 text-right">${h(title)}</div>
                      </div>`;
         };
 
@@ -970,9 +972,7 @@ const wizard = {
         }
     },
 
-    escapeHTML: (value) => String(value ?? '').replace(/[&<>'"]/g, ch => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[ch])),
+    escapeHTML: security.escapeHTML,
 
     buildTargetFromGuidance: () => {
         const services = wizard.answers[1] || [];
@@ -1082,9 +1082,10 @@ const wizard = {
                     <div>
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-xl font-bold ${theme.titleClass}">${theme.title}</h3>
-                            <span class="text-2xl">${offer.icon || theme.icon}</span>
+                            <span class="text-2xl">${h(offer.icon || theme.icon)}</span>
                         </div>
                         <div class="mb-3 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-100 rounded-lg px-3 py-2">${wizard.escapeHTML(offer.recommendation_reason)}</div>
+                        <div class="mb-3 text-xs text-green-700 bg-green-50 border border-green-300 rounded-lg px-3 py-2">موجودی: ${wizard.escapeHTML(offer.stock_status || 'Available')} — ${wizard.escapeHTML(offer.stock_qty ?? 1)} عدد — زمان تامین ${wizard.escapeHTML(offer.lead_time_days || 0)} روز</div>
                         <h4 class="font-bold text-gray-900 mb-2" dir="ltr">${wizard.escapeHTML(offer.title)}</h4>
                         <p class="text-sm text-gray-600 mb-5 line-clamp-3">${wizard.escapeHTML(offer.description)}</p>
                         <div class="grid grid-cols-2 gap-2 text-xs mb-5">
@@ -1175,7 +1176,7 @@ const configurator = {
         if (chassisSelect && state.db.chassis) {
             chassisSelect.innerHTML = '<option value="">شاسی مورد نظر را انتخاب کنید...</option>';
             state.db.chassis.forEach(c => {
-                chassisSelect.innerHTML += `<option value="${c.id}">${c.model} (${c.form_factor}) - Base: ${c.storage_rules?.base_bays || '?'}${c.storage_rules?.base_drive_type || 'SFF'}</option>`;
+                chassisSelect.innerHTML += `<option value="${c.id}">${h(c.model)} (${h(c.form_factor)}) - Base: ${h(c.storage_rules?.base_bays || '?')}${h(c.storage_rules?.base_drive_type || 'SFF')}</option>`;
             });
         }
     },
@@ -1185,7 +1186,7 @@ const configurator = {
             const el = document.getElementById(id);
             if (el && data) {
                 el.innerHTML = el.querySelector('option[value=""]')?.outerHTML || '<option value="">انتخاب کنید...</option>';
-                data.forEach(item => { el.innerHTML += `<option value="${item.id}">${item.model_name}</option>`; });
+                data.forEach(item => { el.innerHTML += `<option value="${item.id}">${h(item.model_name)}</option>`; });
             }
         };
 
@@ -1194,7 +1195,7 @@ const configurator = {
             ctrlSelect.innerHTML = '<option value="">استفاده از کنترلر پیش‌فرض مادربرد</option>';
             state.db.controllers.forEach(c => {
                 const formFactor = c.form_factor ? ` — ${c.form_factor}` : '';
-                ctrlSelect.innerHTML += `<option value="${c.id}">${c.model_name}${formFactor}</option>`;
+                ctrlSelect.innerHTML += `<option value="${c.id}">${h(c.model_name)}${h(formFactor)}</option>`;
             });
         }
         populate('gpu-select', state.db.gpus);
@@ -1220,13 +1221,13 @@ const configurator = {
 
         const defNetEl = document.getElementById('default-network-display');
         if (defNetEl && state.currentConfig.chassis.default_network) {
-            defNetEl.innerHTML = `✅ <b>کارت شبکه پیش‌فرض:</b> ${state.currentConfig.chassis.default_network}`;
+            defNetEl.innerHTML = `✅ <b>کارت شبکه پیش‌فرض:</b> ${h(state.currentConfig.chassis.default_network)}`;
             defNetEl.classList.remove('hidden');
         }
 
         const defCtrlEl = document.getElementById('default-controller-display');
         if (defCtrlEl && state.currentConfig.chassis.default_controller) {
-            defCtrlEl.innerHTML = `✅ <b>کنترلر پیش‌فرض:</b> ${state.currentConfig.chassis.default_controller}`;
+            defCtrlEl.innerHTML = `✅ <b>کنترلر پیش‌فرض:</b> ${h(state.currentConfig.chassis.default_controller)}`;
             defCtrlEl.classList.remove('hidden');
         }
 
@@ -1235,7 +1236,7 @@ const configurator = {
             cpuSelect.innerHTML = '<option value="">پردازنده را انتخاب کنید...</option>';
             state.db.cpus.forEach(c => {
                 if (c.cores * state.currentConfig.chassis.max_cpus >= (state.target.cores || 0)) {
-                    cpuSelect.innerHTML += `<option value="${c.id}">${c.model_name} (${c.cores} Cores)</option>`;
+                    cpuSelect.innerHTML += `<option value="${c.id}">${h(c.model_name)} (${h(c.cores)} Cores)</option>`;
                 }
             });
         }
@@ -1285,7 +1286,7 @@ const configurator = {
             state.db.rams.forEach(r => {
                 const cpuOk = !r.compatible_cpu_ids || r.compatible_cpu_ids.length === 0 || r.compatible_cpu_ids.includes(state.currentConfig.cpu.id);
                 if (cpuOk && (r.capacity_gb * ramQtyInput.max) >= (state.target.ram || 0)) {
-                    ramSelect.innerHTML += `<option value="${r.id}">${r.model_name}</option>`;
+                    ramSelect.innerHTML += `<option value="${r.id}">${h(r.model_name)}</option>`;
                 }
             });
         }
@@ -1336,7 +1337,7 @@ const configurator = {
                 const isSelectedElsewhere = selectedIds.includes(opt.id.toString()) && o.opticalId != opt.id;
                 if (!isSelectedElsewhere) {
                     const selected = (o.opticalId == opt.id) ? 'selected' : '';
-                    optionsHTML += `<option value="${opt.id}" ${selected}>${opt.model_name}</option>`;
+                    optionsHTML += `<option value="${opt.id}" ${selected}>${h(opt.model_name)}</option>`;
                 }
             });
             container.innerHTML += `
@@ -1402,7 +1403,7 @@ const configurator = {
                 if (!allowedFormFactor || drive.form_factor === allowedFormFactor) {
                     if ((drive.capacity_gb * maxChassisBays) >= (state.target.storage || 0)) {
                         const selected = (d.driveId == drive.id) ? 'selected' : '';
-                        optionsHTML += `<option value="${drive.id}" ${selected}>${drive.model_name}</option>`;
+                        optionsHTML += `<option value="${drive.id}" ${selected}>${h(drive.model_name)}</option>`;
                     }
                 }
             });
@@ -1468,7 +1469,7 @@ const configurator = {
             let optionsHTML = '<option value="">انتخاب کارت HBA...</option>';
             state.db.hbas.forEach(hba => {
                 const selected = (h.hbaId == hba.id) ? 'selected' : '';
-                optionsHTML += `<option value="${hba.id}" ${selected}>${hba.model_name}</option>`;
+                optionsHTML += `<option value="${hba.id}" ${selected}>${h(hba.model_name)}</option>`;
             });
             let qty = parseInt(h.qty) || 1;
             container.innerHTML += `
@@ -1495,7 +1496,7 @@ const configurator = {
 
             state.db.networks.forEach(net => {
                 const selected = (n.networkId == net.id) ? 'selected' : '';
-                optionsHTML += `<option value="${net.id}" ${selected}>${net.model_name}</option>`;
+                optionsHTML += `<option value="${net.id}" ${selected}>${h(net.model_name)}</option>`;
 
                 if (n.networkId == net.id) {
                     if (net.model_name.toUpperCase().includes('SFP')) {
@@ -1652,7 +1653,7 @@ const configurator = {
 
                     if (totalDriveBaysUsed > limit) {
                         opt.disabled = true;
-                        opt.text = `${ctrlObj.model_name} (محدود به ${match ? parseInt(match[1]) : 8} هارد - نیازمند Expander)`;
+                        opt.text = `${h(ctrlObj.model_name)} (محدود به ${h(match ? parseInt(match[1]) : 8)} هارد - نیازمند Expander)`;
                         if (ctrlSelect.value == opt.value) valIsNowInvalid = true;
                     } else {
                         opt.disabled = false;
@@ -1712,7 +1713,7 @@ const configurator = {
                 if (psuObj) {
                     if (psuObj.wattage < safeWatts) {
                         opt.disabled = true;
-                        if (!opt.text.includes('(ضعیف)')) opt.text = `${psuObj.model_name} (ضعیف - توان لازم: ${Math.ceil(safeWatts)}W)`;
+                        if (!opt.text.includes('(ضعیف)')) opt.text = `${h(psuObj.model_name)} (ضعیف - توان لازم: ${h(Math.ceil(safeWatts))}W)`;
                     } else {
                         opt.disabled = false;
                         opt.text = psuObj.model_name;
@@ -1889,9 +1890,10 @@ const smartAssistant = {
                     <div>
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="font-bold text-gray-900">${theme.title}</h4>
-                            <span class="text-2xl">${offer.icon || theme.icon}</span>
+                            <span class="text-2xl">${h(offer.icon || theme.icon)}</span>
                         </div>
-                        <p class="text-xs text-gray-500 mb-3" dir="ltr">${wizard.escapeHTML(offer.title)}</p>
+                        <p class="text-xs text-gray-500 mb-2" dir="ltr">${wizard.escapeHTML(offer.title)}</p>
+                        <p class="text-xs text-green-700 bg-green-50 border border-green-300 rounded p-2 mb-3">موجودی: ${wizard.escapeHTML(offer.stock_status || 'Available')} — ${wizard.escapeHTML(offer.stock_qty ?? 1)} عدد</p>
                         <div class="grid grid-cols-2 gap-2 text-xs mb-4">
                             <div class="bg-gray-50 rounded p-2"><span class="text-gray-400 block">CPU</span><b>${offer.cpu_cores} Core</b></div>
                             <div class="bg-gray-50 rounded p-2"><span class="text-gray-400 block">RAM</span><b>${offer.ram_gb} GB</b></div>
@@ -1899,7 +1901,7 @@ const smartAssistant = {
                             <div class="bg-gray-50 rounded p-2"><span class="text-gray-400 block">Gen</span><b>${offer.generation_rank}</b></div>
                         </div>
                     </div>
-                    <button type="button" onclick="smartAssistant.applyOffer('${offer.recommendation_tier}')" class="w-full py-2 rounded-lg font-bold transition ${theme.btn}">انتخاب این سرور</button>
+                    <button type="button" onclick="smartAssistant.applyOffer(${security.inlineJson(offer.recommendation_tier)})" class="w-full py-2 rounded-lg font-bold transition ${theme.btn}">انتخاب این سرور</button>
                 </div>`;
         }).join('');
     },

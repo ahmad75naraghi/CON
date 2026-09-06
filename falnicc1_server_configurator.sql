@@ -780,6 +780,9 @@ CREATE TABLE `Prepared_Server_Offers` (
   `performance_score` int(11) NOT NULL DEFAULT 0,
   `selected_components` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`selected_components`)),
   `bullets` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`bullets` is null or json_valid(`bullets`)),
+  `stock_status` enum('Available','Limited','Unavailable') NOT NULL DEFAULT 'Available',
+  `stock_qty` int(11) NOT NULL DEFAULT 0,
+  `lead_time_days` int(11) NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -789,10 +792,10 @@ CREATE TABLE `Prepared_Server_Offers` (
 -- Dumping data for table `Prepared_Server_Offers`
 --
 
-INSERT INTO `Prepared_Server_Offers` (`id`, `title`, `description`, `icon`, `cpu_cores`, `ram_gb`, `usable_storage_gb`, `raw_storage_gb`, `gpu_memory_gb`, `generation_rank`, `expansion_score`, `performance_score`, `selected_components`, `bullets`) VALUES
-(1, 'DL360 Gen9 اقتصادی', 'کم‌هزینه‌ترین سرور آماده‌ای که حداقل نیازهای پایه را پوشش می‌دهد و برای شروع کار مناسب است.', '🖨️', 12, 64, 2000, 4000, 0, 9, 35, 12064, '{"chassis_id":3,"cpu":{"id":55,"qty":1},"ram":{"id":20,"qty":2},"drives":[{"id":127,"qty":2,"raid":"1"}],"controller":null,"sas_expander":false,"gpu":null,"networks":[],"riser2":null,"riser3":null,"psu":{"id":13,"qty":2},"hbas":[],"optical_drives":[]}', '["ضعیف‌ترین گزینه‌ای که کار را راه می‌اندازد","مناسب سرویس‌های عمومی، حسابداری، CRM و تیم‌های کوچک","مصرف توان و هزینه اولیه کمتر"]'),
-(2, 'DL380 Gen10 مدیریت‌شده', 'ترکیب استاندارد و متعادل با پردازنده دوگانه، رم بیشتر، RAID سخت‌افزاری و فضای توسعه مناسب برای چند سال آینده.', '🏢', 32, 256, 3840, 7680, 0, 10, 70, 32256, '{"chassis_id":1,"cpu":{"id":25,"qty":2},"ram":{"id":5,"qty":4},"drives":[{"id":31,"qty":4,"raid":"10"}],"controller":{"id":2},"sas_expander":false,"gpu":null,"networks":[{"id":2,"qty":1}],"riser2":{"id":3},"riser3":null,"psu":{"id":3,"qty":2},"hbas":[],"optical_drives":[]}', '["تعادل خوب بین هزینه، کارایی و پایداری","فضای توسعه مناسب برای رشد سازمان","مناسب دیتابیس، مجازی‌سازی سبک و سرویس‌های سازمانی"]'),
-(3, 'ML110 Gen11 پیشرفته', 'گزینه نسل جدیدتر با ظرفیت ذخیره‌سازی بسیار بالاتر، NVMe، رم مناسب و GPU برای رشد آینده و بارهای سنگین‌تر.', '🚀', 32, 256, 25600, 51200, 24, 11, 85, 32256, '{"chassis_id":2,"cpu":{"id":37,"qty":1},"ram":{"id":14,"qty":4},"drives":[{"id":76,"qty":4,"raid":"10"}],"controller":{"id":12},"sas_expander":false,"gpu":{"id":7,"qty":1},"networks":[{"id":3,"qty":1}],"riser2":{"id":18},"riser3":null,"psu":{"id":11,"qty":2},"hbas":[],"optical_drives":[]}', '["نسل جدیدتر و مناسب‌تر برای ارتقای آینده","ظرفیت ذخیره‌سازی چندبرابر نیازهای معمول","آماده برای GPU، AI سبک، VDI یا بارهای پیشرفته"]');
+INSERT INTO `Prepared_Server_Offers` (`id`, `title`, `description`, `icon`, `cpu_cores`, `ram_gb`, `usable_storage_gb`, `raw_storage_gb`, `gpu_memory_gb`, `generation_rank`, `expansion_score`, `performance_score`, `selected_components`, `bullets`, `stock_status`, `stock_qty`, `lead_time_days`) VALUES
+(1, 'DL360 Gen9 اقتصادی', 'کم‌هزینه‌ترین سرور آماده‌ای که حداقل نیازهای پایه را پوشش می‌دهد و برای شروع کار مناسب است.', '🖨️', 12, 64, 2000, 4000, 0, 9, 35, 12064, '{"chassis_id":3,"cpu":{"id":55,"qty":1},"ram":{"id":20,"qty":2},"drives":[{"id":127,"qty":2,"raid":"1"}],"controller":null,"sas_expander":false,"gpu":null,"networks":[],"riser2":null,"riser3":null,"psu":{"id":13,"qty":2},"hbas":[],"optical_drives":[]}', '["ضعیف‌ترین گزینه‌ای که کار را راه می‌اندازد","مناسب سرویس‌های عمومی، حسابداری، CRM و تیم‌های کوچک","مصرف توان و هزینه اولیه کمتر"]', 'Available', 3, 1),
+(2, 'DL380 Gen10 مدیریت‌شده', 'ترکیب استاندارد و متعادل با پردازنده دوگانه، رم بیشتر، RAID سخت‌افزاری و فضای توسعه مناسب برای چند سال آینده.', '🏢', 32, 256, 3840, 7680, 0, 10, 70, 32256, '{"chassis_id":1,"cpu":{"id":25,"qty":2},"ram":{"id":5,"qty":4},"drives":[{"id":31,"qty":4,"raid":"10"}],"controller":{"id":2},"sas_expander":false,"gpu":null,"networks":[{"id":2,"qty":1}],"riser2":{"id":3},"riser3":null,"psu":{"id":3,"qty":2},"hbas":[],"optical_drives":[]}', '["تعادل خوب بین هزینه، کارایی و پایداری","فضای توسعه مناسب برای رشد سازمان","مناسب دیتابیس، مجازی‌سازی سبک و سرویس‌های سازمانی"]', 'Available', 2, 2),
+(3, 'ML110 Gen11 پیشرفته', 'گزینه نسل جدیدتر با ظرفیت ذخیره‌سازی بسیار بالاتر، NVMe، رم مناسب و GPU برای رشد آینده و بارهای سنگین‌تر.', '🚀', 32, 256, 25600, 51200, 24, 11, 85, 32256, '{"chassis_id":2,"cpu":{"id":37,"qty":1},"ram":{"id":14,"qty":4},"drives":[{"id":76,"qty":4,"raid":"10"}],"controller":{"id":12},"sas_expander":false,"gpu":{"id":7,"qty":1},"networks":[{"id":3,"qty":1}],"riser2":{"id":18},"riser3":null,"psu":{"id":11,"qty":2},"hbas":[],"optical_drives":[]}', '["نسل جدیدتر و مناسب‌تر برای ارتقای آینده","ظرفیت ذخیره‌سازی چندبرابر نیازهای معمول","آماده برای GPU، AI سبک، VDI یا بارهای پیشرفته"]', 'Limited', 1, 5);
 
 --
 -- Table structure for table `User_Configurations`
@@ -918,7 +921,8 @@ ALTER TABLE `Storage_Drives`
 ALTER TABLE `Prepared_Server_Offers`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_ready_offer_capacity` (`cpu_cores`,`ram_gb`,`usable_storage_gb`),
-  ADD KEY `idx_ready_offer_generation` (`generation_rank`,`expansion_score`);
+  ADD KEY `idx_ready_offer_generation` (`generation_rank`,`expansion_score`),
+  ADD KEY `idx_ready_offer_stock` (`is_active`,`stock_status`,`stock_qty`);
 
 --
 -- Indexes for table `User_Configurations`

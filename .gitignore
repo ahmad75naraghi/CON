@@ -1,0 +1,11 @@
+# Local environment / secrets
+.env
+config/database.local.php
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+*.log

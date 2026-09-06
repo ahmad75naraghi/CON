@@ -266,7 +266,7 @@ GET /api/get_data.php?chassis_id=1
 }
 ```
 
-پاسخ شامل `target` نرمال‌شده، سه `offers`، کانفیگ کامل قابل ثبت و ردیف‌های نمایشی پیش‌فاکتور است.
+پاسخ شامل `target` نرمال‌شده، دقیقاً سه `offers`، کانفیگ کامل قابل ثبت، ردیف‌های نمایشی پیش‌فاکتور و وضعیت موجودی/زمان تامین است.
 
 ### `POST /api/submit_config.php`
 
@@ -368,16 +368,24 @@ CREATE DATABASE falnicc1_server_configurator CHARACTER SET utf8mb4 COLLATE utf8m
 mysql -u <db_user> -p falnicc1_server_configurator < falnicc1_server_configurator.sql
 ```
 
-### 3. تنظیم اتصال دیتابیس
+### 3. تنظیم امن اتصال دیتابیس
 
-اتصال دیتابیس در حال حاضر داخل فایل‌های زیر تعریف شده است:
+اتصال دیتابیس فقط از `config/database.php` و تابع `databaseConnection()` ساخته می‌شود. برای محیط واقعی، یکی از این دو روش را استفاده کنید:
 
-- `api/get_data.php`
-- `api/submit_config.php`
+1. تعریف متغیرهای محیطی `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`, `DB_CHARSET`
+2. کپی کردن `config/database.local.example.php` به `config/database.local.php` و تنظیم مقادیر محلی. فایل local در Git ذخیره نمی‌شود.
 
-برای محیط واقعی بهتر است مقادیر اتصال از متغیرهای محیطی یا فایل تنظیمات خارج از Git خوانده شوند.
+### 4. Migration دیتابیس‌های موجود
 
-### 4. اجرای پروژه با سرور داخلی PHP
+برای محیط‌هایی که دیتابیس قبلاً Import شده، Migration جداگانه زیر اضافه شده است:
+
+```text
+database/migrations/2026_09_06_create_prepared_server_offers.sql
+```
+
+این Migration جدول `Prepared_Server_Offers`، ستون‌های موجودی (`stock_status`, `stock_qty`, `lead_time_days`) و سه Seed پیشنهاد آماده را به‌روزرسانی می‌کند.
+
+### 5. اجرای پروژه با سرور داخلی PHP
 
 ```bash
 php -S 0.0.0.0:8000
@@ -410,7 +418,7 @@ http://localhost:8000
 
 ## محدودیت‌های فعلی
 
-- پیشنهادهای مسیر راهنمایی اکنون از جدول `Prepared_Server_Offers` می‌آیند، اما Ruleها و امتیازدهی آن هنوز قابل دقیق‌تر شدن است.
+- پیشنهادهای مسیر راهنمایی اکنون با Ruleهای کامل‌تر ظرفیت، workload، GPU، رشد آینده، موجودی و زمان تامین از `Prepared_Server_Offers` انتخاب می‌شوند.
 - وابستگی Tailwind CDN حذف شده و استایل‌ها در `assets/style.css` نگهداری می‌شوند؛ برای تغییر ظاهر باید همین فایل به‌روزرسانی شود.
 - قیمت اکثر قطعات `NULL` است؛ بنابراین `total_price` معمولاً `null` و `price_incomplete=true` می‌شود.
 - اعتبارسنجی سمت سرور هنوز همه‌ی محدودیت‌های پیچیده‌ی فرانت‌اند مثل PCIe Slot، RAID Level دقیق، ظرفیت Bay و توان PSU را به‌صورت کامل بازسازی نکرده است.
