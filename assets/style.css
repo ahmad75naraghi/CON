@@ -706,3 +706,7 @@ td {
 img[alt="لوگوی فالنیک"] {
     object-fit: contain;
 }
+
+.pro-step-container {
+    min-height: 1px;
+}

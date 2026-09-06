@@ -290,7 +290,7 @@ const uiRenderer = {
             document.querySelectorAll('[id^="validator-"] > div').forEach(div => {
                 if (div.innerText.includes('⚠️')) {
                     hasAlerts = true;
-                    alertsDiv.innerHTML += `<div class="text-sm text-gray-700 flex items-start gap-2"><span class="mt-1 text-yellow-600 font-bold">⚠️</span> <span>${div.innerText.replace('⚠️', '').trim()}</span></div>`;
+                    alertsDiv.innerHTML += `<div class="text-sm text-gray-700 flex items-start gap-2"><span class="mt-1 text-yellow-600 font-bold">⚠️</span> <span>${h(div.innerText.replace('⚠️', '').trim())}</span></div>`;
                 }
             });
             hasAlerts ? alertsContainer.classList.remove('hidden') : alertsContainer.classList.add('hidden');
@@ -769,7 +769,7 @@ const proWizard = {
             progressHTML += `
                 <div class="flex items-center gap-2 bg-white px-2 cursor-pointer transition hover:opacity-80" onclick="proWizard.currentStep = ${stepNum}; proWizard.render();">
                     <span class="${stateClass} flex items-center justify-center w-6 h-6 rounded-md text-xs transition-all duration-300">${icon}</span>
-                    <span class="${textClass} text-xs hidden md:inline-block">${cfg.label}</span>
+                    <span class="${textClass} text-xs hidden md:inline-block">${h(cfg.label)}</span>
                 </div>`;
         });
         progressHTML += `</div>`;
@@ -903,11 +903,11 @@ const wizard = {
             let stateClass = i < wizard.currentStepIndex ? 'bg-green-100 text-green-700 border border-green-300' :
                              (i === wizard.currentStepIndex ? 'bg-blue-100 text-blue-900' : 'bg-white text-gray-400 border border-gray-200');
             let content = i < wizard.currentStepIndex ? '✔' : `0${i + 1}`;
-            progressHTML += `<span class="${stateClass} px-3 py-1 rounded-md z-10 font-mono text-xs shadow-sm">${content}</span>`;
+            progressHTML += `<span class="${stateClass} px-3 py-1 rounded-md z-10 font-mono text-xs shadow-sm">${h(content)}</span>`;
         }
         document.getElementById('guidance-progress').innerHTML = progressHTML;
 
-        let html = step.tip ? `<p class="text-yellow-600 text-xs font-bold flex items-center gap-1 mb-6"><span>💡</span> ${step.tip}</p>` : '';
+        let html = step.tip ? `<p class="text-yellow-600 text-xs font-bold flex items-center gap-1 mb-6"><span>💡</span> ${h(step.tip)}</p>` : '';
         html += `<div class="${step.type === 'checkbox' ? 'grid md:grid-cols-3 gap-y-4 gap-x-2' : 'space-y-3'}">`;
 
         step.options.forEach(opt => {
@@ -915,17 +915,17 @@ const wizard = {
             if (step.type === 'radio') {
                 html += `
                 <label class="flex justify-between items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition ${isChecked ? 'ring-2 ring-blue-500 bg-blue-50' : ''}">
-                    <span class="text-xs text-gray-500">${opt.desc}</span>
+                    <span class="text-xs text-gray-500">${h(opt.desc)}</span>
                     <div class="flex items-center gap-3">
-                        <span class="text-sm font-bold text-gray-800">${opt.label}</span>
-                        <input type="radio" name="step_${step.id}" value="${opt.val}" class="w-5 h-5 text-blue-600 focus:ring-blue-500" onchange="wizard.validateStep()" ${isChecked}>
+                        <span class="text-sm font-bold text-gray-800">${h(opt.label)}</span>
+                        <input type="radio" name="step_${step.id}" value="${security.attr(opt.val)}" class="w-5 h-5 text-blue-600 focus:ring-blue-500" onchange="wizard.validateStep()" ${isChecked}>
                     </div>
                 </label>`;
             } else {
                 html += `
                 <label class="flex items-center justify-end gap-3 cursor-pointer flex-row-reverse p-2 hover:bg-gray-50 rounded transition">
-                    <span class="text-sm text-gray-700 font-medium">${opt.label}</span>
-                    <input type="checkbox" value="${opt.val}" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="wizard.validateStep()" ${isChecked}>
+                    <span class="text-sm text-gray-700 font-medium">${h(opt.label)}</span>
+                    <input type="checkbox" value="${security.attr(opt.val)}" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="wizard.validateStep()" ${isChecked}>
                 </label>`;
             }
         });

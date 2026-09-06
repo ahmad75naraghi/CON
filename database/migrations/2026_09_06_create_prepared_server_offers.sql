@@ -5,7 +5,7 @@
 START TRANSACTION;
 
 CREATE TABLE IF NOT EXISTS `Prepared_Server_Offers` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `icon` varchar(20) DEFAULT NULL,
@@ -24,7 +24,11 @@ CREATE TABLE IF NOT EXISTS `Prepared_Server_Offers` (
   `lead_time_days` int(11) NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_ready_offer_capacity` (`cpu_cores`,`ram_gb`,`usable_storage_gb`),
+  KEY `idx_ready_offer_generation` (`generation_rank`,`expansion_score`),
+  KEY `idx_ready_offer_stock` (`is_active`,`stock_status`,`stock_qty`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -35,13 +39,9 @@ ALTER TABLE `Prepared_Server_Offers`
   ADD COLUMN IF NOT EXISTS `lead_time_days` int(11) NOT NULL DEFAULT 0 AFTER `stock_qty`;
 
 ALTER TABLE `Prepared_Server_Offers`
-  ADD PRIMARY KEY IF NOT EXISTS (`id`),
   ADD KEY IF NOT EXISTS `idx_ready_offer_capacity` (`cpu_cores`,`ram_gb`,`usable_storage_gb`),
   ADD KEY IF NOT EXISTS `idx_ready_offer_generation` (`generation_rank`,`expansion_score`),
   ADD KEY IF NOT EXISTS `idx_ready_offer_stock` (`is_active`,`stock_status`,`stock_qty`);
-
-ALTER TABLE `Prepared_Server_Offers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 INSERT INTO `Prepared_Server_Offers` (`id`, `title`, `description`, `icon`, `cpu_cores`, `ram_gb`, `usable_storage_gb`, `raw_storage_gb`, `gpu_memory_gb`, `generation_rank`, `expansion_score`, `performance_score`, `selected_components`, `bullets`, `stock_status`, `stock_qty`, `lead_time_days`) VALUES
 (1, 'DL360 Gen9 اقتصادی', 'کم‌هزینه‌ترین سرور آماده‌ای که حداقل نیازهای پایه را پوشش می‌دهد و برای شروع کار مناسب است.', '🖨️', 12, 64, 2000, 4000, 0, 9, 35, 12064, '{"chassis_id":3,"cpu":{"id":55,"qty":1},"ram":{"id":20,"qty":2},"drives":[{"id":127,"qty":2,"raid":"1"}],"controller":null,"sas_expander":false,"gpu":null,"networks":[],"riser2":null,"riser3":null,"psu":{"id":13,"qty":2},"hbas":[],"optical_drives":[]}', '["ضعیف‌ترین گزینه‌ای که کار را راه می‌اندازد","مناسب سرویس‌های عمومی، حسابداری، CRM و تیم‌های کوچک","مصرف توان و هزینه اولیه کمتر"]', 'Available', 3, 1),
