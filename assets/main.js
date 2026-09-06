@@ -1791,17 +1791,29 @@ const smartAssistant = {
     chatStarted: false,
     chatHistory: [],
     lastContext: null,
+    chatStorageKey: 'falnic_ai_chat_history',
 
     open: async () => {
         const modal = document.getElementById('ai-assistant-modal');
         if (!modal) return;
         modal.classList.remove('hidden');
-        smartAssistant.chatStarted = false;
-        smartAssistant.chatHistory = [];
+        smartAssistant.loadChatHistory();
 
         const offersPanel = document.getElementById('ai-offers-panel');
         const chatPanel = document.getElementById('ai-chat-panel');
         const startBtn = document.getElementById('ai-start-chat-btn');
+
+        if (smartAssistant.chatHistory.length > 0) {
+            smartAssistant.chatStarted = true;
+            if (offersPanel) offersPanel.classList.add('hidden');
+            if (chatPanel) chatPanel.classList.remove('hidden');
+            if (startBtn) startBtn.classList.add('hidden');
+            smartAssistant.renderChatHistory();
+            document.getElementById('ai-chat-input')?.focus();
+            return;
+        }
+
+        smartAssistant.chatStarted = false;
         if (offersPanel) offersPanel.classList.remove('hidden');
         if (chatPanel) chatPanel.classList.add('hidden');
         if (startBtn) startBtn.classList.remove('hidden');
@@ -1811,6 +1823,29 @@ const smartAssistant = {
 
     close: () => {
         document.getElementById('ai-assistant-modal')?.classList.add('hidden');
+    },
+
+    loadChatHistory: () => {
+        try {
+            smartAssistant.chatHistory = JSON.parse(sessionStorage.getItem(smartAssistant.chatStorageKey) || '[]');
+        } catch (error) {
+            smartAssistant.chatHistory = [];
+        }
+    },
+
+    saveChatHistory: () => {
+        try {
+            sessionStorage.setItem(smartAssistant.chatStorageKey, JSON.stringify(smartAssistant.chatHistory.slice(-20)));
+        } catch (error) {
+            console.warn('AI chat history could not be saved.', error);
+        }
+    },
+
+    resetChat: async () => {
+        smartAssistant.chatHistory = [];
+        smartAssistant.chatStarted = false;
+        sessionStorage.removeItem(smartAssistant.chatStorageKey);
+        await smartAssistant.open();
     },
 
     getCurrentStep: () => {
@@ -1977,7 +2012,7 @@ const smartAssistant = {
             const result = await api.sendAIMessage('__context_init__', smartAssistant.lastContext, smartAssistant.chatHistory);
             if (log) log.innerHTML = '';
             if (result.status !== 'success') throw new Error(result.message || 'AI init failed');
-            if (result.reply) smartAssistant.addChatMessage('assistant', result.reply);
+            if (result.reply) smartAssistant.addChatMessage('assistant', result.reply, { question: result.question, quickReplies: result.quick_replies, actions: result.actions });
         } catch (error) {
             console.error('AI Context Init Error:', error);
             if (log) log.innerHTML = '';
@@ -1987,18 +2022,134 @@ const smartAssistant = {
         document.getElementById('ai-chat-input')?.focus();
     },
 
-    addChatMessage: (role, text) => {
-        const log = document.getElementById('ai-chat-log');
-        if (!log) return;
-        const isUser = role === 'user';
-        smartAssistant.chatHistory.push({ role, text, timestamp: Date.now() });
-        log.innerHTML += `
+    renderAiText: (text) => {
+        const escaped = h(text || '').replace(/\n{3,}/g, '\n\n');
+        return escaped
+            .split(/\n+/)
+            .filter(line => line.trim() !== '')
+            .map(line => `<p class="mb-2 last:mb-0">${line.replace(/^[-•]\s*/, '• ')}</p>`)
+            .join('');
+    },
+
+    renderMessageMeta: (entry) => {
+        if (entry.role !== 'assistant') return '';
+        const quickReplies = Array.isArray(entry.quickReplies) ? entry.quickReplies.slice(0, 3) : [];
+        const actions = Array.isArray(entry.actions) ? entry.actions.slice(0, 2) : [];
+        const question = entry.question ? `<div class="mt-3 pt-3 border-t border-gray-100 font-bold text-blue-900">${h(entry.question)}</div>` : '';
+        const quickHtml = quickReplies.length ? `
+            <div class="mt-3 flex flex-wrap gap-2">
+                ${quickReplies.map(item => `<button type="button" class="ai-choice-btn" onclick="smartAssistant.sendQuickReply(${security.inlineJson(item.message)})">${h(item.label)}</button>`).join('')}
+            </div>` : '';
+        const actionHtml = actions.length ? `
+            <div class="mt-3 flex flex-wrap gap-2">
+                ${actions.map(action => `<button type="button" class="ai-action-btn" onclick="smartAssistant.applyAIAction(${security.inlineJson(action)})">${h(action.label)}</button>`).join('')}
+            </div>` : '';
+        return question + actionHtml + quickHtml;
+    },
+
+    renderChatEntry: (entry) => {
+        const isUser = entry.role === 'user';
+        const body = isUser ? h(entry.text) : smartAssistant.renderAiText(entry.text);
+        return `
             <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
-                <div class="${isUser ? 'bg-blue-900 text-white' : 'bg-white text-gray-800 border border-gray-200'} rounded-xl px-4 py-3 max-w-[80%] shadow-sm leading-relaxed">
-                    ${wizard.escapeHTML(text)}
+                <div class="${isUser ? 'bg-blue-900 text-white' : 'bg-white text-gray-800 border border-gray-200'} rounded-xl px-4 py-3 max-w-[85%] shadow-sm leading-relaxed ai-message">
+                    ${body}
+                    ${smartAssistant.renderMessageMeta(entry)}
                 </div>
             </div>`;
+    },
+
+    renderChatHistory: () => {
+        const log = document.getElementById('ai-chat-log');
+        if (!log) return;
+        log.innerHTML = smartAssistant.chatHistory.map(entry => smartAssistant.renderChatEntry(entry)).join('');
         log.scrollTop = log.scrollHeight;
+    },
+
+    addChatMessage: (role, text, meta = {}) => {
+        const log = document.getElementById('ai-chat-log');
+        const entry = {
+            role,
+            text: String(text || '').slice(0, 1600),
+            question: meta.question || '',
+            quickReplies: Array.isArray(meta.quickReplies) ? meta.quickReplies.slice(0, 3) : [],
+            actions: Array.isArray(meta.actions) ? meta.actions.slice(0, 2) : [],
+            timestamp: Date.now()
+        };
+        smartAssistant.chatHistory.push(entry);
+        smartAssistant.chatHistory = smartAssistant.chatHistory.slice(-20);
+        smartAssistant.saveChatHistory();
+        if (!log) return;
+        log.innerHTML += smartAssistant.renderChatEntry(entry);
+        log.scrollTop = log.scrollHeight;
+    },
+
+    sendQuickReply: async (message) => {
+        const input = document.getElementById('ai-chat-input');
+        if (input) input.value = message;
+        await smartAssistant.sendMessage({ preventDefault: () => {} });
+    },
+
+    applyAIAction: async (action) => {
+        if (!action || typeof action !== 'object') return;
+        const payload = action.payload || {};
+        let applied = false;
+
+        if (action.type === 'set_ram_qty') {
+            const qty = Math.max(1, Math.min(parseInt(payload.qty) || 1, state.currentConfig.chassis?.max_ram_slots || 24));
+            if (state.currentConfig.ram) {
+                state.currentConfig.ramQty = qty;
+                const ramQtyInput = document.getElementById('ram-qty');
+                if (ramQtyInput) ramQtyInput.value = qty;
+                applied = true;
+            }
+        }
+
+        if (action.type === 'set_ram_total') {
+            const totalGb = parseInt(payload.total_gb) || 0;
+            if (state.currentConfig.ram && totalGb > 0) {
+                const capacity = parseInt(state.currentConfig.ram.capacity_gb) || 1;
+                const qty = Math.ceil(totalGb / capacity);
+                state.currentConfig.ramQty = Math.max(1, Math.min(qty, state.currentConfig.chassis?.max_ram_slots || 24));
+                const ramQtyInput = document.getElementById('ram-qty');
+                if (ramQtyInput) ramQtyInput.value = state.currentConfig.ramQty;
+                applied = true;
+            }
+        }
+
+        if (action.type === 'set_cpu_qty') {
+            const qty = Math.max(1, Math.min(parseInt(payload.qty) || 1, state.currentConfig.chassis?.max_cpus || 2));
+            state.currentConfig.cpuQty = qty;
+            const cpuQtyInput = document.getElementById('cpu-qty');
+            if (cpuQtyInput) cpuQtyInput.value = qty;
+            configurator.updateCpu();
+            applied = true;
+        }
+
+        if (action.type === 'set_psu_qty') {
+            const qty = Math.max(1, Math.min(parseInt(payload.qty) || 1, state.currentConfig.chassis?.max_psu_bays || 2));
+            state.currentConfig.psuQty = qty;
+            applied = true;
+        }
+
+        if (action.type === 'add_drive_raid10') {
+            const driveId = String(payload.drive_id || '');
+            const qty = Math.max(4, parseInt(payload.qty) || 4);
+            if (driveId) {
+                state.currentConfig.drives.push({ driveId, qty, raid: '10' });
+                configurator.renderDrives();
+                applied = true;
+            }
+        }
+
+        if (applied) {
+            configurator.calculateSummary();
+            validator.runChecks();
+            sessionManager.save('draft');
+            smartAssistant.addChatMessage('assistant', `انجام شد: ${action.label}. کانفیگ و اعتبارسنجی به‌روزرسانی شد.`);
+        } else {
+            smartAssistant.addChatMessage('assistant', 'این تغییر با وضعیت فعلی کانفیگ قابل اعمال خودکار نیست. لطفاً اول قطعه مرتبط را انتخاب کنید.');
+        }
     },
 
     sendMessage: async (event) => {
@@ -2018,7 +2169,7 @@ const smartAssistant = {
             smartAssistant.lastContext = smartAssistant.getCurrentContext();
             const result = await api.sendAIMessage(message, smartAssistant.lastContext, smartAssistant.chatHistory);
             if (result.status !== 'success') throw new Error(result.message || 'AI request failed');
-            smartAssistant.addChatMessage('assistant', result.reply || 'پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.');
+            smartAssistant.addChatMessage('assistant', result.reply || 'پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.', { question: result.question, quickReplies: result.quick_replies, actions: result.actions });
         } catch (error) {
             console.error('AI Chat Error:', error);
             smartAssistant.addChatMessage('assistant', 'ارتباط با سرویس AI برقرار نشد. لطفاً تنظیمات AI روی سرور را بررسی کنید.');

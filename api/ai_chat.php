@@ -24,7 +24,7 @@ function sanitizeText($value, int $limit = 1000): string
 {
     $text = trim(strip_tags((string)$value));
     $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $text) ?? '';
-    return substr($text, 0, $limit);
+    return function_exists('mb_substr') ? mb_substr($text, 0, $limit, 'UTF-8') : substr($text, 0, $limit);
 }
 
 function pickFields(?array $row, array $fields): ?array
@@ -37,6 +37,39 @@ function pickFields(?array $row, array $fields): ?array
         }
     }
     return $result ?: null;
+}
+
+
+function sanitizeAssocRecursive($value, int $depth = 0)
+{
+    if ($depth > 3) return null;
+    if (is_array($value)) {
+        $out = [];
+        foreach ($value as $key => $item) {
+            $safeKey = is_string($key) ? sanitizeText($key, 50) : $key;
+            $out[$safeKey] = sanitizeAssocRecursive($item, $depth + 1);
+        }
+        return $out;
+    }
+    if (is_bool($value) || is_int($value) || is_float($value) || $value === null) return $value;
+    return sanitizeText($value, 180);
+}
+
+function cleanCustomerReply(string $text): string
+{
+    $text = sanitizeText($text, 900);
+    $lines = preg_split('/\R/u', $text) ?: [];
+    $clean = [];
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '') continue;
+        if (strpos($line, '|') === 0 || preg_match('/^[-:| ]{5,}$/u', $line)) continue;
+        $line = preg_replace('/^#{1,6}\s*/u', '', $line) ?? $line;
+        $line = preg_replace('/\*\*(.*?)\*\*/u', '$1', $line) ?? $line;
+        $clean[] = $line;
+        if (count($clean) >= 5) break;
+    }
+    return implode("\n", $clean);
 }
 
 function compactConfigSummary(array $context): array
@@ -77,8 +110,8 @@ function compactConfigSummary(array $context): array
         'page' => [
             'active_view' => sanitizeText($context['activeView'] ?? '', 80),
             'active_mode' => sanitizeText($context['activeMode'] ?? '', 30),
-            'current_step' => is_array($context['currentStep'] ?? null) ? $context['currentStep'] : null,
-            'validation' => is_array($context['validation'] ?? null) ? array_slice($context['validation'], 0, 12) : [],
+            'current_step' => is_array($context['currentStep'] ?? null) ? sanitizeAssocRecursive($context['currentStep']) : null,
+            'validation' => array_map(fn($item) => sanitizeAssocRecursive($item), is_array($context['validation'] ?? null) ? array_slice($context['validation'], 0, 12) : []),
         ],
         'target' => [
             'cores' => (int)($target['cores'] ?? 0),
@@ -198,7 +231,7 @@ function databaseSignals(array $context): array
     return $signals;
 }
 
-function compactHistory(array $history): array
+function compactHistory(array $history, string $currentMessage = ''): array
 {
     $messages = [];
     foreach (array_slice($history, -8) as $item) {
@@ -206,10 +239,126 @@ function compactHistory(array $history): array
         $role = ($item['role'] ?? '') === 'user' ? 'user' : 'assistant';
         $text = sanitizeText($item['text'] ?? '', 700);
         if ($text !== '' && $text !== '__context_init__') {
+            if ($role === 'user' && $currentMessage !== '' && $text === $currentMessage) continue;
             $messages[] = ['role' => $role, 'content' => $text];
         }
     }
     return $messages;
+}
+
+
+function decodeAiJson(string $raw): ?array
+{
+    $text = trim($raw);
+    $text = preg_replace('/^```(?:json)?\s*|\s*```$/u', '', $text) ?? $text;
+    $decoded = json_decode($text, true);
+    if (is_array($decoded)) return $decoded;
+
+    $start = strpos($text, '{');
+    $end = strrpos($text, '}');
+    if ($start !== false && $end !== false && $end > $start) {
+        $candidate = substr($text, $start, $end - $start + 1);
+        $decoded = json_decode($candidate, true);
+        if (is_array($decoded)) return $decoded;
+    }
+    return null;
+}
+
+function normalizeAiPayload(string $raw): array
+{
+    $decoded = decodeAiJson($raw);
+    if (!is_array($decoded)) {
+        return [
+            'reply' => cleanCustomerReply($raw),
+            'question' => 'مایلید کدام بخش را دقیق‌تر بررسی کنیم؟',
+            'quick_replies' => [
+                ['label' => 'بررسی رم', 'message' => 'رم این کانفیگ را بررسی کن'],
+                ['label' => 'بررسی ذخیره‌سازی', 'message' => 'ذخیره‌سازی و RAID را بررسی کن'],
+            ],
+            'actions' => [],
+        ];
+    }
+
+    $quickReplies = [];
+    foreach (($decoded['quick_replies'] ?? []) as $item) {
+        if (!is_array($item)) continue;
+        $label = sanitizeText($item['label'] ?? '', 60);
+        $msg = sanitizeText($item['message'] ?? $label, 220);
+        if ($label !== '' && $msg !== '') $quickReplies[] = ['label' => $label, 'message' => $msg];
+        if (count($quickReplies) >= 3) break;
+    }
+
+    $actions = [];
+    foreach (($decoded['actions'] ?? []) as $item) {
+        if (!is_array($item)) continue;
+        $type = sanitizeText($item['type'] ?? '', 50);
+        if (!in_array($type, ['set_ram_total', 'set_ram_qty', 'set_cpu_qty', 'set_psu_qty', 'add_drive_raid10'], true)) continue;
+        $payload = is_array($item['payload'] ?? null) ? $item['payload'] : [];
+        $safePayload = [];
+        foreach ($payload as $key => $value) {
+            if (is_numeric($value)) $safePayload[sanitizeText($key, 40)] = (int)$value;
+            elseif (is_bool($value)) $safePayload[sanitizeText($key, 40)] = $value;
+            else $safePayload[sanitizeText($key, 40)] = sanitizeText($value, 80);
+        }
+        $label = sanitizeText($item['label'] ?? '', 70);
+        if ($label !== '' && $type !== '') $actions[] = ['label' => $label, 'type' => $type, 'payload' => $safePayload];
+        if (count($actions) >= 2) break;
+    }
+
+    $reply = cleanCustomerReply((string)($decoded['reply'] ?? ''));
+    if ($reply === '') $reply = 'اطلاعات فعلی کانفیگ را بررسی کردم. برای راهنمایی دقیق‌تر، لطفاً یکی از گزینه‌های زیر را انتخاب کنید.';
+    $question = sanitizeText($decoded['question'] ?? '', 180);
+    if ($question === '') $question = 'دوست دارید کدام بخش را تغییر یا بررسی کنیم؟';
+
+    return [
+        'reply' => $reply,
+        'question' => $question,
+        'quick_replies' => $quickReplies,
+        'actions' => $actions,
+    ];
+}
+
+function enrichWithSafeActions(array $payload, array $compactContext): array
+{
+    $config = $compactContext['selected_config'] ?? [];
+    $target = $compactContext['target'] ?? [];
+    $ram = is_array($config['ram'] ?? null) ? $config['ram'] : null;
+    $ramQty = (int)($config['ram_qty'] ?? 0);
+    $currentTotalRam = $ram ? ((int)($ram['capacity_gb'] ?? 0) * max(1, $ramQty)) : 0;
+    $targetRam = max((int)($target['ram_gb'] ?? 0), $currentTotalRam);
+
+    $replyText = ($payload['reply'] ?? '') . ' ' . ($payload['question'] ?? '');
+    $isRamFocused = stripos($replyText, 'RAM') !== false || strpos($replyText, 'رم') !== false;
+    if ($isRamFocused && $ram && $currentTotalRam > 0) {
+        $capacity = max(1, (int)($ram['capacity_gb'] ?? 1));
+        $suggestTotal = max($targetRam, $currentTotalRam * 2);
+        $suggestTotal = min(1024, (int)(ceil($suggestTotal / $capacity) * $capacity));
+        $suggestQty = max($ramQty + 1, (int)ceil($suggestTotal / $capacity));
+
+        $hasRamAction = false;
+        foreach (($payload['actions'] ?? []) as $action) {
+            if (($action['type'] ?? '') === 'set_ram_total' || ($action['type'] ?? '') === 'set_ram_qty') $hasRamAction = true;
+        }
+        if (!$hasRamAction && $suggestQty > $ramQty) {
+            $payload['actions'][] = [
+                'label' => 'ارتقای RAM به ' . ($suggestQty * $capacity) . 'GB',
+                'type' => 'set_ram_qty',
+                'payload' => ['qty' => $suggestQty],
+            ];
+        }
+    }
+
+    if (empty($payload['quick_replies'])) {
+        $payload['quick_replies'] = [
+            ['label' => 'اقتصادی‌ترش کن', 'message' => 'چطور این کانفیگ را اقتصادی‌تر کنم؟'],
+            ['label' => 'برای رشد آینده', 'message' => 'برای رشد آینده کدام بخش را ارتقا بدهم؟'],
+            ['label' => 'بررسی ریسک‌ها', 'message' => 'ریسک‌های اصلی این کانفیگ چیست؟'],
+        ];
+    }
+
+    $payload['actions'] = array_slice($payload['actions'] ?? [], 0, 2);
+    $payload['quick_replies'] = array_slice($payload['quick_replies'] ?? [], 0, 3);
+    return $payload;
 }
 
 function callAiProvider(array $messages): string
@@ -276,12 +425,15 @@ try {
 
     $systemPrompt = implode("\n", [
         'تو دستیار تخصصی کانفیگ سرور HPE در وب‌سایت فالنیک هستی.',
-        'فقط بر اساس CONTEXT و DB_SIGNALS پاسخ بده؛ اگر داده کافی نیست شفاف بگو چه اطلاعاتی لازم است.',
-        'همه داده‌های دیتابیس ارسال نشده‌اند؛ فقط خلاصه قطعات منتخب، چند گزینه سازگار و پیشنهادهای آماده ارسال شده‌اند.',
-        'پاسخ باید فارسی، کوتاه، کاربردی و مرحله‌محور باشد؛ معمولاً ۳ تا ۶ بولت کافی است.',
-        'قیمت، موجودی یا سازگاری‌ای را که در داده‌ها نیست حدس نزن.',
-        'اگر کاربر در یک مرحله خاص است، اول همان مرحله را راهنمایی کن و بعد ریسک‌های مهم مثل RAID، RAM، PCIe، Riser، Power و Storage را گوشزد کن.',
+        'خیلی مهم: هیچ جدول Markdown، تحلیل طولانی، thinking، مقدمه اضافه یا داده خام دیتابیس ننویس.',
+        'پاسخ مشتری باید کوتاه، خوانا و عملی باشد: حداکثر ۴ بولت کوتاه، هر بولت زیر ۱۸ کلمه.',
+        'همیشه با توجه به page.current_step بگو کاربر در کدام مرحله کمک خواسته و فقط همان مرحله را اولویت بده.',
+        'حتماً در پایان یک سوال کوتاه از کاربر بپرس.',
+        'اگر تغییر قابل اعمال وجود دارد، action امن بده؛ مثل set_ram_qty یا set_ram_total. اگر مطمئن نیستی action نده.',
+        'فقط بر اساس CONTEXT و DB_SIGNALS پاسخ بده؛ قیمت/موجودی/سازگاری ناموجود را حدس نزن.',
         'هیچ کلید API، مسیر سرور، SQL خام یا اطلاعات محرمانه‌ای را بازگو نکن.',
+        'خروجی فقط JSON معتبر باشد؛ بدون ``` و بدون متن بیرون JSON.',
+        'Schema دقیق: {"reply":"متن کوتاه با بولت‌های ساده","question":"سوال کوتاه","quick_replies":[{"label":"...","message":"..."}],"actions":[{"label":"...","type":"set_ram_qty|set_ram_total|set_cpu_qty|set_psu_qty|add_drive_raid10","payload":{"qty":4,"total_gb":256}}]}',
     ]);
 
     $userQuestion = $message === '__context_init__'
@@ -290,18 +442,22 @@ try {
 
     $messages = array_merge(
         [['role' => 'system', 'content' => $systemPrompt]],
-        compactHistory($history),
+        compactHistory($history, $message),
         [[
             'role' => 'user',
             'content' => "USER_QUESTION:\n" . $userQuestion . "\n\nCONTEXT:\n" . json_encode($compactContext, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n\nDB_SIGNALS:\n" . json_encode($dbSignals, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
         ]]
     );
 
-    $reply = callAiProvider($messages);
+    $rawReply = callAiProvider($messages);
+    $payload = enrichWithSafeActions(normalizeAiPayload($rawReply), $compactContext);
 
     echo json_encode([
         'status' => 'success',
-        'reply' => $reply,
+        'reply' => $payload['reply'],
+        'question' => $payload['question'],
+        'quick_replies' => $payload['quick_replies'],
+        'actions' => $payload['actions'],
     ], JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
     http_response_code(502);

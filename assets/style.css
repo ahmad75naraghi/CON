@@ -710,3 +710,37 @@ img[alt="لوگوی فالنیک"] {
 .pro-step-container {
     min-height: 1px;
 }
+
+.ai-message p {
+    line-height: 1.9;
+}
+
+.ai-choice-btn,
+.ai-action-btn {
+    border-radius: .75rem;
+    border: 1px solid #dbeafe;
+    font-size: .75rem;
+    font-weight: 800;
+    padding: .5rem .75rem;
+    transition: all .2s ease;
+}
+
+.ai-choice-btn {
+    background: #eff6ff;
+    color: #1e3a8a;
+}
+
+.ai-action-btn {
+    background: #ecfdf5;
+    border-color: #bbf7d0;
+    color: #047857;
+}
+
+.ai-choice-btn:hover,
+.ai-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
+}
+.flex-wrap { flex-wrap: wrap; }
+.pt-3 { padding-top: .75rem; }
+.last\:mb-0:last-child { margin-bottom: 0; }

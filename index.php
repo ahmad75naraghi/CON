@@ -670,6 +670,7 @@
                     <form onsubmit="smartAssistant.sendMessage(event)" class="flex gap-2">
                         <input id="ai-chat-input" type="text" class="flex-1 border border-gray-300 p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-200" placeholder="سوال یا نیازتون رو بنویسید...">
                         <button id="ai-chat-send-btn" type="submit" class="px-6 py-3 bg-blue-900 text-white rounded-lg font-bold hover:bg-blue-800 transition">ارسال</button>
+                        <button type="button" onclick="smartAssistant.resetChat()" class="px-4 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition text-xs">گفتگوی جدید</button>
                     </form>
                 </div>
 
