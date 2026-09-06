@@ -2062,7 +2062,7 @@ const smartAssistant = {
         const question = entry.question ? `<div class="mt-3 pt-3 border-t border-gray-100 font-bold text-blue-900">${h(entry.question)}</div>` : '';
         const quickHtml = quickReplies.length ? `
             <div class="mt-3 flex flex-wrap gap-2">
-                ${quickReplies.map(item => `<button type="button" class="ai-choice-btn" onclick="smartAssistant.sendQuickReply(${security.inlineJson(item.message)})">${h(item.label)}</button>`).join('')}
+                ${quickReplies.map(item => `<button type="button" class="${item.action ? 'ai-action-btn' : 'ai-choice-btn'}" onclick="smartAssistant.handleQuickReply(${security.inlineJson(item)})">${h(item.label)}</button>`).join('')}
             </div>` : '';
         const actionHtml = actions.length ? `
             <div class="mt-3 flex flex-wrap gap-2">
@@ -2108,16 +2108,68 @@ const smartAssistant = {
         log.scrollTop = log.scrollHeight;
     },
 
-    sendQuickReply: async (message) => {
+    handleQuickReply: async (item) => {
+        if (!item || typeof item !== 'object') return;
+        const message = item.message || item.label || '';
+        if (item.action) {
+            smartAssistant.addChatMessage('user', message);
+            await smartAssistant.applyAIAction(item.action);
+            return;
+        }
+        await smartAssistant.sendQuickReply(message, true);
+    },
+
+    sendQuickReply: async (message, autoApplyActions = false) => {
         const input = document.getElementById('ai-chat-input');
         if (input) input.value = message;
-        await smartAssistant.sendMessage({ preventDefault: () => {} });
+        await smartAssistant.sendMessage({ preventDefault: () => {} }, { autoApplyActions });
+    },
+
+    ensureActionData: async (payload) => {
+        if (!state.db) state.db = {};
+        const needsCpu = payload.cpu_id && !state.db.cpus?.some(cpu => cpu.id == payload.cpu_id);
+        const needsRam = payload.ram_id && !state.db.rams?.some(ram => ram.id == payload.ram_id);
+        const needsDrive = payload.drive_id && !state.db.drives?.some(drive => drive.id == payload.drive_id);
+        if ((needsCpu || needsRam || needsDrive) && state.currentConfig.chassis?.id) {
+            await api.fetchChassisData(state.currentConfig.chassis.id);
+        }
     },
 
     applyAIAction: async (action) => {
         if (!action || typeof action !== 'object') return;
         const payload = action.payload || {};
+        await smartAssistant.ensureActionData(payload);
         let applied = false;
+
+        if (['set_cpu', 'set_cpu_ram'].includes(action.type) && payload.cpu_id) {
+            const cpu = state.db?.cpus?.find(item => item.id == payload.cpu_id);
+            if (cpu) {
+                const maxCpu = state.currentConfig.chassis?.max_cpus || 2;
+                const qty = Math.max(1, Math.min(parseInt(payload.cpu_qty || payload.qty) || 1, maxCpu));
+                state.currentConfig.cpu = cpu;
+                state.currentConfig.cpuQty = qty;
+                const cpuSelect = document.getElementById('cpu-select');
+                const cpuQtyInput = document.getElementById('cpu-qty');
+                if (cpuSelect) cpuSelect.value = String(cpu.id);
+                if (cpuQtyInput) cpuQtyInput.value = qty;
+                applied = true;
+            }
+        }
+
+        if (['set_ram', 'set_cpu_ram'].includes(action.type) && payload.ram_id) {
+            const ram = state.db?.rams?.find(item => item.id == payload.ram_id);
+            if (ram) {
+                const maxRam = Math.min(state.currentConfig.chassis?.max_ram_slots || 24, (state.currentConfig.cpuQty || 1) * (state.currentConfig.chassis?.ram_slots_per_cpu || 12));
+                const qty = Math.max(1, Math.min(parseInt(payload.ram_qty || payload.qty) || 1, maxRam));
+                state.currentConfig.ram = ram;
+                state.currentConfig.ramQty = qty;
+                const ramSelect = document.getElementById('ram-select');
+                const ramQtyInput = document.getElementById('ram-qty');
+                if (ramSelect) ramSelect.value = String(ram.id);
+                if (ramQtyInput) { ramQtyInput.value = qty; ramQtyInput.max = maxRam; }
+                applied = true;
+            }
+        }
 
         if (action.type === 'set_ram_qty') {
             const qty = Math.max(1, Math.min(parseInt(payload.qty) || 1, state.currentConfig.chassis?.max_ram_slots || 24));
@@ -2176,7 +2228,7 @@ const smartAssistant = {
         }
     },
 
-    sendMessage: async (event) => {
+    sendMessage: async (event, options = {}) => {
         event.preventDefault();
         if (!smartAssistant.chatStarted) await smartAssistant.startChat();
 
@@ -2193,7 +2245,11 @@ const smartAssistant = {
             smartAssistant.lastContext = smartAssistant.getCurrentContext();
             const result = await api.sendAIMessage(message, smartAssistant.lastContext, smartAssistant.chatHistory);
             if (result.status !== 'success') throw new Error(result.message || 'AI request failed');
-            smartAssistant.addChatMessage('assistant', result.reply || 'پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.', { question: result.question, quickReplies: result.quick_replies, actions: result.actions });
+            const actions = Array.isArray(result.actions) ? result.actions : [];
+            smartAssistant.addChatMessage('assistant', result.reply || 'پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.', { question: result.question, quickReplies: result.quick_replies, actions });
+            if (options.autoApplyActions && actions.length) {
+                for (const action of actions.slice(0, 2)) await smartAssistant.applyAIAction(action);
+            }
         } catch (error) {
             console.error('AI Chat Error:', error);
             smartAssistant.addChatMessage('assistant', 'ارتباط با سرویس AI برقرار نشد. لطفاً تنظیمات AI روی سرور را بررسی کنید.');

@@ -271,6 +271,101 @@ function decodeAiJson(string $raw): ?array
     return null;
 }
 
+
+function allowedAiActionTypes(): array
+{
+    return ['set_ram_total', 'set_ram_qty', 'set_cpu_qty', 'set_psu_qty', 'add_drive_raid10', 'set_cpu', 'set_ram', 'set_cpu_ram'];
+}
+
+function sanitizeAiAction($item): ?array
+{
+    if (!is_array($item)) return null;
+    $type = sanitizeText($item['type'] ?? '', 50);
+    if (!in_array($type, allowedAiActionTypes(), true)) return null;
+
+    $payload = is_array($item['payload'] ?? null) ? $item['payload'] : [];
+    $safePayload = [];
+    foreach ($payload as $key => $value) {
+        $safeKey = sanitizeText($key, 40);
+        if ($safeKey === '') continue;
+        if (is_numeric($value)) $safePayload[$safeKey] = (int)$value;
+        elseif (is_bool($value)) $safePayload[$safeKey] = $value;
+        else $safePayload[$safeKey] = sanitizeText($value, 80);
+    }
+
+    $label = sanitizeText($item['label'] ?? '', 70);
+    if ($label === '') $label = 'اعمال پیشنهاد';
+    return ['label' => $label, 'type' => $type, 'payload' => $safePayload];
+}
+
+function buildCpuRamAction(array $compactContext, array $dbSignals, string $focusText): ?array
+{
+    $focus = function_exists('mb_strtolower') ? mb_strtolower($focusText, 'UTF-8') : strtolower($focusText);
+    $isCpuRamIntent = strpos($focus, 'cpu') !== false || strpos($focus, 'پردازنده') !== false || strpos($focus, 'رم') !== false || stripos($focusText, 'ram') !== false;
+    $isApplyIntent = strpos($focus, 'اصلاح') !== false || strpos($focus, 'ارتقا') !== false || strpos($focus, 'تغییر') !== false || strpos($focus, 'درست') !== false || strpos($focus, 'اعمال') !== false;
+    if (!$isCpuRamIntent || !$isApplyIntent) return null;
+
+    $snapshot = is_array($dbSignals['compatible_snapshot'] ?? null) ? $dbSignals['compatible_snapshot'] : [];
+    $cpus = is_array($snapshot['top_compatible_cpus'] ?? null) ? $snapshot['top_compatible_cpus'] : [];
+    $rams = is_array($snapshot['top_compatible_rams'] ?? null) ? $snapshot['top_compatible_rams'] : [];
+    if (!$cpus && !$rams) return null;
+
+    $target = $compactContext['target'] ?? [];
+    $config = $compactContext['selected_config'] ?? [];
+    $chassis = is_array($config['chassis'] ?? null) ? $config['chassis'] : [];
+    $maxCpus = max(1, (int)($chassis['max_cpus'] ?? 2));
+    $maxRamSlots = max(1, (int)($chassis['max_ram_slots'] ?? 24));
+    $neededCores = max(1, (int)($target['cores'] ?? 0));
+    $neededRam = max(16, (int)($target['ram_gb'] ?? 0));
+    $gpu = is_array($config['gpu'] ?? null) ? $config['gpu'] : null;
+    if ($gpu) $neededRam = max($neededRam, (int)($gpu['memory_gb'] ?? 0) * max(1, (int)($config['gpu_qty'] ?? 1)) * 2);
+
+    $selectedCpu = null; $selectedCpuQty = max(1, (int)($config['cpu_qty'] ?? 1));
+    if ($cpus) {
+        $bestScore = PHP_INT_MAX;
+        foreach ($cpus as $cpu) {
+            $cores = max(1, (int)($cpu['cores'] ?? 1));
+            for ($qty = 1; $qty <= $maxCpus; $qty++) {
+                $total = $cores * $qty;
+                if ($total < $neededCores) continue;
+                $score = ($total - $neededCores) + ($qty * 2);
+                if ($score < $bestScore) { $bestScore = $score; $selectedCpu = $cpu; $selectedCpuQty = $qty; }
+            }
+        }
+        if (!$selectedCpu) { $selectedCpu = $cpus[0]; $selectedCpuQty = min($maxCpus, 1); }
+    }
+
+    $selectedRam = null; $selectedRamQty = max(1, (int)($config['ram_qty'] ?? 1));
+    if ($rams) {
+        $bestScore = PHP_INT_MAX;
+        foreach ($rams as $ram) {
+            $cap = max(1, (int)($ram['capacity_gb'] ?? 1));
+            $qty = (int)ceil($neededRam / $cap);
+            $qty = max(1, min($maxRamSlots, $qty));
+            if ($qty * $cap < $neededRam) continue;
+            if ($selectedCpuQty > 1 && $qty % $selectedCpuQty !== 0) $qty += $selectedCpuQty - ($qty % $selectedCpuQty);
+            if ($qty > $maxRamSlots) continue;
+            $score = ($qty * $cap - $neededRam) + $qty;
+            if ($score < $bestScore) { $bestScore = $score; $selectedRam = $ram; $selectedRamQty = $qty; }
+        }
+        if (!$selectedRam) { $selectedRam = $rams[0]; $selectedRamQty = min($maxRamSlots, max(1, (int)ceil($neededRam / max(1, (int)($selectedRam['capacity_gb'] ?? 1))))); }
+    }
+
+    $payload = [];
+    if ($selectedCpu) { $payload['cpu_id'] = (int)$selectedCpu['id']; $payload['cpu_qty'] = $selectedCpuQty; }
+    if ($selectedRam) { $payload['ram_id'] = (int)$selectedRam['id']; $payload['ram_qty'] = $selectedRamQty; }
+    if (!$payload) return null;
+
+    $labelParts = [];
+    if ($selectedCpu) $labelParts[] = $selectedCpuQty . '× CPU';
+    if ($selectedRam) $labelParts[] = ($selectedRamQty * (int)($selectedRam['capacity_gb'] ?? 0)) . 'GB RAM';
+    return [
+        'label' => 'اعمال اصلاح CPU/RAM (' . implode('، ', $labelParts) . ')',
+        'type' => 'set_cpu_ram',
+        'payload' => $payload,
+    ];
+}
+
 function normalizeAiPayload(string $raw): array
 {
     $decoded = decodeAiJson($raw);
@@ -291,24 +386,19 @@ function normalizeAiPayload(string $raw): array
         if (!is_array($item)) continue;
         $label = sanitizeText($item['label'] ?? '', 60);
         $msg = sanitizeText($item['message'] ?? $label, 220);
-        if ($label !== '' && $msg !== '') $quickReplies[] = ['label' => $label, 'message' => $msg];
+        $quickAction = sanitizeAiAction($item['action'] ?? null);
+        if ($label !== '' && $msg !== '') {
+            $reply = ['label' => $label, 'message' => $msg];
+            if ($quickAction) $reply['action'] = $quickAction;
+            $quickReplies[] = $reply;
+        }
         if (count($quickReplies) >= 3) break;
     }
 
     $actions = [];
     foreach (($decoded['actions'] ?? []) as $item) {
-        if (!is_array($item)) continue;
-        $type = sanitizeText($item['type'] ?? '', 50);
-        if (!in_array($type, ['set_ram_total', 'set_ram_qty', 'set_cpu_qty', 'set_psu_qty', 'add_drive_raid10'], true)) continue;
-        $payload = is_array($item['payload'] ?? null) ? $item['payload'] : [];
-        $safePayload = [];
-        foreach ($payload as $key => $value) {
-            if (is_numeric($value)) $safePayload[sanitizeText($key, 40)] = (int)$value;
-            elseif (is_bool($value)) $safePayload[sanitizeText($key, 40)] = $value;
-            else $safePayload[sanitizeText($key, 40)] = sanitizeText($value, 80);
-        }
-        $label = sanitizeText($item['label'] ?? '', 70);
-        if ($label !== '' && $type !== '') $actions[] = ['label' => $label, 'type' => $type, 'payload' => $safePayload];
+        $action = sanitizeAiAction($item);
+        if ($action) $actions[] = $action;
         if (count($actions) >= 2) break;
     }
 
@@ -325,7 +415,7 @@ function normalizeAiPayload(string $raw): array
     ];
 }
 
-function enrichWithSafeActions(array $payload, array $compactContext, string $focusText = ''): array
+function enrichWithSafeActions(array $payload, array $compactContext, array $dbSignals = [], string $focusText = ''): array
 {
     $config = $compactContext['selected_config'] ?? [];
     $target = $compactContext['target'] ?? [];
@@ -335,6 +425,19 @@ function enrichWithSafeActions(array $payload, array $compactContext, string $fo
     $targetRam = max((int)($target['ram_gb'] ?? 0), $currentTotalRam);
 
     $replyText = $focusText . ' ' . ($payload['reply'] ?? '') . ' ' . ($payload['question'] ?? '');
+    $cpuRamAction = buildCpuRamAction($compactContext, $dbSignals, $replyText);
+    if ($cpuRamAction) {
+        $hasCpuRamAction = false;
+        foreach (($payload['actions'] ?? []) as $action) {
+            if (in_array($action['type'] ?? '', ['set_cpu', 'set_ram', 'set_cpu_ram'], true)) $hasCpuRamAction = true;
+        }
+        if (!$hasCpuRamAction) $payload['actions'][] = $cpuRamAction;
+        $payload['quick_replies'][] = [
+            'label' => 'بله، CPU و RAM را اصلاح کن',
+            'message' => 'بله، اول CPU و رم را اصلاح کن',
+            'action' => $cpuRamAction,
+        ];
+    }
     $isRamFocused = stripos($replyText, 'RAM') !== false || strpos($replyText, 'رم') !== false;
     if ($isRamFocused && $ram && $currentTotalRam > 0) {
         $capacity = max(1, (int)($ram['capacity_gb'] ?? 1));
@@ -436,11 +539,11 @@ try {
         'پاسخ مشتری باید کوتاه، خوانا و عملی باشد: حداکثر ۴ بولت کوتاه، هر بولت زیر ۱۸ کلمه.',
         'همیشه با توجه به page.current_step بگو کاربر در کدام مرحله کمک خواسته و فقط همان مرحله را اولویت بده.',
         'حتماً در پایان یک سوال کوتاه از کاربر بپرس.',
-        'اگر تغییر قابل اعمال وجود دارد، action امن بده؛ مثل set_ram_qty یا set_ram_total. اگر مطمئن نیستی action نده.',
+        'اگر تغییر قابل اعمال وجود دارد، action امن بده؛ برای اصلاح CPU/RAM از set_cpu_ram استفاده کن. اگر مطمئن نیستی action نده.',
         'فقط بر اساس CONTEXT و DB_SIGNALS پاسخ بده؛ قیمت/موجودی/سازگاری ناموجود را حدس نزن.',
         'هیچ کلید API، مسیر سرور، SQL خام یا اطلاعات محرمانه‌ای را بازگو نکن.',
         'خروجی فقط JSON معتبر باشد؛ بدون ``` و بدون متن بیرون JSON.',
-        'Schema دقیق: {"reply":"متن کوتاه با بولت‌های ساده","question":"سوال کوتاه","quick_replies":[{"label":"...","message":"..."}],"actions":[{"label":"...","type":"set_ram_qty|set_ram_total|set_cpu_qty|set_psu_qty|add_drive_raid10","payload":{"qty":4,"total_gb":256}}]}',
+        'Schema دقیق: {"reply":"متن کوتاه با بولت‌های ساده","question":"سوال کوتاه","quick_replies":[{"label":"...","message":"...","action":{"label":"...","type":"set_cpu_ram","payload":{"cpu_id":1,"cpu_qty":2,"ram_id":5,"ram_qty":4}}}],"actions":[{"label":"...","type":"set_cpu|set_ram|set_cpu_ram|set_ram_qty|set_ram_total|set_cpu_qty|set_psu_qty|add_drive_raid10","payload":{"qty":4,"cpu_id":1,"ram_id":5}}]}',
     ]);
 
     $userQuestion = $message === '__context_init__'
@@ -457,7 +560,7 @@ try {
     );
 
     $rawReply = callAiProvider($messages);
-    $payload = enrichWithSafeActions(normalizeAiPayload($rawReply), $compactContext, $userQuestion);
+    $payload = enrichWithSafeActions(normalizeAiPayload($rawReply), $compactContext, $dbSignals, $userQuestion);
 
     echo json_encode([
         'status' => 'success',
