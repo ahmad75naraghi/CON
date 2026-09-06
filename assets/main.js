@@ -12,7 +12,10 @@ const state = {
         riser2: null, riser3: null,
         sasExpander: false,
         totalWatts: 0, reqHighPerfFan: false
-    }
+    },
+    readyOffers: [],
+    selectedOffer: null,
+    currentView: 'view-intro'
 };
 
 // ==========================================
@@ -20,7 +23,7 @@ const state = {
 // ==========================================
 const sessionManager = {
     storageKey: 'falnic_server_sessions',
-    
+
     init: () => {
         if (!state.sessionId) state.sessionId = 'session_' + Date.now();
         sessionManager.renderLists();
@@ -33,7 +36,7 @@ const sessionManager = {
 
         const sessions = sessionManager.getAll();
         const existingIndex = sessions.findIndex(s => s.id === state.sessionId);
-        
+
         const sessionData = {
             id: state.sessionId,
             timestamp: Date.now(),
@@ -78,7 +81,7 @@ const sessionManager = {
                 const actionText = isCompleted ? 'مشاهده پیش‌فاکتور ←' : 'ادامه کانفیگ ←';
                 const actionClass = isCompleted ? 'text-green-600' : 'text-blue-900';
                 const modeName = item.stateDump.activeMode === 'pro' ? 'مسیر حرفه‌ای' : 'مسیر راهنمایی';
-                
+
                 return `
                 <button onclick="sessionManager.load('${item.id}')" class="w-full bg-white border border-gray-200 hover:border-blue-400 hover:shadow-md text-gray-800 py-4 px-6 rounded-xl flex justify-between items-center transition text-right">
                     <div>
@@ -121,9 +124,9 @@ const sessionManager = {
             const btn = document.activeElement;
             const originalText = btn ? btn.innerText : '';
             if (btn && btn.tagName === 'BUTTON') btn.innerText = "در حال بازیابی...";
-            
+
             await sessionManager.hydrateProConfig(session);
-            
+
             if (btn && btn.tagName === 'BUTTON') btn.innerText = originalText;
         }
     },
@@ -183,7 +186,7 @@ const sessionManager = {
             // تنظیم مقادیر دراپ‌داون‌های ساده
             const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
             setVal('controller-select', config.controller ? config.controller.id : '');
-            
+
             const sasEl = document.getElementById('sas-expander-checkbox');
             if(sasEl) { sasEl.checked = config.sasExpander; sasEl.disabled = false; }
 
@@ -209,7 +212,7 @@ const sessionManager = {
         wizard.showView('view-pro-configurator');
         proWizard.currentStep = session.stateDump.proStep || 1;
         proWizard.render();
-        configurator.calculateSummary(); 
+        configurator.calculateSummary();
     }
 };
 
@@ -413,6 +416,24 @@ const api = {
             alert("خطا در ارتباط با سرور!");
             return false;
         }
+    },
+
+    fetchRecommendations: async (target, answers) => {
+        const response = await fetch('api/recommend_servers.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target, answers })
+        });
+        return response.json();
+    },
+
+    sendAIMessage: async (message, context, history) => {
+        const response = await fetch('api/ai_chat.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, context, history })
+        });
+        return response.json();
     }
 };
 
@@ -482,18 +503,18 @@ const validator = {
             let maxSlots = config.chassis?.max_ram_slots || 24;
             let validRamQty = config.ram ? (config.ramQty <= maxSlots) : null;
             html += validator.renderItem(validRamQty, 'تعداد ماژول‌های رم در محدوده مجاز است', 'در انتظار بررسی ظرفیت اسلات‌های رم...', `تعداد رم بیش از ظرفیت مادربرد (${maxSlots} عدد) است!`, ['ram-qty']);
-            
+
             let ramBalanceStatus = null, ramBalanceMsg = 'در انتظار بررسی تقارن و بازدهی رم...';
             if (config.ram) {
-                if (config.ramQty % config.cpuQty !== 0) { ramBalanceStatus = 'warning'; ramBalanceMsg = `اخطار عدم تقارن: تعداد رم‌ها (${config.ramQty}) مضربی از پردازنده‌ها (${config.cpuQty}) نیست.`; } 
-                else if ((config.ramQty / config.cpuQty) % 2 !== 0) { ramBalanceStatus = 'warning'; ramBalanceMsg = 'اخطار بازدهی: اختصاص تعداد فرد رم به هر پردازنده حالت Multi-Channel را می‌شکند.'; } 
+                if (config.ramQty % config.cpuQty !== 0) { ramBalanceStatus = 'warning'; ramBalanceMsg = `اخطار عدم تقارن: تعداد رم‌ها (${config.ramQty}) مضربی از پردازنده‌ها (${config.cpuQty}) نیست.`; }
+                else if ((config.ramQty / config.cpuQty) % 2 !== 0) { ramBalanceStatus = 'warning'; ramBalanceMsg = 'اخطار بازدهی: اختصاص تعداد فرد رم به هر پردازنده حالت Multi-Channel را می‌شکند.'; }
                 else { ramBalanceStatus = true; ramBalanceMsg = 'چیدمان ماژول‌های رم متقارن و دارای بالاترین بازدهی است'; }
             }
             html += validator.renderItem(ramBalanceStatus, ramBalanceMsg, 'در انتظار بررسی تقارن و بازدهی رم...', ramBalanceMsg, ['ram-qty']);
 
             let ramSpeedStatus = null, ramSpeedMsg = 'در انتظار بررسی گلوگاه فرکانس رم و پردازنده...';
             if (config.cpu && config.ram) {
-                if (config.ram.speed_mt < config.cpu.supported_ram_speed_mt) { ramSpeedStatus = 'warning'; ramSpeedMsg = `اخطار گلوگاه: فرکانس رم (${config.ram.speed_mt} MT/s) از حداکثر توان پردازنده (${config.cpu.supported_ram_speed_mt} MT/s) کمتر است.`; } 
+                if (config.ram.speed_mt < config.cpu.supported_ram_speed_mt) { ramSpeedStatus = 'warning'; ramSpeedMsg = `اخطار گلوگاه: فرکانس رم (${config.ram.speed_mt} MT/s) از حداکثر توان پردازنده (${config.cpu.supported_ram_speed_mt} MT/s) کمتر است.`; }
                 else { ramSpeedStatus = true; ramSpeedMsg = 'فرکانس رم با پردازنده سازگاری کامل دارد'; }
             }
             html += validator.renderItem(ramSpeedStatus, ramSpeedMsg, 'در انتظار بررسی گلوگاه فرکانس رم...', ramSpeedMsg, ['ram-select']);
@@ -535,7 +556,7 @@ const validator = {
             if (total_physical_boxes > 0 && total_physical_boxes <= maxBoxesAllowed) {
                 let added_backplanes = drive_boxes > 1 ? (drive_boxes - 1) : 0;
                 let expanderText = config.sasExpander ? " + یک عدد کارت SAS Expander" : "";
-                if (added_backplanes === 0 && !config.sasExpander) { backplaneStatus = true; backplaneMsg = 'هاردهای انتخابی روی بک‌پلین و کنترلر پیش‌فرض نصب می‌شوند (بدون هزینه اضافی)'; } 
+                if (added_backplanes === 0 && !config.sasExpander) { backplaneStatus = true; backplaneMsg = 'هاردهای انتخابی روی بک‌پلین و کنترلر پیش‌فرض نصب می‌شوند (بدون هزینه اضافی)'; }
                 else { backplaneStatus = 'warning'; backplaneMsg = `نیاز به خرید قطعات رابط: ${added_backplanes > 0 ? added_backplanes + ' عدد بک‌پلین اضافی' : ''}${expanderText}`; }
             }
             html += validator.renderItem(backplaneStatus, backplaneMsg, 'در انتظار بررسی قطعات رابط هاردها...', backplaneMsg, []);
@@ -725,7 +746,7 @@ const proWizard = {
 
         let allStepsValid = true;
         let progressHTML = `<div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -z-10"></div><div class="flex w-full justify-between">`;
-        
+
         proWizard.stepsConfig.forEach((cfg, index) => {
             const stepNum = index + 1;
             const status = proWizard.getStepStatus(stepNum);
@@ -750,7 +771,7 @@ const proWizard = {
                 </div>`;
         });
         progressHTML += `</div>`;
-        
+
         const pBar = document.getElementById('pro-progress-bar');
         if (pBar) pBar.innerHTML = progressHTML;
 
@@ -760,7 +781,7 @@ const proWizard = {
 
         if (prevBtn) prevBtn.classList.toggle('hidden', proWizard.currentStep === 1);
         if (nextBtn) nextBtn.classList.toggle('hidden', proWizard.currentStep === proWizard.totalSteps);
-        
+
         if (finalBtn) {
             if (allStepsValid) {
                 finalBtn.classList.remove('hidden');
@@ -778,8 +799,8 @@ const proWizard = {
     submitConfig: () => {
         const tbody = document.getElementById('pro-details-table-body');
         const codeEl = document.getElementById('pro-generated-svr-code');
-        if (codeEl) codeEl.innerText = "آماده ثبت..."; 
-        
+        if (codeEl) codeEl.innerText = "آماده ثبت...";
+
         let html = '';
         const addRow = (title, desc) => {
             html += `<div class="flex justify-between items-center py-4 hover:bg-white transition px-2 rounded border-b last:border-0">
@@ -792,7 +813,7 @@ const proWizard = {
         if (state.currentConfig.chassis) addRow('شاسی (Chassis)', state.currentConfig.chassis.model);
         if (state.currentConfig.cpu) addRow('پردازنده (CPU)', `${state.currentConfig.cpuQty}X ${state.currentConfig.cpu.model_name}`);
         if (state.currentConfig.ram) addRow('حافظه رم (RAM)', `${state.currentConfig.ramQty}X ${state.currentConfig.ram.model_name}`);
-        
+
         state.currentConfig.drives.forEach(d => {
             if (!d.driveId) return;
             const driveObj = state.db.drives.find(x => x.id == d.driveId);
@@ -814,7 +835,7 @@ const wizard = {
 
     showView: (viewId) => {
         const views = [
-            'view-intro', 'view-pro', 'view-guidance', 'view-offers', 
+            'view-intro', 'view-pro', 'view-guidance', 'view-offers',
             'view-server-details', 'view-pro-configurator', 'view-pro-results'
         ];
         views.forEach(id => {
@@ -822,7 +843,10 @@ const wizard = {
             if (el) el.classList.add('hidden');
         });
         const target = document.getElementById(viewId);
-        if (target) target.classList.remove('hidden');
+        if (target) {
+            target.classList.remove('hidden');
+            state.currentView = viewId;
+        }
     },
 
     skipAndStart: () => {
@@ -864,7 +888,7 @@ const wizard = {
 
         let progressHTML = `<div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 -z-10"></div>`;
         for (let i = 0; i < guidanceConfig.length; i++) {
-            let stateClass = i < wizard.currentStepIndex ? 'bg-green-100 text-green-700 border border-green-300' : 
+            let stateClass = i < wizard.currentStepIndex ? 'bg-green-100 text-green-700 border border-green-300' :
                              (i === wizard.currentStepIndex ? 'bg-blue-100 text-blue-900' : 'bg-white text-gray-400 border border-gray-200');
             let content = i < wizard.currentStepIndex ? '✔' : `0${i + 1}`;
             progressHTML += `<span class="${stateClass} px-3 py-1 rounded-md z-10 font-mono text-xs shadow-sm">${content}</span>`;
@@ -873,7 +897,7 @@ const wizard = {
 
         let html = step.tip ? `<p class="text-yellow-600 text-xs font-bold flex items-center gap-1 mb-6"><span>💡</span> ${step.tip}</p>` : '';
         html += `<div class="${step.type === 'checkbox' ? 'grid md:grid-cols-3 gap-y-4 gap-x-2' : 'space-y-3'}">`;
-        
+
         step.options.forEach(opt => {
             let isChecked = wizard.answers[step.id] && wizard.answers[step.id].includes(opt.val) ? 'checked' : '';
             if (step.type === 'radio') {
@@ -906,7 +930,7 @@ const wizard = {
         const step = guidanceConfig[wizard.currentStepIndex];
         const inputs = document.querySelectorAll(`#guidance-content input:checked`);
         const nextBtn = document.getElementById('guidance-next-btn');
-        
+
         if (inputs.length > 0) {
             wizard.answers[step.id] = Array.from(inputs).map(el => el.value);
             nextBtn.disabled = false;
@@ -918,12 +942,12 @@ const wizard = {
         sessionManager.save('draft');
     },
 
-    nextStep: () => {
+    nextStep: async () => {
         if (wizard.currentStepIndex < guidanceConfig.length - 1) {
             wizard.currentStepIndex++;
             wizard.renderStep();
         } else {
-            wizard.showView('view-offers');
+            await wizard.loadRecommendedOffers();
         }
     },
 
@@ -936,27 +960,198 @@ const wizard = {
         }
     },
 
-    selectOffer: (tier) => {
-        const demoData = [
-            { title: 'شاسی (Chassis)', desc: 'DL360 (2U) - Base: 8SFF, Max: 24 Bays' },
-            { title: 'پردازنده (CPU)', desc: '2X Intel Xeon Bronze 3104 (6C 8.25M Cache 1.70 GHz)' },
-            { title: 'حافظه رم (RAM)', desc: '2X 16GB DDR4 RDIMM 2133MHz' },
-            { title: 'فضای ذخیره سازی (Storage)', desc: '2 × SSD 960GB SAS 2.5" + Tray Caddy' },
-            { title: 'کنترلر رید (RAID)', desc: 'RAID HPE S100i (Only sata disks)' },
-            { title: 'منبع تغذیه (Power Supply)', desc: 'hpe 1600w flex slot platinum hot plug' }
-        ];
+    escapeHTML: (value) => String(value ?? '').replace(/[&<>'"]/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[ch])),
 
-        let tbody = '';
-        demoData.forEach(item => {
-            tbody += `
+    buildTargetFromGuidance: () => {
+        const services = wizard.answers[1] || [];
+        const userFactor = parseInt((wizard.answers[2] || ['1'])[0]) || 1;
+        const performance = (wizard.answers[3] || ['med'])[0];
+        const wantsGrowth = (wizard.answers[4] || ['no'])[0] === 'yes';
+        const hasExternalStorage = (wizard.answers[5] || ['no'])[0] === 'yes';
+        const infrastructure = wizard.answers[6] || [];
+
+        let cores = 8 * userFactor;
+        let ram = 32 * userFactor;
+        let storage = hasExternalStorage ? 500 : 2000 * userFactor;
+        let gpu = false;
+        let usecase = 'Guidance';
+
+        if (services.includes('db')) { cores += 8; ram += 64; storage += hasExternalStorage ? 500 : 1000; usecase = 'Database'; }
+        if (services.includes('virt')) { cores += 8; ram += 96; usecase = 'Virtualization'; }
+        if (services.includes('ai')) { cores += 8; ram += 64; gpu = true; usecase = 'AI'; }
+        if (services.includes('storage')) { storage += 4000; usecase = 'File Server'; }
+        if (services.includes('web')) { cores += 4; ram += 16; }
+        if (services.includes('accounting') || services.includes('crm')) { ram += 16; }
+
+        if (performance === 'max') { cores = Math.ceil(cores * 1.5); ram = Math.ceil(ram * 1.5); storage = Math.ceil(storage * 1.25); }
+        if (performance === 'min') { cores = Math.ceil(cores * 0.75); ram = Math.ceil(ram * 0.75); }
+        if (wantsGrowth) { cores = Math.ceil(cores * 1.25); ram = Math.ceil(ram * 1.25); storage = Math.ceil(storage * 1.25); }
+
+        return {
+            usecase,
+            cores: Math.max(4, cores),
+            ram: Math.max(16, ram),
+            storage: Math.max(500, storage),
+            gpu,
+            network: infrastructure.includes('fiber') ? 'fiber' : 'any',
+            formFactor: infrastructure.includes('rack') ? 'rack' : 'any'
+        };
+    },
+
+    loadRecommendedOffers: async () => {
+        state.target = wizard.buildTargetFromGuidance();
+        wizard.showView('view-offers');
+        wizard.renderOffersLoading();
+
+        try {
+            const result = await api.fetchRecommendations(state.target, wizard.answers);
+            if (result.status !== 'success') throw new Error(result.message || 'Recommendation API failed');
+            state.target = result.target || state.target;
+            state.readyOffers = result.offers || [];
+            wizard.renderOffers();
+            sessionManager.save('draft');
+        } catch (error) {
+            console.error('Recommendation Error:', error);
+            const list = document.getElementById('offers-list');
+            if (list) {
+                list.innerHTML = `
+                    <div class="md:col-span-3 bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+                        <div class="text-3xl mb-3">⚠️</div>
+                        <h3 class="font-bold text-red-700 mb-2">خطا در دریافت پیشنهادها</h3>
+                        <p class="text-sm text-red-600 mb-4">امکان دریافت سرورهای آماده از دیتابیس وجود ندارد. لطفاً اتصال API و جدول Prepared_Server_Offers را بررسی کنید.</p>
+                        <button onclick="wizard.loadRecommendedOffers()" class="px-5 py-2 bg-red-600 text-white rounded-lg font-bold">تلاش مجدد</button>
+                    </div>`;
+            }
+        }
+    },
+
+    renderOffersLoading: () => {
+        const targetSummary = document.getElementById('offers-target-summary');
+        if (targetSummary) {
+            targetSummary.innerText = `نیاز محاسبه‌شده: ${state.target.cores} Core، ${state.target.ram}GB RAM، ${(state.target.storage / 1000).toFixed(1)}TB Storage${state.target.gpu ? '، همراه GPU' : ''}`;
+        }
+        const list = document.getElementById('offers-list');
+        if (list) {
+            list.innerHTML = `
+                <div class="md:col-span-3 bg-white border border-gray-200 rounded-2xl p-10 text-center shadow-sm">
+                    <div class="text-4xl mb-4 animate-pulse">🔎</div>
+                    <h3 class="font-bold text-gray-800 mb-2">در حال انتخاب خودکار سرورهای آماده...</h3>
+                    <p class="text-sm text-gray-500">سیستم در حال بررسی جدول سرورهای آماده و انتخاب سه سطح اقتصادی، مدیریت‌شده و پیشرفته است.</p>
+                </div>`;
+        }
+    },
+
+    renderOffers: () => {
+        const list = document.getElementById('offers-list');
+        const targetSummary = document.getElementById('offers-target-summary');
+        if (targetSummary) {
+            targetSummary.innerText = `نیاز محاسبه‌شده: ${state.target.cores} Core، ${state.target.ram}GB RAM، ${(state.target.storage / 1000).toFixed(1)}TB Storage${state.target.gpu ? '، همراه GPU' : ''}`;
+        }
+        if (!list) return;
+
+        if (!state.readyOffers.length) {
+            list.innerHTML = '<div class="md:col-span-3 bg-white border border-gray-200 rounded-2xl p-8 text-center text-gray-500">هیچ سرور آماده‌ای برای پاسخ‌های شما پیدا نشد.</div>';
+            return;
+        }
+
+        const cardTheme = {
+            eco: { title: 'اقتصادی', icon: '🖨️', wrapper: 'bg-white border border-gray-200 hover:shadow-lg', titleClass: 'text-gray-800', button: 'border-2 border-blue-900 text-blue-900 hover:bg-blue-50' },
+            managed: { title: 'مدیریت‌شده', icon: '🏢', wrapper: 'bg-blue-50 border-2 border-blue-200 transform md:scale-105 shadow-md', titleClass: 'text-blue-900', button: 'bg-blue-900 text-white hover:bg-blue-800 shadow-lg' },
+            advanced: { title: 'پیشرفته', icon: '🚀', wrapper: 'bg-white border border-gray-200 hover:shadow-lg', titleClass: 'text-gray-800', button: 'border-2 border-blue-900 text-blue-900 hover:bg-blue-50' }
+        };
+
+        list.innerHTML = state.readyOffers.map(offer => {
+            const theme = cardTheme[offer.recommendation_tier] || cardTheme.eco;
+            const bullets = (offer.bullets || []).slice(0, 3).map(b => `
+                <li class="flex items-start gap-2 text-sm text-gray-700"><span class="text-green-500 text-base">✔</span>${wizard.escapeHTML(b)}</li>
+            `).join('');
+            return `
+                <div class="${theme.wrapper} rounded-2xl p-6 flex flex-col justify-between transition">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold ${theme.titleClass}">${theme.title}</h3>
+                            <span class="text-2xl">${offer.icon || theme.icon}</span>
+                        </div>
+                        <div class="mb-3 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-100 rounded-lg px-3 py-2">${wizard.escapeHTML(offer.recommendation_reason)}</div>
+                        <h4 class="font-bold text-gray-900 mb-2" dir="ltr">${wizard.escapeHTML(offer.title)}</h4>
+                        <p class="text-sm text-gray-600 mb-5 line-clamp-3">${wizard.escapeHTML(offer.description)}</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-5">
+                            <div class="bg-gray-50 rounded-lg p-2"><span class="text-gray-400 block">CPU</span><b>${offer.cpu_cores} Core</b></div>
+                            <div class="bg-gray-50 rounded-lg p-2"><span class="text-gray-400 block">RAM</span><b>${offer.ram_gb} GB</b></div>
+                            <div class="bg-gray-50 rounded-lg p-2"><span class="text-gray-400 block">Storage</span><b>${(offer.usable_storage_gb / 1000).toFixed(1)} TB</b></div>
+                            <div class="bg-gray-50 rounded-lg p-2"><span class="text-gray-400 block">نسل</span><b>Gen${offer.generation_rank}</b></div>
+                        </div>
+                        <ul class="space-y-3 mb-6">${bullets}</ul>
+                    </div>
+                    <button onclick="wizard.selectOffer('${offer.recommendation_tier}')" class="w-full py-3 ${theme.button} font-bold rounded-lg transition">جزییات سرور</button>
+                </div>`;
+        }).join('');
+    },
+
+    mergeOfferDb: (offerDb) => {
+        state.db = state.db || {};
+        Object.entries(offerDb || {}).forEach(([key, rows]) => {
+            state.db[key] = state.db[key] || [];
+            rows.forEach(row => {
+                if (!row || !row.id) return;
+                const idx = state.db[key].findIndex(existing => existing.id == row.id);
+                if (idx >= 0) state.db[key][idx] = row;
+                else state.db[key].push(row);
+            });
+        });
+    },
+
+    renderOfferDetails: (offer) => {
+        const title = document.getElementById('server-details-title');
+        const desc = document.getElementById('server-details-desc');
+        const codeEl = document.getElementById('generated-svr-code');
+        const tbody = document.getElementById('details-table-body');
+
+        if (title) title.innerText = `${offer.recommendation_label}: ${offer.title}`;
+        if (desc) desc.innerText = offer.description || offer.recommendation_reason || 'کانفیگ آماده بر اساس پاسخ‌های شما انتخاب شده است.';
+        if (codeEl) codeEl.innerText = `READY-${offer.id}`;
+
+        let html = '';
+        (offer.display_rows || []).forEach(item => {
+            html += `
             <div class="flex justify-between items-center py-4 hover:bg-white transition px-2 rounded border-b last:border-0">
-                <button onclick="wizard.launchConfigurator()" class="text-blue-600 flex items-center gap-1 text-sm font-bold"><span class="text-lg">✎</span> ویرایش</button>
-                <div class="text-right flex-1 pr-6 font-bold text-gray-800" dir="ltr">${item.desc}</div>
-                <div class="text-gray-500 text-sm w-1/4 text-right">${item.title}</div>
+                <button onclick="wizard.editSelectedOffer()" class="text-blue-600 flex items-center gap-1 text-sm font-bold"><span class="text-lg">✎</span> ویرایش</button>
+                <div class="text-right flex-1 pr-6 font-bold text-gray-800" dir="ltr">${wizard.escapeHTML(item.desc)}</div>
+                <div class="text-gray-500 text-sm w-1/4 text-right">${wizard.escapeHTML(item.title)}</div>
             </div>`;
         });
-        document.getElementById('details-table-body').innerHTML = tbody;
+        if (tbody) tbody.innerHTML = html;
+    },
+
+    selectOffer: (tier) => {
+        const offer = state.readyOffers.find(item => item.recommendation_tier === tier) || state.readyOffers.find(item => item.id == tier);
+        if (!offer || !offer.config) {
+            alert('کانفیگ آماده انتخابی پیدا نشد. لطفاً دوباره تلاش کنید.');
+            return;
+        }
+
+        state.selectedOffer = offer;
+        state.activeMode = 'guidance';
+        state.target = offer.target || state.target;
+        state.currentConfig = offer.config;
+        wizard.mergeOfferDb(offer.db);
+        document.querySelectorAll('[id^="validator-"]').forEach(el => { el.innerHTML = ''; });
+        wizard.renderOfferDetails(offer);
+        sessionManager.save('draft');
         wizard.showView('view-server-details');
+    },
+
+    editSelectedOffer: async () => {
+        if (!state.selectedOffer) {
+            wizard.launchConfigurator();
+            return;
+        }
+        state.activeMode = 'pro';
+        wizard.mergeOfferDb(state.selectedOffer.db);
+        configurator.initDropdowns();
+        await sessionManager.hydrateProConfig({ stateDump: { proStep: 1 } });
     },
 
     submitFinalGuidance: () => {
@@ -1524,7 +1719,7 @@ const configurator = {
         if (document.getElementById('view-pro-configurator') && !document.getElementById('view-pro-configurator').classList.contains('hidden')) {
             proWizard.render();
         }
-        
+
         sessionManager.save('draft');
     },
 
@@ -1544,7 +1739,7 @@ const configurator = {
             return;
         }
 
-        const btn = document.activeElement; 
+        const btn = document.activeElement;
         const originalText = btn ? btn.innerText : 'درخواست پیش فاکتور';
         if (btn && btn.tagName === 'BUTTON') { btn.innerText = "در حال ثبت درخواست..."; btn.disabled = true; }
 
@@ -1554,7 +1749,7 @@ const configurator = {
         state.currentConfig.opticalDrives = state.currentConfig.opticalDrives.filter(o => o.opticalId !== "");
         state.currentConfig.totalWatts = parseInt(document.getElementById('summary-power').innerText) || 0;
         state.currentConfig.psuQty = state.currentConfig.chassis?.max_psu_bays || 2;
-        
+
         try {
             const response = await fetch('api/submit_config.php', {
                 method: 'POST',
@@ -1577,11 +1772,220 @@ const configurator = {
     }
 };
 
+
+
+// ==========================================
+// 7. Smart Assistant Modal (پیشنهاد آماده + چت AI)
+// ==========================================
+const smartAssistant = {
+    chatStarted: false,
+    chatHistory: [],
+    lastContext: null,
+
+    open: async () => {
+        const modal = document.getElementById('ai-assistant-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        smartAssistant.chatStarted = false;
+        smartAssistant.chatHistory = [];
+
+        const offersPanel = document.getElementById('ai-offers-panel');
+        const chatPanel = document.getElementById('ai-chat-panel');
+        const startBtn = document.getElementById('ai-start-chat-btn');
+        if (offersPanel) offersPanel.classList.remove('hidden');
+        if (chatPanel) chatPanel.classList.add('hidden');
+        if (startBtn) startBtn.classList.remove('hidden');
+
+        await smartAssistant.loadOffers();
+    },
+
+    close: () => {
+        document.getElementById('ai-assistant-modal')?.classList.add('hidden');
+    },
+
+    getCurrentContext: () => {
+        const guidanceTarget = Object.keys(wizard.answers || {}).length ? wizard.buildTargetFromGuidance() : null;
+        const target = Object.keys(state.target || {}).length ? state.target : (guidanceTarget || { cores: 16, ram: 64, storage: 2000, gpu: false, network: 'any', formFactor: 'any' });
+
+        return {
+            activeView: state.currentView,
+            activeMode: state.activeMode,
+            target,
+            guidanceAnswers: wizard.answers,
+            selectedOffer: state.selectedOffer ? {
+                id: state.selectedOffer.id,
+                title: state.selectedOffer.title,
+                tier: state.selectedOffer.recommendation_tier,
+                label: state.selectedOffer.recommendation_label
+            } : null,
+            currentConfig: state.currentConfig
+        };
+    },
+
+    summarizeTarget: (target) => `نیاز فعلی: ${target.cores || 0} Core، ${target.ram || 0}GB RAM، ${((target.storage || 0) / 1000).toFixed(1)}TB Storage${target.gpu ? '، همراه GPU' : ''}`,
+
+    loadOffers: async () => {
+        const list = document.getElementById('ai-offers-list');
+        const summary = document.getElementById('ai-context-summary');
+        smartAssistant.lastContext = smartAssistant.getCurrentContext();
+        const target = smartAssistant.lastContext.target;
+        state.target = target;
+
+        if (summary) summary.innerText = smartAssistant.summarizeTarget(target);
+        if (list) {
+            list.innerHTML = `
+                <div class="md:col-span-3 bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
+                    <div class="text-3xl mb-3 animate-pulse">🔎</div>
+                    <p class="font-bold text-gray-700">در حال دریافت سه پیشنهاد آماده...</p>
+                </div>`;
+        }
+
+        try {
+            const result = await api.fetchRecommendations(target, wizard.answers);
+            if (result.status !== 'success') throw new Error(result.message || 'Recommendation API failed');
+            state.readyOffers = result.offers || [];
+            if (result.target) state.target = result.target;
+            smartAssistant.lastContext = smartAssistant.getCurrentContext();
+            smartAssistant.renderOffers();
+        } catch (error) {
+            console.error('AI Assistant Offers Error:', error);
+            if (list) {
+                list.innerHTML = `
+                    <div class="md:col-span-3 bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                        <h4 class="font-bold text-red-700 mb-2">خطا در دریافت پیشنهادها</h4>
+                        <p class="text-sm text-red-600">لطفاً اتصال API پیشنهاددهی یا جدول سرورهای آماده را بررسی کنید.</p>
+                    </div>`;
+            }
+        }
+    },
+
+    renderOffers: () => {
+        const list = document.getElementById('ai-offers-list');
+        if (!list) return;
+        if (!state.readyOffers.length) {
+            list.innerHTML = '<div class="md:col-span-3 bg-gray-50 border border-gray-200 rounded-xl p-6 text-center text-gray-500">پیشنهاد آماده‌ای پیدا نشد.</div>';
+            return;
+        }
+
+        const themes = {
+            eco: { title: 'اقتصادی', icon: '🖨️', box: 'bg-white border border-gray-200', btn: 'border border-blue-900 text-blue-900 hover:bg-blue-50' },
+            managed: { title: 'مدیریت‌شده', icon: '🏢', box: 'bg-blue-50 border-2 border-blue-200 shadow-sm', btn: 'bg-blue-900 text-white hover:bg-blue-800' },
+            advanced: { title: 'پیشرفته', icon: '🚀', box: 'bg-white border border-gray-200', btn: 'border border-blue-900 text-blue-900 hover:bg-blue-50' }
+        };
+
+        list.innerHTML = state.readyOffers.map(offer => {
+            const theme = themes[offer.recommendation_tier] || themes.eco;
+            return `
+                <div class="${theme.box} rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-gray-900">${theme.title}</h4>
+                            <span class="text-2xl">${offer.icon || theme.icon}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-3" dir="ltr">${wizard.escapeHTML(offer.title)}</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+                            <div class="bg-gray-50 rounded p-2"><span class="text-gray-400 block">CPU</span><b>${offer.cpu_cores} Core</b></div>
+                            <div class="bg-gray-50 rounded p-2"><span class="text-gray-400 block">RAM</span><b>${offer.ram_gb} GB</b></div>
+                            <div class="bg-gray-50 rounded p-2"><span class="text-gray-400 block">Storage</span><b>${(offer.usable_storage_gb / 1000).toFixed(1)} TB</b></div>
+                            <div class="bg-gray-50 rounded p-2"><span class="text-gray-400 block">Gen</span><b>${offer.generation_rank}</b></div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="smartAssistant.applyOffer('${offer.recommendation_tier}')" class="w-full py-2 rounded-lg font-bold transition ${theme.btn}">انتخاب این سرور</button>
+                </div>`;
+        }).join('');
+    },
+
+    applyOffer: async (tier) => {
+        const offer = state.readyOffers.find(item => item.recommendation_tier === tier) || state.readyOffers.find(item => item.id == tier);
+        if (!offer?.config) {
+            alert('کانفیگ آماده انتخابی پیدا نشد.');
+            return;
+        }
+
+        state.selectedOffer = offer;
+        state.currentConfig = offer.config;
+        state.target = offer.target || state.target;
+        wizard.mergeOfferDb(offer.db);
+        sessionManager.save('draft');
+
+        if (state.currentView === 'view-pro-configurator') {
+            configurator.initDropdowns();
+            await sessionManager.hydrateProConfig({ stateDump: { proStep: proWizard.currentStep || 1 } });
+        } else if (state.currentView === 'view-server-details') {
+            wizard.renderOfferDetails(offer);
+        }
+
+        const summary = document.getElementById('ai-context-summary');
+        if (summary) summary.innerText = `سرور ${offer.recommendation_label} انتخاب شد و فیلدهای کانفیگ پر شدند.`;
+        smartAssistant.addChatMessage('assistant', `سرور «${offer.recommendation_label}» انتخاب شد و قطعات آن داخل کانفیگ فعلی قرار گرفت. اگر خواستید می‌تونیم همین کانفیگ رو با هم بررسی یا اصلاح کنیم.`);
+    },
+
+    startChat: async () => {
+        smartAssistant.chatStarted = true;
+        smartAssistant.lastContext = smartAssistant.getCurrentContext();
+        document.getElementById('ai-offers-panel')?.classList.add('hidden');
+        document.getElementById('ai-chat-panel')?.classList.remove('hidden');
+        document.getElementById('ai-start-chat-btn')?.classList.add('hidden');
+
+        const log = document.getElementById('ai-chat-log');
+        if (log) log.innerHTML = '';
+        smartAssistant.addChatMessage('assistant', 'چت شروع شد. اطلاعات انتخاب‌شده تا اینجا برای AI ارسال شد. حالا بفرمایید چه تغییری در کانفیگ می‌خواید یا چه سوالی دارید؟');
+
+        try {
+            const result = await api.sendAIMessage('__context_init__', smartAssistant.lastContext, smartAssistant.chatHistory);
+            if (result.status === 'success' && result.reply) smartAssistant.addChatMessage('assistant', result.reply);
+        } catch (error) {
+            console.error('AI Context Init Error:', error);
+        }
+
+        document.getElementById('ai-chat-input')?.focus();
+    },
+
+    addChatMessage: (role, text) => {
+        const log = document.getElementById('ai-chat-log');
+        if (!log) return;
+        const isUser = role === 'user';
+        smartAssistant.chatHistory.push({ role, text, timestamp: Date.now() });
+        log.innerHTML += `
+            <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+                <div class="${isUser ? 'bg-blue-900 text-white' : 'bg-white text-gray-800 border border-gray-200'} rounded-xl px-4 py-3 max-w-[80%] shadow-sm leading-relaxed">
+                    ${wizard.escapeHTML(text)}
+                </div>
+            </div>`;
+        log.scrollTop = log.scrollHeight;
+    },
+
+    sendMessage: async (event) => {
+        event.preventDefault();
+        if (!smartAssistant.chatStarted) await smartAssistant.startChat();
+
+        const input = document.getElementById('ai-chat-input');
+        const btn = document.getElementById('ai-chat-send-btn');
+        const message = input?.value.trim();
+        if (!message) return;
+
+        smartAssistant.addChatMessage('user', message);
+        input.value = '';
+        if (btn) { btn.disabled = true; btn.innerText = 'در حال پاسخ...'; }
+
+        try {
+            smartAssistant.lastContext = smartAssistant.getCurrentContext();
+            const result = await api.sendAIMessage(message, smartAssistant.lastContext, smartAssistant.chatHistory);
+            smartAssistant.addChatMessage('assistant', result.reply || 'پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.');
+        } catch (error) {
+            console.error('AI Chat Error:', error);
+            smartAssistant.addChatMessage('assistant', 'فعلاً ارتباط با سرویس AI برقرار نشد، اما اطلاعات کانفیگ آماده ارسال است.');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerText = 'ارسال'; }
+        }
+    }
+};
+
 // اجرای اولیه
 document.addEventListener('DOMContentLoaded', () => {
     sessionManager.init();
     wizard.showView('view-intro');
-    
+
     document.querySelectorAll('#view-pro input, #view-pro select').forEach(el => {
         el.addEventListener('input', () => {
             const btn = document.getElementById('pro-submit-btn');

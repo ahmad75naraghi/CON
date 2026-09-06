@@ -1,6 +1,5 @@
 -- phpMyAdmin SQL Dump
 -- version 5.2.3
--- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
 -- Generation Time: Sep 05, 2026 at 11:46 AM
@@ -759,6 +758,42 @@ INSERT INTO `Storage_Drives` (`id`, `part_number`, `price`, `currency`, `model_n
 
 -- --------------------------------------------------------
 
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Prepared_Server_Offers`
+--
+
+CREATE TABLE `Prepared_Server_Offers` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `icon` varchar(20) DEFAULT NULL,
+  `cpu_cores` int(11) NOT NULL,
+  `ram_gb` int(11) NOT NULL,
+  `usable_storage_gb` int(11) NOT NULL DEFAULT 0,
+  `raw_storage_gb` int(11) NOT NULL DEFAULT 0,
+  `gpu_memory_gb` int(11) NOT NULL DEFAULT 0,
+  `generation_rank` int(11) NOT NULL DEFAULT 0,
+  `expansion_score` int(11) NOT NULL DEFAULT 0,
+  `performance_score` int(11) NOT NULL DEFAULT 0,
+  `selected_components` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`selected_components`)),
+  `bullets` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (`bullets` is null or json_valid(`bullets`)),
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `Prepared_Server_Offers`
+--
+
+INSERT INTO `Prepared_Server_Offers` (`id`, `title`, `description`, `icon`, `cpu_cores`, `ram_gb`, `usable_storage_gb`, `raw_storage_gb`, `gpu_memory_gb`, `generation_rank`, `expansion_score`, `performance_score`, `selected_components`, `bullets`) VALUES
+(1, 'DL360 Gen9 اقتصادی', 'کم‌هزینه‌ترین سرور آماده‌ای که حداقل نیازهای پایه را پوشش می‌دهد و برای شروع کار مناسب است.', '🖨️', 12, 64, 2000, 4000, 0, 9, 35, 12064, '{"chassis_id":3,"cpu":{"id":55,"qty":1},"ram":{"id":20,"qty":2},"drives":[{"id":127,"qty":2,"raid":"1"}],"controller":null,"sas_expander":false,"gpu":null,"networks":[],"riser2":null,"riser3":null,"psu":{"id":13,"qty":2},"hbas":[],"optical_drives":[]}', '["ضعیف‌ترین گزینه‌ای که کار را راه می‌اندازد","مناسب سرویس‌های عمومی، حسابداری، CRM و تیم‌های کوچک","مصرف توان و هزینه اولیه کمتر"]'),
+(2, 'DL380 Gen10 مدیریت‌شده', 'ترکیب استاندارد و متعادل با پردازنده دوگانه، رم بیشتر، RAID سخت‌افزاری و فضای توسعه مناسب برای چند سال آینده.', '🏢', 32, 256, 3840, 7680, 0, 10, 70, 32256, '{"chassis_id":1,"cpu":{"id":25,"qty":2},"ram":{"id":5,"qty":4},"drives":[{"id":31,"qty":4,"raid":"10"}],"controller":{"id":2},"sas_expander":false,"gpu":null,"networks":[{"id":2,"qty":1}],"riser2":{"id":3},"riser3":null,"psu":{"id":3,"qty":2},"hbas":[],"optical_drives":[]}', '["تعادل خوب بین هزینه، کارایی و پایداری","فضای توسعه مناسب برای رشد سازمان","مناسب دیتابیس، مجازی‌سازی سبک و سرویس‌های سازمانی"]'),
+(3, 'ML110 Gen11 پیشرفته', 'گزینه نسل جدیدتر با ظرفیت ذخیره‌سازی بسیار بالاتر، NVMe، رم مناسب و GPU برای رشد آینده و بارهای سنگین‌تر.', '🚀', 32, 256, 25600, 51200, 24, 11, 85, 32256, '{"chassis_id":2,"cpu":{"id":37,"qty":1},"ram":{"id":14,"qty":4},"drives":[{"id":76,"qty":4,"raid":"10"}],"controller":{"id":12},"sas_expander":false,"gpu":{"id":7,"qty":1},"networks":[{"id":3,"qty":1}],"riser2":{"id":18},"riser3":null,"psu":{"id":11,"qty":2},"hbas":[],"optical_drives":[]}', '["نسل جدیدتر و مناسب‌تر برای ارتقای آینده","ظرفیت ذخیره‌سازی چندبرابر نیازهای معمول","آماده برای GPU، AI سبک، VDI یا بارهای پیشرفته"]');
+
 --
 -- Table structure for table `User_Configurations`
 --
@@ -878,6 +913,14 @@ ALTER TABLE `Storage_Drives`
   ADD UNIQUE KEY `uq_part_number` (`part_number`);
 
 --
+-- Indexes for table `Prepared_Server_Offers`
+--
+ALTER TABLE `Prepared_Server_Offers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_ready_offer_capacity` (`cpu_cores`,`ram_gb`,`usable_storage_gb`),
+  ADD KEY `idx_ready_offer_generation` (`generation_rank`,`expansion_score`);
+
+--
 -- Indexes for table `User_Configurations`
 --
 ALTER TABLE `User_Configurations`
@@ -897,7 +940,7 @@ ALTER TABLE `Chassis`
 -- AUTO_INCREMENT for table `CPUs`
 --
 ALTER TABLE `CPUs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `GPUs`
@@ -954,10 +997,16 @@ ALTER TABLE `Storage_Drives`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=191;
 
 --
+-- AUTO_INCREMENT for table `Prepared_Server_Offers`
+--
+ALTER TABLE `Prepared_Server_Offers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `User_Configurations`
 --
 ALTER TABLE `User_Configurations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
