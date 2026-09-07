@@ -8,6 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once FALNIC_SC_DIR . 'includes/class-falnic-sc-install.php';
+require_once FALNIC_SC_DIR . 'includes/falnic-sc-catalog-defs.php';
 require_once FALNIC_SC_DIR . 'includes/class-falnic-sc-crud.php';
 
 class Falnic_SC_Admin {

@@ -11,6 +11,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+require_once FALNIC_SC_DIR . 'includes/falnic-sc-functions.php';
+
 class Falnic_SC_AI {
 
 	/**

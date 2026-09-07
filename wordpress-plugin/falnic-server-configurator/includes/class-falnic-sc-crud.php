@@ -12,6 +12,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
+require_once FALNIC_SC_DIR . 'includes/class-falnic-sc-tables.php';
+require_once FALNIC_SC_DIR . 'includes/falnic-sc-functions.php';
+require_once FALNIC_SC_DIR . 'includes/falnic-sc-catalog-defs.php';
+
 class Falnic_SC_CRUD {
 
 	/**
