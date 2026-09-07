@@ -2,9 +2,8 @@
 /**
  * AI provider gateway (OpenAI-compatible).
  *
- * Ported from the standalone api/ai_chat.php + config/ai.php, but credentials
- * live in WordPress settings (stored in the DB, never exposed to the browser)
- * and the HTTP call goes through the WordPress HTTP API instead of raw cURL.
+ * Credentials live in WordPress settings (never exposed to the browser).
+ * HTTP calls go through the WordPress HTTP API.
  *
  * @package FalnicServerConfigurator
  */

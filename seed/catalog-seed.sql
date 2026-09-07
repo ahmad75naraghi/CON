@@ -1,4 +1,4 @@
--- catalog seed data, extracted verbatim from falnicc1_server_configurator.sql
+-- Catalog seed data for Falnic Server Configurator (WordPress plugin)
 -- each block is only executed when the corresponding table is empty
 SET NAMES utf8mb4;
 

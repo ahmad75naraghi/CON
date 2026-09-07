@@ -11,9 +11,8 @@
  *   4. Verifies `id` is AUTO_INCREMENT       → repairs when needed.
  *   5. Seeds empty catalog tables with the original data.
  *
- * The structure is byte-for-byte the one shipped in
- * falnicc1_server_configurator.sql, so the plugin and the standalone app can
- * share the same database without any code-level differences.
+ * Column/index definitions come from includes/falnic-sc-schema.php and must
+ * stay aligned with seed/catalog-seed.sql.
  *
  * @package FalnicServerConfigurator
  */
