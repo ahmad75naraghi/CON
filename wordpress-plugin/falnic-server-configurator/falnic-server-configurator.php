@@ -3,7 +3,7 @@
  * Plugin Name:       کانفیگوراتور سرور فالنیک (Falnic Server Configurator)
  * Plugin URI:        https://falnic.com
  * Description:       کانفیگوراتور حرفه‌ای سرور HPE با شورت‌کد، نیازسنجی هوشمند، پیشنهاد سرور آماده، اعتبارسنجی سازگاری سخت‌افزار، دستیار AI و پنل مدیریت کامل قطعات. جایگزین وردپرسی پروژه falnicc1_server_configurator.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Falnic
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 // -----------------------------------------------------------------------------
 // Core constants
 // -----------------------------------------------------------------------------
-define( 'FALNIC_SC_VERSION', '1.0.0' );
+define( 'FALNIC_SC_VERSION', '1.0.1' );
 define( 'FALNIC_SC_DB_VERSION', '1.0.0' );
 define( 'FALNIC_SC_FILE', __FILE__ );
 define( 'FALNIC_SC_DIR', plugin_dir_path( __FILE__ ) );

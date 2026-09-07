@@ -405,33 +405,6 @@ class Falnic_SC_Ajax {
 	}
 
 	/**
-	 * Does the offer satisfy the (scaled) target?
-	 *
-	 * @param array $offer      Offer row.
-	 * @param array $target     Normalized target.
-	 * @param float $multiplier Scale factor.
-	 * @return bool
-	 */
-	private static function meets_target( array $offer, array $target, $multiplier = 1.0 ) {
-		if ( ! self::is_available_offer( $offer ) ) {
-			return false;
-		}
-		if ( $offer['cpu_cores'] < ( $target['cores'] * $multiplier ) ) {
-			return false;
-		}
-		if ( $offer['ram_gb'] < ( $target['ram'] * $multiplier ) ) {
-			return false;
-		}
-		if ( $target['storage'] > 0 && $offer['usable_storage_gb'] < ( $target['storage'] * $multiplier ) ) {
-			return false;
-		}
-		if ( ! empty( $target['gpu'] ) && $offer['gpu_memory_gb'] <= 0 ) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
 	 * Workload / stock adjustments to the score.
 	 *
 	 * @param array $offer  Offer row.
@@ -476,6 +449,12 @@ class Falnic_SC_Ajax {
 	/**
 	 * Pick exactly eco / managed / advanced offers.
 	 *
+	 * Stable tier ladder: offers are ranked weakest → strongest
+	 * (performance_score ASC, generation_rank ASC, id ASC — the catalog order).
+	 * اقتصادی = weakest offer, پیشرفته = strongest offer, and مدیریت‌شده = the
+	 * middle offer closest to target × 1.35. Tiers therefore always stick to
+	 * the same catalog entries instead of rotating with the target workload.
+	 *
 	 * @param array[] $offers Catalog.
 	 * @param array   $target Normalized target.
 	 * @return array[]
@@ -485,28 +464,33 @@ class Falnic_SC_Ajax {
 		if ( ! $available ) {
 			$available = $offers;
 		}
-
-		$eligible = array_values( array_filter( $available, static fn( $o ) => self::meets_target( $o, $target, 1.0 ) ) );
-		if ( ! $eligible ) {
-			$eligible = $available;
+		if ( ! $available ) {
+			return array();
 		}
 
-		usort( $eligible, static fn( $a, $b ) => array( self::score_distance( $a, $target, 1.0 ), $a['performance_score'], $a['ram_gb'], $a['usable_storage_gb'] ) <=> array( self::score_distance( $b, $target, 1.0 ), $b['performance_score'], $b['ram_gb'], $b['usable_storage_gb'] ) );
-		$eco = $eligible[0];
+		usort(
+			$available,
+			static fn( $a, $b ) => array( (int) $a['performance_score'], (int) $a['generation_rank'], (int) $a['id'] )
+				<=> array( (int) $b['performance_score'], (int) $b['generation_rank'], (int) $b['id'] )
+		);
 
-		$managed_pool = array_values( array_filter( $eligible, static fn( $o ) => $o['id'] != $eco['id'] && (int) $o['expansion_score'] >= 50 ) );
-		if ( ! $managed_pool ) {
-			$managed_pool = array_values( array_filter( $available, static fn( $o ) => $o['id'] != $eco['id'] ) );
-		}
-		usort( $managed_pool, static fn( $a, $b ) => self::score_distance( $a, $target, 1.35 ) <=> self::score_distance( $b, $target, 1.35 ) );
-		$managed = $managed_pool[0] ?? $eco;
+		$eco      = $available[0];
+		$advanced = $available[ count( $available ) - 1 ];
 
-		$advanced_pool = array_values( array_filter( $available, static fn( $o ) => $o['id'] != $eco['id'] && $o['id'] != $managed['id'] && self::meets_target( $o, $target, 2.0 ) ) );
-		if ( ! $advanced_pool ) {
-			$advanced_pool = array_values( array_filter( $available, static fn( $o ) => $o['id'] != $eco['id'] && $o['id'] != $managed['id'] ) );
+		$middle_pool = array_values( array_filter( $available, static fn( $o ) => $o['id'] != $eco['id'] && $o['id'] != $advanced['id'] ) );
+
+		$managed = null;
+		$best    = null;
+		foreach ( $middle_pool as $offer ) {
+			$distance = self::score_distance( $offer, $target, 1.35 );
+			if ( null === $best || $distance < $best ) {
+				$best    = $distance;
+				$managed = $offer;
+			}
 		}
-		usort( $advanced_pool, static fn( $a, $b ) => array( self::score_distance( $a, $target, 2.0 ), -$a['generation_rank'], -$a['expansion_score'] ) <=> array( self::score_distance( $b, $target, 2.0 ), -$b['generation_rank'], -$b['expansion_score'] ) );
-		$advanced = $advanced_pool[0] ?? $managed;
+		if ( null === $managed ) {
+			$managed = $available[1] ?? $eco;
+		}
 
 		$eco['recommendation_tier']   = 'eco';
 		$eco['recommendation_label']  = 'اقتصادی';
