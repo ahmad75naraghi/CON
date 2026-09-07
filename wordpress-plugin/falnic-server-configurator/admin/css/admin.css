@@ -1,0 +1,135 @@
+/* Falnic Server Configurator — admin styles (RTL friendly, no dependencies) */
+
+.falnic-admin-wrap { max-width: 1080px; }
+
+.falnic-admin-title {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	flex-wrap: wrap;
+}
+
+.falnic-admin-desc { color: #646970; margin-top: .25rem 0 1rem; }
+
+/* Hero + shortcode box */
+.falnic-hero {
+	display: flex;
+	gap: 1rem;
+	align-items: stretch;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-right: 4px solid #1e3a8a;
+	border-radius: 8px;
+	padding: 1rem 1.25rem;
+	margin: 1rem 0 1.5rem;
+	flex-wrap: wrap;
+}
+.falnic-hero-main { flex: 1 1 420px; }
+.falnic-hero-main h2 { margin: 0 0 .5rem; }
+.falnic-hero-side {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	flex: 0 0 auto;
+}
+.falnic-stat {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: .75rem 1.25rem;
+	text-align: center;
+	min-width: 130px;
+}
+.falnic-stat-num {
+	display: block;
+	font-size: 1.6rem;
+	font-weight: 700;
+	color: #1e3a8a;
+	line-height: 1.2;
+}
+.falnic-stat-label { font-size: .75rem; color: #646970; }
+
+.falnic-shortcode-box {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	background: #f0f6fc;
+	border: 1px dashed #72aee6;
+	border-radius: 6px;
+	padding: .5rem .75rem;
+	margin: .5rem 0;
+}
+.falnic-shortcode-box code {
+	font-size: 1rem;
+	background: transparent;
+	padding: 0;
+	flex: 1;
+}
+
+.falnic-tools {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 1rem 1.25rem;
+	margin-bottom: 1.5rem;
+}
+.falnic-tools h2 { margin-top: 0; }
+.falnic-tools .button { margin-inline-end: .5rem; }
+
+/* Badges */
+.falnic-badge {
+	display: inline-block;
+	padding: 2px 10px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.6;
+}
+.falnic-badge-green { background: #edfaef; color: #116329; border: 1px solid #68de7c; }
+.falnic-badge-red { background: #fcf0f1; color: #8a2424; border: 1px solid #ffabaf; }
+.falnic-badge-gray { background: #f6f7f7; color: #50575e; border: 1px solid #c3c4c7; }
+
+/* Tables */
+.falnic-table { margin-top: .5rem; }
+.falnic-table .check-column { width: 2.5rem; }
+.falnic-col-id { width: 4rem; font-weight: 600; }
+.falnic-row-actions { white-space: nowrap; }
+.falnic-danger { color: #b32d2e; }
+.falnic-ltr, .falnic-ltr code { direction: ltr; text-align: left; }
+.falnic-json-cell { font-size: 11px; background: #f6f7f7; padding: 2px 6px; border-radius: 4px; display: inline-block; max-width: 260px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+
+.falnic-table th a { text-decoration: none; }
+.falnic-table th a:hover, .falnic-table th a:focus { color: #2271b1; }
+
+/* Forms */
+.falnic-form-table th { width: 240px; }
+.falnic-ltr-row td input[type="text"],
+.falnic-json-input { direction: ltr; text-align: left; font-family: Consolas, Monaco, monospace; }
+.falnic-req { color: #b32d2e; margin-inline-start: 2px; }
+
+.falnic-inline-form { display: inline-flex; gap: .35rem; align-items: center; }
+
+.falnic-json-view {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	padding: 1rem;
+	overflow: auto;
+	max-height: 480px;
+	font-size: 12px;
+}
+
+.falnic-settings-section {
+	margin-top: 2rem;
+	padding-inline-start: .75rem;
+	border-inline-start: 4px solid #1e3a8a;
+}
+
+/* Search form spacing */
+.falnic-search-form .search-box { margin: .75rem 0; }
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+	.falnic-hero-side { width: 100%; justify-content: space-between; }
+	.falnic-form-table th { width: auto; }
+}
