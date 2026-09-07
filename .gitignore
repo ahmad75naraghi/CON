@@ -1,13 +1,29 @@
-# Local environment / secrets
+# Local / secrets
 .env
-config/database.local.php
-config/ai.local.php
-config/secrets.local.php
+.env.*
+*.local.php
 
-# OS/editor
+# OS / editor
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
+*.swp
+*.swo
+*~
 
-# Logs
+# Logs & caches
 *.log
+.cache/
+.phpunit.result.cache
+
+# Composer / Node (if added later)
+/vendor/
+/node_modules/
+/package-lock.json
+/composer.lock
+
+# Build / release artifacts
+*.zip
+dist/
+build/

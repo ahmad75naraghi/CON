@@ -1,630 +1,1236 @@
-@font-face {
-    font-family: "Falnic";
-    src: url("./falnic-font.woff2") format("woff2");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-}
+/*
+ * Falnic Server Configurator — WordPress stylesheet.
+ * Hand-written local CSS (no Tailwind/CDN): every selector is scoped under
+ * .falnic-sc-app and declarations carry !important so the app renders
+ * identically inside any WordPress theme.
+ *
+ * Typography inherits the active WordPress theme / site font — no bundled face.
+ */
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    border-width: 0;
-    border-style: solid;
-    border-color: #e5e7eb;
-}
+.falnic-sc-app *,
+.falnic-sc-app *::before,
+.falnic-sc-app *::after {
+        box-sizing: border-box !important;
+        border-width: 0 !important;
+        border-style: solid !important;
+        border-color: #e5e7eb !important;
+    }
 
-html {
-    line-height: 1.5;
-    -webkit-text-size-adjust: 100%;
-    tab-size: 4;
-}
+.falnic-sc-app {
+        line-height: 1.5 !important;
+        -webkit-text-size-adjust: 100% !important;
+        tab-size: 4 !important;
+    }
 
-body {
-    margin: 0;
-    font-family: "Falnic", Tahoma, Arial, sans-serif;
-    background-color: #f8fafc;
-    color: #1f2937;
-}
+.falnic-sc-app {
+        margin: 0 !important;
+        font-family: inherit !important;
+        background-color: #f8fafc !important;
+        color: #1f2937 !important;
+    }
 
-button,
-input,
-select,
-textarea {
-    font: inherit;
-    color: inherit;
-    margin: 0;
-}
+.falnic-sc-app button,
+.falnic-sc-app input,
+.falnic-sc-app select,
+.falnic-sc-app textarea {
+        font: inherit !important;
+        color: inherit !important;
+        margin: 0 !important;
+    }
 
-button,
-select {
-    text-transform: none;
-}
+.falnic-sc-app button,
+.falnic-sc-app select {
+        text-transform: none !important;
+    }
 
-button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
-    -webkit-appearance: button;
-    appearance: button;
-    background-color: transparent;
-    background-image: none;
-}
+.falnic-sc-app button,
+.falnic-sc-app [type="button"],
+.falnic-sc-app [type="reset"],
+.falnic-sc-app [type="submit"] {
+        -webkit-appearance: button !important;
+        appearance: button !important;
+        background-color: transparent !important;
+        background-image: none !important;
+    }
 
-button,
-[role="button"] {
-    cursor: pointer;
-}
+.falnic-sc-app button,
+.falnic-sc-app [role="button"] {
+        cursor: pointer !important;
+    }
 
-button:disabled,
-select:disabled,
-input:disabled {
-    cursor: default;
-}
+.falnic-sc-app button:disabled,
+.falnic-sc-app select:disabled,
+.falnic-sc-app input:disabled {
+        cursor: default !important;
+    }
 
-img,
-svg {
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
+.falnic-sc-app img,
+.falnic-sc-app svg {
+        display: block !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
 
-table {
-    text-indent: 0;
-    border-color: inherit;
-}
+.falnic-sc-app table {
+        text-indent: 0 !important;
+        border-color: inherit !important;
+    }
 
-summary {
-    display: list-item;
-}
+.falnic-sc-app summary {
+        display: list-item !important;
+    }
 
 /* Layout */
-.container { width: 100%; }
-.mx-auto { margin-left: auto; margin-right: auto; }
-.my-8 { margin-top: 2rem; margin-bottom: 2rem; }
-.block { display: block; }
-.flex { display: flex; }
-.grid { display: grid; }
-.hidden { display: none !important; }
-.inline-block { display: inline-block; }
-.inline-flex { display: inline-flex; }
-.fixed { position: fixed; }
-.absolute { position: absolute; }
-.relative { position: relative; }
-.sticky { position: sticky; }
-.inset-0 { inset: 0; }
-.top-1\/2 { top: 50%; }
-.top-4 { top: 1rem; }
-.top-6 { top: 1.5rem; }
-.left-0 { left: 0; }
-.left-6 { left: 1.5rem; }
-.right-0 { right: 0; }
-.right-1 { right: .25rem; }
-.-top-5 { top: -1.25rem; }
-.z-10 { z-index: 10; }
-.z-50 { z-index: 50; }
-.-z-10 { z-index: -10; }
+.falnic-sc-app .container {
+        width: 100% !important;
+    }
+.falnic-sc-app .mx-auto {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+.falnic-sc-app .my-8 {
+        margin-top: 2rem !important;
+        margin-bottom: 2rem !important;
+    }
+.falnic-sc-app .block {
+        display: block !important;
+    }
+.falnic-sc-app .flex {
+        display: flex !important;
+    }
+.falnic-sc-app .grid {
+        display: grid !important;
+    }
+.falnic-sc-app .hidden {
+        display: none !important;
+    }
+.falnic-sc-app .inline-block {
+        display: inline-block !important;
+    }
+.falnic-sc-app .inline-flex {
+        display: inline-flex !important;
+    }
+.falnic-sc-app .fixed {
+        position: fixed !important;
+    }
+.falnic-sc-app .absolute {
+        position: absolute !important;
+    }
+.falnic-sc-app .relative {
+        position: relative !important;
+    }
+.falnic-sc-app .sticky {
+        position: sticky !important;
+    }
+.falnic-sc-app .inset-0 {
+        inset: 0 !important;
+    }
+.falnic-sc-app .top-1\/2 {
+        top: 50% !important;
+    }
+.falnic-sc-app .top-4 {
+        top: 1rem !important;
+    }
+.falnic-sc-app .top-6 {
+        top: 1.5rem !important;
+    }
+.falnic-sc-app .left-0 {
+        left: 0 !important;
+    }
+.falnic-sc-app .left-6 {
+        left: 1.5rem !important;
+    }
+.falnic-sc-app .right-0 {
+        right: 0 !important;
+    }
+.falnic-sc-app .right-1 {
+        right: .25rem !important;
+    }
+.falnic-sc-app .-top-5 {
+        top: -1.25rem !important;
+    }
+.falnic-sc-app .z-10 {
+        z-index: 10 !important;
+    }
+.falnic-sc-app .z-50 {
+        z-index: 50 !important;
+    }
+.falnic-sc-app .-z-10 {
+        z-index: -10 !important;
+    }
 
-.flex-1 { flex: 1 1 0%; }
-.flex-col { flex-direction: column; }
-.flex-row-reverse { flex-direction: row-reverse; }
-.items-start { align-items: flex-start; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.justify-end { justify-content: flex-end; }
-.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.falnic-sc-app .flex-1 {
+        flex: 1 1 0% !important;
+    }
+.falnic-sc-app .flex-col {
+        flex-direction: column !important;
+    }
+.falnic-sc-app .flex-row-reverse {
+        flex-direction: row-reverse !important;
+    }
+.falnic-sc-app .items-start {
+        align-items: flex-start !important;
+    }
+.falnic-sc-app .items-center {
+        align-items: center !important;
+    }
+.falnic-sc-app .justify-center {
+        justify-content: center !important;
+    }
+.falnic-sc-app .justify-between {
+        justify-content: space-between !important;
+    }
+.falnic-sc-app .justify-end {
+        justify-content: flex-end !important;
+    }
+.falnic-sc-app .grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
 
-.w-full { width: 100%; }
-.w-1\/2 { width: 50%; }
-.w-1\/3 { width: 33.333333%; }
-.w-1\/4 { width: 25%; }
-.w-1\/6 { width: 16.666667%; }
-.w-3\/4 { width: 75%; }
-.w-4 { width: 1rem; }
-.w-5 { width: 1.25rem; }
-.w-6 { width: 1.5rem; }
-.w-10 { width: 2.5rem; }
-.w-16 { width: 4rem; }
-.w-20 { width: 5rem; }
-.max-w-sm { max-width: 24rem; }
-.max-w-3xl { max-width: 48rem; }
-.max-w-4xl { max-width: 56rem; }
-.max-w-5xl { max-width: 64rem; }
-.max-w-6xl { max-width: 72rem; }
-.max-w-\[150px\] { max-width: 150px; }
-.h-0\.5 { height: .125rem; }
-.h-4 { height: 1rem; }
-.h-5 { height: 1.25rem; }
-.h-6 { height: 1.5rem; }
-.h-10 { height: 2.5rem; }
-.h-16 { height: 4rem; }
-.h-fit { height: fit-content; }
+.falnic-sc-app .w-full {
+        width: 100% !important;
+    }
+.falnic-sc-app .w-1\/2 {
+        width: 50% !important;
+    }
+.falnic-sc-app .w-1\/3 {
+        width: 33.333333% !important;
+    }
+.falnic-sc-app .w-1\/4 {
+        width: 25% !important;
+    }
+.falnic-sc-app .w-1\/6 {
+        width: 16.666667% !important;
+    }
+.falnic-sc-app .w-3\/4 {
+        width: 75% !important;
+    }
+.falnic-sc-app .w-4 {
+        width: 1rem !important;
+    }
+.falnic-sc-app .w-5 {
+        width: 1.25rem !important;
+    }
+.falnic-sc-app .w-6 {
+        width: 1.5rem !important;
+    }
+.falnic-sc-app .w-10 {
+        width: 2.5rem !important;
+    }
+.falnic-sc-app .w-16 {
+        width: 4rem !important;
+    }
+.falnic-sc-app .w-20 {
+        width: 5rem !important;
+    }
+.falnic-sc-app .max-w-sm {
+        max-width: 24rem !important;
+    }
+.falnic-sc-app .max-w-3xl {
+        max-width: 48rem !important;
+    }
+.falnic-sc-app .max-w-4xl {
+        max-width: 56rem !important;
+    }
+.falnic-sc-app .max-w-5xl {
+        max-width: 64rem !important;
+    }
+.falnic-sc-app .max-w-6xl {
+        max-width: 72rem !important;
+    }
+.falnic-sc-app .max-w-\[150px\] {
+        max-width: 150px !important;
+    }
+.falnic-sc-app .h-0\.5 {
+        height: .125rem !important;
+    }
+.falnic-sc-app .h-4 {
+        height: 1rem !important;
+    }
+.falnic-sc-app .h-5 {
+        height: 1.25rem !important;
+    }
+.falnic-sc-app .h-6 {
+        height: 1.5rem !important;
+    }
+.falnic-sc-app .h-10 {
+        height: 2.5rem !important;
+    }
+.falnic-sc-app .h-16 {
+        height: 4rem !important;
+    }
+.falnic-sc-app .h-fit {
+        height: fit-content !important;
+    }
 
 /* Spacing */
-.gap-1 { gap: .25rem; }
-.gap-2 { gap: .5rem; }
-.gap-3 { gap: .75rem; }
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
-.p-2 { padding: .5rem; }
-.p-3 { padding: .75rem; }
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
-.p-8 { padding: 2rem; }
-.p-10 { padding: 2.5rem; }
-.px-2 { padding-left: .5rem; padding-right: .5rem; }
-.px-3 { padding-left: .75rem; padding-right: .75rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
-.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-.px-8 { padding-left: 2rem; padding-right: 2rem; }
-.py-1 { padding-top: .25rem; padding-bottom: .25rem; }
-.py-2 { padding-top: .5rem; padding-bottom: .5rem; }
-.py-3 { padding-top: .75rem; padding-bottom: .75rem; }
-.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-.pt-1 { padding-top: .25rem; }
-.pt-2 { padding-top: .5rem; }
-.pt-4 { padding-top: 1rem; }
-.pt-6 { padding-top: 1.5rem; }
-.pb-2 { padding-bottom: .5rem; }
-.pb-4 { padding-bottom: 1rem; }
-.pb-20 { padding-bottom: 5rem; }
-.pl-8 { padding-left: 2rem; }
-.pr-2 { padding-right: .5rem; }
-.pr-6 { padding-right: 1.5rem; }
-.mt-1 { margin-top: .25rem; }
-.mt-2 { margin-top: .5rem; }
-.mt-3 { margin-top: .75rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-6 { margin-top: 1.5rem; }
-.mt-8 { margin-top: 2rem; }
-.mt-12 { margin-top: 3rem; }
-.mb-1\.5 { margin-bottom: .375rem; }
-.mb-2 { margin-bottom: .5rem; }
-.mb-3 { margin-bottom: .75rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-5 { margin-bottom: 1.25rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.mb-8 { margin-bottom: 2rem; }
-.mb-10 { margin-bottom: 2.5rem; }
-.mb-12 { margin-bottom: 3rem; }
-.ml-2 { margin-left: .5rem; }
-.ml-8 { margin-left: 2rem; }
-.-mx-2 { margin-left: -.5rem; margin-right: -.5rem; }
-.space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: .25rem; }
-.space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: .5rem; }
-.space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: .75rem; }
-.space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
-.space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 2rem; }
+.falnic-sc-app .gap-1 {
+        gap: .25rem !important;
+    }
+.falnic-sc-app .gap-2 {
+        gap: .5rem !important;
+    }
+.falnic-sc-app .gap-3 {
+        gap: .75rem !important;
+    }
+.falnic-sc-app .gap-4 {
+        gap: 1rem !important;
+    }
+.falnic-sc-app .gap-6 {
+        gap: 1.5rem !important;
+    }
+.falnic-sc-app .p-2 {
+        padding: .5rem !important;
+    }
+.falnic-sc-app .p-3 {
+        padding: .75rem !important;
+    }
+.falnic-sc-app .p-4 {
+        padding: 1rem !important;
+    }
+.falnic-sc-app .p-6 {
+        padding: 1.5rem !important;
+    }
+.falnic-sc-app .p-8 {
+        padding: 2rem !important;
+    }
+.falnic-sc-app .p-10 {
+        padding: 2.5rem !important;
+    }
+.falnic-sc-app .px-2 {
+        padding-left: .5rem !important;
+        padding-right: .5rem !important;
+    }
+.falnic-sc-app .px-3 {
+        padding-left: .75rem !important;
+        padding-right: .75rem !important;
+    }
+.falnic-sc-app .px-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+.falnic-sc-app .px-5 {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+    }
+.falnic-sc-app .px-6 {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+.falnic-sc-app .px-8 {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+.falnic-sc-app .py-1 {
+        padding-top: .25rem !important;
+        padding-bottom: .25rem !important;
+    }
+.falnic-sc-app .py-2 {
+        padding-top: .5rem !important;
+        padding-bottom: .5rem !important;
+    }
+.falnic-sc-app .py-3 {
+        padding-top: .75rem !important;
+        padding-bottom: .75rem !important;
+    }
+.falnic-sc-app .py-4 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+.falnic-sc-app .pt-1 {
+        padding-top: .25rem !important;
+    }
+.falnic-sc-app .pt-2 {
+        padding-top: .5rem !important;
+    }
+.falnic-sc-app .pt-4 {
+        padding-top: 1rem !important;
+    }
+.falnic-sc-app .pt-6 {
+        padding-top: 1.5rem !important;
+    }
+.falnic-sc-app .pb-2 {
+        padding-bottom: .5rem !important;
+    }
+.falnic-sc-app .pb-4 {
+        padding-bottom: 1rem !important;
+    }
+.falnic-sc-app .pb-20 {
+        padding-bottom: 5rem !important;
+    }
+.falnic-sc-app .pl-8 {
+        padding-left: 2rem !important;
+    }
+.falnic-sc-app .pr-2 {
+        padding-right: .5rem !important;
+    }
+.falnic-sc-app .pr-6 {
+        padding-right: 1.5rem !important;
+    }
+.falnic-sc-app .mt-1 {
+        margin-top: .25rem !important;
+    }
+.falnic-sc-app .mt-2 {
+        margin-top: .5rem !important;
+    }
+.falnic-sc-app .mt-3 {
+        margin-top: .75rem !important;
+    }
+.falnic-sc-app .mt-4 {
+        margin-top: 1rem !important;
+    }
+.falnic-sc-app .mt-6 {
+        margin-top: 1.5rem !important;
+    }
+.falnic-sc-app .mt-8 {
+        margin-top: 2rem !important;
+    }
+.falnic-sc-app .mt-12 {
+        margin-top: 3rem !important;
+    }
+.falnic-sc-app .mb-1\.5 {
+        margin-bottom: .375rem !important;
+    }
+.falnic-sc-app .mb-2 {
+        margin-bottom: .5rem !important;
+    }
+.falnic-sc-app .mb-3 {
+        margin-bottom: .75rem !important;
+    }
+.falnic-sc-app .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+.falnic-sc-app .mb-5 {
+        margin-bottom: 1.25rem !important;
+    }
+.falnic-sc-app .mb-6 {
+        margin-bottom: 1.5rem !important;
+    }
+.falnic-sc-app .mb-8 {
+        margin-bottom: 2rem !important;
+    }
+.falnic-sc-app .mb-10 {
+        margin-bottom: 2.5rem !important;
+    }
+.falnic-sc-app .mb-12 {
+        margin-bottom: 3rem !important;
+    }
+.falnic-sc-app .ml-2 {
+        margin-left: .5rem !important;
+    }
+.falnic-sc-app .ml-8 {
+        margin-left: 2rem !important;
+    }
+.falnic-sc-app .-mx-2 {
+        margin-left: -.5rem !important;
+        margin-right: -.5rem !important;
+    }
+.falnic-sc-app .space-y-1 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: .25rem !important;
+    }
+.falnic-sc-app .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: .5rem !important;
+    }
+.falnic-sc-app .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: .75rem !important;
+    }
+.falnic-sc-app .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1rem !important;
+    }
+.falnic-sc-app .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 2rem !important;
+    }
 
 /* Typography */
-.text-left { text-align: left; }
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.text-\[10px\] { font-size: 10px; line-height: 1rem; }
-.text-xs { font-size: .75rem; line-height: 1rem; }
-.text-sm { font-size: .875rem; line-height: 1.25rem; }
-.text-base { font-size: 1rem; line-height: 1.5rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-.text-2xl { font-size: 1.5rem; line-height: 2rem; }
-.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-.font-normal { font-weight: 400; }
-.font-medium { font-weight: 500; }
-.font-semibold { font-weight: 600; }
-.font-bold { font-weight: 700; }
-.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-.leading-none { line-height: 1; }
-.leading-relaxed { line-height: 1.625; }
-.list-none { list-style-type: none; }
-.line-clamp-1,
-.line-clamp-3 {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.line-clamp-1 { -webkit-line-clamp: 1; }
-.line-clamp-3 { -webkit-line-clamp: 3; }
+.falnic-sc-app .text-left {
+        text-align: left !important;
+    }
+.falnic-sc-app .text-center {
+        text-align: center !important;
+    }
+.falnic-sc-app .text-right {
+        text-align: right !important;
+    }
+.falnic-sc-app .text-\[10px\] {
+        font-size: 10px !important;
+        line-height: 1rem !important;
+    }
+.falnic-sc-app .text-xs {
+        font-size: .75rem !important;
+        line-height: 1rem !important;
+    }
+.falnic-sc-app .text-sm {
+        font-size: .875rem !important;
+        line-height: 1.25rem !important;
+    }
+.falnic-sc-app .text-base {
+        font-size: 1rem !important;
+        line-height: 1.5rem !important;
+    }
+.falnic-sc-app .text-lg {
+        font-size: 1.125rem !important;
+        line-height: 1.75rem !important;
+    }
+.falnic-sc-app .text-xl {
+        font-size: 1.25rem !important;
+        line-height: 1.75rem !important;
+    }
+.falnic-sc-app .text-2xl {
+        font-size: 1.5rem !important;
+        line-height: 2rem !important;
+    }
+.falnic-sc-app .text-3xl {
+        font-size: 1.875rem !important;
+        line-height: 2.25rem !important;
+    }
+.falnic-sc-app .text-4xl {
+        font-size: 2.25rem !important;
+        line-height: 2.5rem !important;
+    }
+.falnic-sc-app .font-normal {
+        font-weight: 400 !important;
+    }
+.falnic-sc-app .font-medium {
+        font-weight: 500 !important;
+    }
+.falnic-sc-app .font-semibold {
+        font-weight: 600 !important;
+    }
+.falnic-sc-app .font-bold {
+        font-weight: 700 !important;
+    }
+.falnic-sc-app .font-mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+    }
+.falnic-sc-app .leading-none {
+        line-height: 1 !important;
+    }
+.falnic-sc-app .leading-relaxed {
+        line-height: 1.625 !important;
+    }
+.falnic-sc-app .list-none {
+        list-style-type: none !important;
+    }
+.falnic-sc-app .line-clamp-1,
+.falnic-sc-app .line-clamp-3 {
+        display: -webkit-box !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+.falnic-sc-app .line-clamp-1 {
+        -webkit-line-clamp: 1 !important;
+    }
+.falnic-sc-app .line-clamp-3 {
+        -webkit-line-clamp: 3 !important;
+    }
 
 /* Colors */
-.text-white { color: #fff; }
-.text-gray-300 { color: #d1d5db; }
-.text-gray-400 { color: #9ca3af; }
-.text-gray-500 { color: #6b7280; }
-.text-gray-600 { color: #4b5563; }
-.text-gray-700 { color: #374151; }
-.text-gray-800 { color: #1f2937; }
-.text-gray-900 { color: #111827; }
-.text-blue-500 { color: #3b82f6; }
-.text-blue-600 { color: #2563eb; }
-.text-blue-700 { color: #1d4ed8; }
-.text-blue-800 { color: #1e40af; }
-.text-blue-900 { color: #1e3a8a; }
-.text-green-500 { color: #22c55e; }
-.text-green-600 { color: #16a34a; }
-.text-green-700 { color: #15803d; }
-.text-orange-500 { color: #f97316; }
-.text-orange-600 { color: #ea580c; }
-.text-red-500 { color: #ef4444; }
-.text-red-600 { color: #dc2626; }
-.text-red-700 { color: #b91c1c; }
-.text-yellow-600 { color: #ca8a04; }
-.text-amber-600 { color: #d97706; }
-.text-purple-700 { color: #7e22ce; }
-.text-teal-600 { color: #0d9488; }
+.falnic-sc-app .text-white {
+        color: #fff !important;
+    }
+.falnic-sc-app .text-gray-300 {
+        color: #d1d5db !important;
+    }
+.falnic-sc-app .text-gray-400 {
+        color: #9ca3af !important;
+    }
+.falnic-sc-app .text-gray-500 {
+        color: #6b7280 !important;
+    }
+.falnic-sc-app .text-gray-600 {
+        color: #4b5563 !important;
+    }
+.falnic-sc-app .text-gray-700 {
+        color: #374151 !important;
+    }
+.falnic-sc-app .text-gray-800 {
+        color: #1f2937 !important;
+    }
+.falnic-sc-app .text-gray-900 {
+        color: #111827 !important;
+    }
+.falnic-sc-app .text-blue-500 {
+        color: #3b82f6 !important;
+    }
+.falnic-sc-app .text-blue-600 {
+        color: #2563eb !important;
+    }
+.falnic-sc-app .text-blue-700 {
+        color: #1d4ed8 !important;
+    }
+.falnic-sc-app .text-blue-800 {
+        color: #1e40af !important;
+    }
+.falnic-sc-app .text-blue-900 {
+        color: #1e3a8a !important;
+    }
+.falnic-sc-app .text-green-500 {
+        color: #22c55e !important;
+    }
+.falnic-sc-app .text-green-600 {
+        color: #16a34a !important;
+    }
+.falnic-sc-app .text-green-700 {
+        color: #15803d !important;
+    }
+.falnic-sc-app .text-orange-500 {
+        color: #f97316 !important;
+    }
+.falnic-sc-app .text-orange-600 {
+        color: #ea580c !important;
+    }
+.falnic-sc-app .text-red-500 {
+        color: #ef4444 !important;
+    }
+.falnic-sc-app .text-red-600 {
+        color: #dc2626 !important;
+    }
+.falnic-sc-app .text-red-700 {
+        color: #b91c1c !important;
+    }
+.falnic-sc-app .text-yellow-600 {
+        color: #ca8a04 !important;
+    }
+.falnic-sc-app .text-amber-600 {
+        color: #d97706 !important;
+    }
+.falnic-sc-app .text-purple-700 {
+        color: #7e22ce !important;
+    }
+.falnic-sc-app .text-teal-600 {
+        color: #0d9488 !important;
+    }
 
-.bg-white { background-color: #fff; }
-.bg-black { background-color: #000; }
-.bg-gray-50 { background-color: #f9fafb; }
-.bg-gray-100 { background-color: #f3f4f6; }
-.bg-gray-200 { background-color: #e5e7eb; }
-.bg-gray-900 { background-color: #111827; }
-.bg-blue-50 { background-color: #eff6ff; }
-.bg-blue-100 { background-color: #dbeafe; }
-.bg-blue-600 { background-color: #2563eb; }
-.bg-blue-900 { background-color: #1e3a8a; }
-.bg-green-50 { background-color: #f0fdf4; }
-.bg-green-100 { background-color: #dcfce7; }
-.bg-green-500 { background-color: #22c55e; }
-.bg-orange-50 { background-color: #fff7ed; }
-.bg-orange-500 { background-color: #f97316; }
-.bg-purple-50 { background-color: #faf5ff; }
-.bg-purple-100 { background-color: #f3e8ff; }
-.bg-purple-600 { background-color: #9333ea; }
-.bg-red-50 { background-color: #fef2f2; }
-.bg-red-100 { background-color: #fee2e2; }
-.bg-red-600 { background-color: #dc2626; }
-.bg-yellow-50 { background-color: #fefce8; }
-.bg-gray-900.bg-opacity-50 { background-color: rgba(17, 24, 39, .5); }
-.bg-black.bg-opacity-70 { background-color: rgba(0, 0, 0, .7); }
+.falnic-sc-app .bg-white {
+        background-color: #fff !important;
+    }
+.falnic-sc-app .bg-black {
+        background-color: #000 !important;
+    }
+.falnic-sc-app .bg-gray-50 {
+        background-color: #f9fafb !important;
+    }
+.falnic-sc-app .bg-gray-100 {
+        background-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .bg-gray-200 {
+        background-color: #e5e7eb !important;
+    }
+.falnic-sc-app .bg-gray-900 {
+        background-color: #111827 !important;
+    }
+.falnic-sc-app .bg-blue-50 {
+        background-color: #eff6ff !important;
+    }
+.falnic-sc-app .bg-blue-100 {
+        background-color: #dbeafe !important;
+    }
+.falnic-sc-app .bg-blue-600 {
+        background-color: #2563eb !important;
+    }
+.falnic-sc-app .bg-blue-900 {
+        background-color: #1e3a8a !important;
+    }
+.falnic-sc-app .bg-green-50 {
+        background-color: #f0fdf4 !important;
+    }
+.falnic-sc-app .bg-green-100 {
+        background-color: #dcfce7 !important;
+    }
+.falnic-sc-app .bg-green-500 {
+        background-color: #22c55e !important;
+    }
+.falnic-sc-app .bg-orange-50 {
+        background-color: #fff7ed !important;
+    }
+.falnic-sc-app .bg-orange-500 {
+        background-color: #f97316 !important;
+    }
+.falnic-sc-app .bg-purple-50 {
+        background-color: #faf5ff !important;
+    }
+.falnic-sc-app .bg-purple-100 {
+        background-color: #f3e8ff !important;
+    }
+.falnic-sc-app .bg-purple-600 {
+        background-color: #9333ea !important;
+    }
+.falnic-sc-app .bg-red-50 {
+        background-color: #fef2f2 !important;
+    }
+.falnic-sc-app .bg-red-100 {
+        background-color: #fee2e2 !important;
+    }
+.falnic-sc-app .bg-red-600 {
+        background-color: #dc2626 !important;
+    }
+.falnic-sc-app .bg-yellow-50 {
+        background-color: #fefce8 !important;
+    }
+.falnic-sc-app .bg-gray-900.bg-opacity-50 {
+        background-color: rgba(17, 24, 39, .5) !important;
+    }
+.falnic-sc-app .bg-black.bg-opacity-70 {
+        background-color: rgba(0, 0, 0, .7) !important;
+    }
 
 /* Borders */
-.border { border-width: 1px; }
-.border-2 { border-width: 2px; }
-.border-t { border-top-width: 1px; }
-.border-b { border-bottom-width: 1px; }
-.border-b-8 { border-bottom-width: 8px; }
-.border-r-4 { border-right-width: 4px; }
-.border-collapse { border-collapse: collapse; }
-.border-gray-100 { border-color: #f3f4f6; }
-.border-gray-200 { border-color: #e5e7eb; }
-.border-gray-300 { border-color: #d1d5db; }
-.border-blue-100 { border-color: #dbeafe; }
-.border-blue-200 { border-color: #bfdbfe; }
-.border-blue-300 { border-color: #93c5fd; }
-.border-blue-400 { border-color: #60a5fa; }
-.border-blue-500 { border-color: #3b82f6; }
-.border-blue-700 { border-color: #1d4ed8; }
-.border-blue-900 { border-color: #1e3a8a; }
-.border-green-300 { border-color: #86efac; }
-.border-green-500 { border-color: #22c55e; }
-.border-orange-100 { border-color: #ffedd5; }
-.border-orange-500 { border-color: #f97316; }
-.border-purple-100 { border-color: #f3e8ff; }
-.border-purple-200 { border-color: #e9d5ff; }
-.border-red-100 { border-color: #fee2e2; }
-.border-red-200 { border-color: #fecaca; }
-.border-red-300 { border-color: #fca5a5; }
-.border-red-500 { border-color: #ef4444; }
-.divide-y > :not([hidden]) ~ :not([hidden]) { border-top-width: 1px; }
-.divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: #f3f4f6; }
-.divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #e5e7eb; }
-.last\:border-0:last-child { border-width: 0; }
+.falnic-sc-app .border {
+        border-width: 1px !important;
+    }
+.falnic-sc-app .border-2 {
+        border-width: 2px !important;
+    }
+.falnic-sc-app .border-t {
+        border-top-width: 1px !important;
+    }
+.falnic-sc-app .border-b {
+        border-bottom-width: 1px !important;
+    }
+.falnic-sc-app .border-b-8 {
+        border-bottom-width: 8px !important;
+    }
+.falnic-sc-app .border-r-4 {
+        border-right-width: 4px !important;
+    }
+.falnic-sc-app .border-collapse {
+        border-collapse: collapse !important;
+    }
+.falnic-sc-app .border-gray-100 {
+        border-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .border-gray-200 {
+        border-color: #e5e7eb !important;
+    }
+.falnic-sc-app .border-gray-300 {
+        border-color: #d1d5db !important;
+    }
+.falnic-sc-app .border-blue-100 {
+        border-color: #dbeafe !important;
+    }
+.falnic-sc-app .border-blue-200 {
+        border-color: #bfdbfe !important;
+    }
+.falnic-sc-app .border-blue-300 {
+        border-color: #93c5fd !important;
+    }
+.falnic-sc-app .border-blue-400 {
+        border-color: #60a5fa !important;
+    }
+.falnic-sc-app .border-blue-500 {
+        border-color: #3b82f6 !important;
+    }
+.falnic-sc-app .border-blue-700 {
+        border-color: #1d4ed8 !important;
+    }
+.falnic-sc-app .border-blue-900 {
+        border-color: #1e3a8a !important;
+    }
+.falnic-sc-app .border-green-300 {
+        border-color: #86efac !important;
+    }
+.falnic-sc-app .border-green-500 {
+        border-color: #22c55e !important;
+    }
+.falnic-sc-app .border-orange-100 {
+        border-color: #ffedd5 !important;
+    }
+.falnic-sc-app .border-orange-500 {
+        border-color: #f97316 !important;
+    }
+.falnic-sc-app .border-purple-100 {
+        border-color: #f3e8ff !important;
+    }
+.falnic-sc-app .border-purple-200 {
+        border-color: #e9d5ff !important;
+    }
+.falnic-sc-app .border-red-100 {
+        border-color: #fee2e2 !important;
+    }
+.falnic-sc-app .border-red-200 {
+        border-color: #fecaca !important;
+    }
+.falnic-sc-app .border-red-300 {
+        border-color: #fca5a5 !important;
+    }
+.falnic-sc-app .border-red-500 {
+        border-color: #ef4444 !important;
+    }
+.falnic-sc-app .divide-y > :not([hidden]) ~ :not([hidden]) {
+        border-top-width: 1px !important;
+    }
+.falnic-sc-app .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+        border-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+        border-color: #e5e7eb !important;
+    }
+.falnic-sc-app .last\:border-0:last-child {
+        border-width: 0 !important;
+    }
 
-.rounded { border-radius: .25rem; }
-.rounded-md { border-radius: .375rem; }
-.rounded-lg { border-radius: .5rem; }
-.rounded-xl { border-radius: .75rem; }
-.rounded-2xl { border-radius: 1rem; }
-.rounded-full { border-radius: 9999px; }
+.falnic-sc-app .rounded {
+        border-radius: .25rem !important;
+    }
+.falnic-sc-app .rounded-md {
+        border-radius: .375rem !important;
+    }
+.falnic-sc-app .rounded-lg {
+        border-radius: .5rem !important;
+    }
+.falnic-sc-app .rounded-xl {
+        border-radius: .75rem !important;
+    }
+.falnic-sc-app .rounded-2xl {
+        border-radius: 1rem !important;
+    }
+.falnic-sc-app .rounded-full {
+        border-radius: 9999px !important;
+    }
 
 /* Effects */
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05); }
-.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1); }
-.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1); }
-.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25); }
-.opacity-80 { opacity: .8; }
-.ring-2 { box-shadow: 0 0 0 2px var(--ring-color, rgba(59, 130, 246, .5)); }
-.ring-4 { box-shadow: 0 0 0 4px var(--ring-color, rgba(59, 130, 246, .25)); }
-.ring-blue-100 { --ring-color: #dbeafe; }
-.ring-blue-500 { --ring-color: #3b82f6; }
-.ring-red-100 { --ring-color: #fee2e2; }
-.transform { transform: translateZ(0); }
-.scale-105 { transform: scale(1.05); }
-.transition { transition-property: color, background-color, border-color, opacity, box-shadow, transform; transition-duration: 150ms; transition-timing-function: cubic-bezier(.4, 0, .2, 1); }
-.transition-all { transition-property: all; transition-duration: 150ms; transition-timing-function: cubic-bezier(.4, 0, .2, 1); }
-.duration-300 { transition-duration: 300ms; }
-.duration-500 { transition-duration: 500ms; }
+.falnic-sc-app .shadow-sm {
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05) !important;
+    }
+.falnic-sc-app .shadow-md {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .shadow-lg {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25) !important;
+    }
+.falnic-sc-app .opacity-80 {
+        opacity: .8 !important;
+    }
+.falnic-sc-app .ring-2 {
+        box-shadow: 0 0 0 2px var(--ring-color, rgba(59, 130, 246, .5)) !important;
+    }
+.falnic-sc-app .ring-4 {
+        box-shadow: 0 0 0 4px var(--ring-color, rgba(59, 130, 246, .25)) !important;
+    }
+.falnic-sc-app .ring-blue-100 {
+        --ring-color: #dbeafe !important;
+    }
+.falnic-sc-app .ring-blue-500 {
+        --ring-color: #3b82f6 !important;
+    }
+.falnic-sc-app .ring-red-100 {
+        --ring-color: #fee2e2 !important;
+    }
+.falnic-sc-app .transform {
+        transform: translateZ(0) !important;
+    }
+.falnic-sc-app .scale-105 {
+        transform: scale(1.05) !important;
+    }
+.falnic-sc-app .transition {
+        transition-property: color, background-color, border-color, opacity, box-shadow, transform !important;
+        transition-duration: 150ms !important;
+        transition-timing-function: cubic-bezier(.4, 0, .2, 1) !important;
+    }
+.falnic-sc-app .transition-all {
+        transition-property: all !important;
+        transition-duration: 150ms !important;
+        transition-timing-function: cubic-bezier(.4, 0, .2, 1) !important;
+    }
+.falnic-sc-app .duration-300 {
+        transition-duration: 300ms !important;
+    }
+.falnic-sc-app .duration-500 {
+        transition-duration: 500ms !important;
+    }
 
 @keyframes pulse {
     50% { opacity: .5; }
 }
-.animate-pulse { animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite; }
+.falnic-sc-app .animate-pulse {
+        animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite !important;
+    }
 
 /* Controls */
-.cursor-pointer { cursor: pointer; }
-.cursor-not-allowed { cursor: not-allowed; }
-.outline-none { outline: 2px solid transparent; outline-offset: 2px; }
-.overflow-x-auto { overflow-x: auto; }
-.overflow-y-auto { overflow-y: auto; }
-.disabled\:bg-gray-200:disabled { background-color: #e5e7eb; }
-.disabled\:opacity-50:disabled { opacity: .5; }
-.focus\:ring-1:focus { box-shadow: 0 0 0 1px var(--focus-ring-color, rgba(59, 130, 246, .35)); }
-.focus\:ring-2:focus { box-shadow: 0 0 0 2px var(--focus-ring-color, rgba(59, 130, 246, .35)); }
-.focus\:ring-blue-200:focus { --focus-ring-color: #bfdbfe; }
-.focus\:ring-blue-500:focus { --focus-ring-color: #3b82f6; }
+.falnic-sc-app .cursor-pointer {
+        cursor: pointer !important;
+    }
+.falnic-sc-app .cursor-not-allowed {
+        cursor: not-allowed !important;
+    }
+.falnic-sc-app .outline-none {
+        outline: 2px solid transparent !important;
+        outline-offset: 2px !important;
+    }
+.falnic-sc-app .overflow-x-auto {
+        overflow-x: auto !important;
+    }
+.falnic-sc-app .overflow-y-auto {
+        overflow-y: auto !important;
+    }
+.falnic-sc-app .disabled\:bg-gray-200:disabled {
+        background-color: #e5e7eb !important;
+    }
+.falnic-sc-app .disabled\:opacity-50:disabled {
+        opacity: .5 !important;
+    }
+.falnic-sc-app .focus\:ring-1:focus {
+        box-shadow: 0 0 0 1px var(--focus-ring-color, rgba(59, 130, 246, .35)) !important;
+    }
+.falnic-sc-app .focus\:ring-2:focus {
+        box-shadow: 0 0 0 2px var(--focus-ring-color, rgba(59, 130, 246, .35)) !important;
+    }
+.falnic-sc-app .focus\:ring-blue-200:focus {
+        --focus-ring-color: #bfdbfe !important;
+    }
+.falnic-sc-app .focus\:ring-blue-500:focus {
+        --focus-ring-color: #3b82f6 !important;
+    }
 
 /* Hover states */
-.hover\:bg-white:hover { background-color: #fff; }
-.hover\:bg-gray-50:hover { background-color: #f9fafb; }
-.hover\:bg-gray-100:hover { background-color: #f3f4f6; }
-.hover\:bg-blue-50:hover { background-color: #eff6ff; }
-.hover\:bg-blue-100:hover { background-color: #dbeafe; }
-.hover\:bg-blue-700:hover { background-color: #1d4ed8; }
-.hover\:bg-blue-800:hover { background-color: #1e40af; }
-.hover\:bg-blue-900:hover { background-color: #1e3a8a; }
-.hover\:bg-orange-50:hover { background-color: #fff7ed; }
-.hover\:bg-red-100:hover { background-color: #fee2e2; }
-.hover\:text-white:hover { color: #fff; }
-.hover\:text-gray-800:hover { color: #1f2937; }
-.hover\:text-blue-700:hover { color: #1d4ed8; }
-.hover\:border-blue-400:hover { border-color: #60a5fa; }
-.hover\:shadow-md:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1); }
-.hover\:shadow-lg:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1); }
-.hover\:opacity-80:hover { opacity: .8; }
+.falnic-sc-app .hover\:bg-white:hover {
+        background-color: #fff !important;
+    }
+.falnic-sc-app .hover\:bg-gray-50:hover {
+        background-color: #f9fafb !important;
+    }
+.falnic-sc-app .hover\:bg-gray-100:hover {
+        background-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .hover\:bg-blue-50:hover {
+        background-color: #eff6ff !important;
+    }
+.falnic-sc-app .hover\:bg-blue-100:hover {
+        background-color: #dbeafe !important;
+    }
+.falnic-sc-app .hover\:bg-blue-700:hover {
+        background-color: #1d4ed8 !important;
+    }
+.falnic-sc-app .hover\:bg-blue-800:hover {
+        background-color: #1e40af !important;
+    }
+.falnic-sc-app .hover\:bg-blue-900:hover {
+        background-color: #1e3a8a !important;
+    }
+.falnic-sc-app .hover\:bg-orange-50:hover {
+        background-color: #fff7ed !important;
+    }
+.falnic-sc-app .hover\:bg-red-100:hover {
+        background-color: #fee2e2 !important;
+    }
+.falnic-sc-app .hover\:text-white:hover {
+        color: #fff !important;
+    }
+.falnic-sc-app .hover\:text-gray-800:hover {
+        color: #1f2937 !important;
+    }
+.falnic-sc-app .hover\:text-blue-700:hover {
+        color: #1d4ed8 !important;
+    }
+.falnic-sc-app .hover\:border-blue-400:hover {
+        border-color: #60a5fa !important;
+    }
+.falnic-sc-app .hover\:shadow-md:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .hover\:shadow-lg:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .hover\:opacity-80:hover {
+        opacity: .8 !important;
+    }
 
-.group[open] .group-open\:rotate-180 { transform: rotate(180deg); }
+.falnic-sc-app .group[open] .falnic-sc-app .group-open\:rotate-180 {
+        transform: rotate(180deg) !important;
+    }
 
 /* Custom tooltip styles */
-.tooltip-icon {
-    cursor: help;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    background: #3b82f6;
-    color: white;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    margin-right: 5px;
-    position: relative;
-    top: -2px;
-}
+.falnic-sc-app .tooltip-icon {
+        cursor: help !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 18px !important;
+        height: 18px !important;
+        background: #3b82f6 !important;
+        color: white !important;
+        border-radius: 50% !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        margin-right: 5px !important;
+        position: relative !important;
+        top: -2px !important;
+    }
 
-.tooltip-container {
-    position: relative;
-    display: inline-block;
-}
+.falnic-sc-app .tooltip-container {
+        position: relative !important;
+        display: inline-block !important;
+    }
 
-.tooltip-text {
-    visibility: hidden;
-    width: max-content;
-    max-width: 350px;
-    background-color: #1f2937;
-    color: #fff;
-    text-align: right;
-    border-radius: 8px;
-    padding: 10px;
-    position: absolute;
-    z-index: 50;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity .3s;
-    font-size: 12px;
-    font-weight: normal;
-    line-height: 1.6;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, .3);
-}
+.falnic-sc-app .tooltip-text {
+        visibility: hidden !important;
+        width: max-content !important;
+        max-width: 350px !important;
+        background-color: #1f2937 !important;
+        color: #fff !important;
+        text-align: right !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+        position: absolute !important;
+        z-index: 50 !important;
+        bottom: 125% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        opacity: 0 !important;
+        transition: opacity .3s !important;
+        font-size: 12px !important;
+        font-weight: normal !important;
+        line-height: 1.6 !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, .3) !important;
+    }
 
-.tooltip-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #1f2937 transparent transparent transparent;
-}
+.falnic-sc-app .tooltip-text::after {
+        content: "" !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 50% !important;
+        margin-left: -5px !important;
+        border-width: 5px !important;
+        border-style: solid !important;
+        border-color: #1f2937 transparent transparent transparent !important;
+    }
 
-.tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
+.falnic-sc-app .tooltip-container:hover .falnic-sc-app .tooltip-text {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
 
 /* Responsive utilities */
 @media (min-width: 640px) {
-    .sm\:w-auto { width: auto; }
+    .falnic-sc-app .sm\:w-auto {
+        width: auto !important;
+    }
 }
 
 @media (min-width: 768px) {
-    .md\:inline-block { display: inline-block; }
-    .md\:flex-row { flex-direction: row; }
-    .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .md\:col-span-3 { grid-column: span 3 / span 3; }
-    .md\:w-1\/3 { width: 33.333333%; }
-    .md\:w-2\/3 { width: 66.666667%; }
+    .falnic-sc-app .md\:text-3xl {
+        font-size: 1.875rem !important;
+        line-height: 2.25rem !important;
+    }
+    .falnic-sc-app .md\:inline-block {
+        display: inline-block !important;
+    }
+    .falnic-sc-app .md\:flex-row {
+        flex-direction: row !important;
+    }
+    .falnic-sc-app .md\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    .falnic-sc-app .md\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+    .falnic-sc-app .md\:col-span-3 {
+        grid-column: span 3 / span 3 !important;
+    }
+    .falnic-sc-app .md\:w-1\/3 {
+        width: 33.333333% !important;
+    }
+    .falnic-sc-app .md\:w-2\/3 {
+        width: 66.666667% !important;
+    }
 }
 
 @media print {
-    body * {
-        visibility: hidden;
+    .falnic-sc-app .falnic-sc-app * {
+        visibility: hidden !important;
     }
 
-    #success-modal,
-    #success-modal * {
-        visibility: visible;
+    .falnic-sc-app #success-modal,
+.falnic-sc-app #success-modal .falnic-sc-app * {
+        visibility: visible !important;
     }
 
-    #success-modal {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: white;
+    .falnic-sc-app #success-modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: white !important;
     }
 
-    .no-print {
+    .falnic-sc-app .no-print {
         display: none !important;
     }
 
-    .bg-opacity-50 {
-        background: transparent;
+    .falnic-sc-app .bg-opacity-50 {
+        background: transparent !important;
     }
 }
 
 /* Additional utilities used by dynamic JavaScript-rendered markup */
-.gap-x-2 { column-gap: .5rem; }
-.gap-y-4 { row-gap: 1rem; }
+.falnic-sc-app .gap-x-2 {
+        column-gap: .5rem !important;
+    }
+.falnic-sc-app .gap-y-4 {
+        row-gap: 1rem !important;
+    }
 
 @media (min-width: 768px) {
-    .md\:scale-105 { transform: scale(1.05); }
-    .hidden.md\:inline-block,
-    .md\:inline-block { display: inline-block !important; }
+    .falnic-sc-app .md\:scale-105 {
+        transform: scale(1.05) !important;
+    }
+    .falnic-sc-app .hidden.md\:inline-block,
+.falnic-sc-app .md\:inline-block {
+        display: inline-block !important;
+    }
 }
 
 /* Smart assistant modal utilities */
-.top-0 { top: 0; }
-.justify-start { justify-content: flex-start; }
-.h-96 { height: 24rem; }
-.max-h-\[90vh\] { max-height: 90vh; }
-.max-w-\[80\%\] { max-width: 80%; }
-.max-w-\[85\%\] { max-width: 85%; }
-.hover\:bg-gray-200:hover { background-color: #e5e7eb; }
+.falnic-sc-app .top-0 {
+        top: 0 !important;
+    }
+.falnic-sc-app .justify-start {
+        justify-content: flex-start !important;
+    }
+.falnic-sc-app .h-96 {
+        height: 24rem !important;
+    }
+.falnic-sc-app .max-h-\[90vh\] {
+        max-height: 90vh !important;
+    }
+.falnic-sc-app .max-w-\[80\%\] {
+        max-width: 80% !important;
+    }
+.falnic-sc-app .max-w-\[85\%\] {
+        max-width: 85% !important;
+    }
+.falnic-sc-app .hover\:bg-gray-200:hover {
+        background-color: #e5e7eb !important;
+    }
 
 /* Professional polish layer: keeps the previous utility-class API while improving consistency */
 :root {
-    --color-primary: #1e3a8a;
-    --color-primary-hover: #1e40af;
-    --color-accent: #9333ea;
-    --color-surface: #ffffff;
-    --color-page: #f8fafc;
-    --color-border: #e5e7eb;
-    --color-muted: #6b7280;
-    --radius-control: .5rem;
-    --shadow-focus: 0 0 0 3px rgba(59, 130, 246, .18);
-}
+        --color-primary: #1e3a8a !important;
+        --color-primary-hover: #1e40af !important;
+        --color-accent: #9333ea !important;
+        --color-surface: #ffffff !important;
+        --color-page: #f8fafc !important;
+        --color-border: #e5e7eb !important;
+        --color-muted: #6b7280 !important;
+        --radius-control: .5rem !important;
+        --shadow-focus: 0 0 0 3px rgba(59, 130, 246, .18) !important;
+    }
 
-html {
-    scroll-behavior: smooth;
-}
+.falnic-sc-app {
+        scroll-behavior: smooth !important;
+    }
 
-body {
-    min-height: 100vh;
-    background:
+.falnic-sc-app {
+        min-height: 100vh !important;
+        background:
         radial-gradient(circle at top right, rgba(219, 234, 254, .55), transparent 34rem),
-        var(--color-page);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+        var(--color-page) !important;
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+    }
 
 ::selection {
-    background: rgba(30, 58, 138, .16);
-    color: #111827;
-}
+        background: rgba(30, 58, 138, .16) !important;
+        color: #111827 !important;
+    }
 
-button,
-a,
-select,
-input {
-    -webkit-tap-highlight-color: transparent;
-}
+.falnic-sc-app button,
+.falnic-sc-app a,
+.falnic-sc-app select,
+.falnic-sc-app input {
+        -webkit-tap-highlight-color: transparent !important;
+    }
 
-button {
-    user-select: none;
-}
+.falnic-sc-app button {
+        user-select: none !important;
+    }
 
-button:disabled,
-input:disabled,
-select:disabled {
-    opacity: .72;
-}
+.falnic-sc-app button:disabled,
+.falnic-sc-app input:disabled,
+.falnic-sc-app select:disabled {
+        opacity: .72 !important;
+    }
 
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-summary:focus-visible {
-    outline: 2px solid transparent;
-    box-shadow: var(--shadow-focus);
-}
+.falnic-sc-app button:focus-visible,
+.falnic-sc-app input:focus-visible,
+.falnic-sc-app select:focus-visible,
+.falnic-sc-app summary:focus-visible {
+        outline: 2px solid transparent !important;
+        box-shadow: var(--shadow-focus) !important;
+    }
 
-input,
-select {
-    min-height: 2.75rem;
-    line-height: 1.5;
-}
+.falnic-sc-app input,
+.falnic-sc-app select {
+        min-height: 2.75rem !important;
+        line-height: 1.5 !important;
+    }
 
-select {
-    background-image:
+.falnic-sc-app select {
+        background-image:
         linear-gradient(45deg, transparent 50%, #6b7280 50%),
-        linear-gradient(135deg, #6b7280 50%, transparent 50%);
-    background-position:
+        linear-gradient(135deg, #6b7280 50%, transparent 50%) !important;
+        background-position:
         left .95rem center,
-        left .65rem center;
-    background-size: .3rem .3rem, .3rem .3rem;
-    background-repeat: no-repeat;
-    padding-left: 2rem;
-}
+        left .65rem center !important;
+        background-size: .3rem .3rem, .3rem .3rem !important;
+        background-repeat: no-repeat !important;
+        padding-left: 2rem !important;
+    }
 
-summary::-webkit-details-marker {
-    display: none;
-}
+.falnic-sc-app summary::-webkit-details-marker {
+        display: none !important;
+    }
 
-summary {
-    border-radius: .75rem;
-}
+.falnic-sc-app summary {
+        border-radius: .75rem !important;
+    }
 
-summary:focus-visible {
-    padding: .25rem;
-}
+.falnic-sc-app summary:focus-visible {
+        padding: .25rem !important;
+    }
 
-th,
-td {
-    vertical-align: top;
-}
+.falnic-sc-app th,
+.falnic-sc-app td {
+        vertical-align: top !important;
+    }
 
 /* Stable card and panel behavior */
-#view-intro .rounded-2xl,
-#view-offers .rounded-2xl,
-#pro-step-content,
-#guidance-content,
-#success-modal .bg-white,
-#modal-final-success .bg-white,
-#ai-assistant-modal .bg-white {
-    border-color: var(--color-border);
-}
+.falnic-sc-app #view-intro .falnic-sc-app .rounded-2xl,
+.falnic-sc-app #view-offers .falnic-sc-app .rounded-2xl,
+.falnic-sc-app #pro-step-content,
+.falnic-sc-app #guidance-content,
+.falnic-sc-app #success-modal .falnic-sc-app .bg-white,
+.falnic-sc-app #modal-final-success .falnic-sc-app .bg-white,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .bg-white {
+        border-color: var(--color-border) !important;
+    }
 
-#view-intro .rounded-2xl:hover,
-#view-offers .rounded-2xl:hover {
-    transform: translateY(-2px);
-}
+.falnic-sc-app #view-intro .falnic-sc-app .rounded-2xl:hover,
+.falnic-sc-app #view-offers .falnic-sc-app .rounded-2xl:hover {
+        transform: translateY(-2px) !important;
+    }
 
-#pro-step-content details,
-#guidance-content,
-#details-table-body > div,
-#pro-details-table-body > div {
-    transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
-}
+.falnic-sc-app #pro-step-content .falnic-sc-app details,
+.falnic-sc-app #guidance-content,
+.falnic-sc-app #details-table-body > .falnic-sc-app div,
+.falnic-sc-app #pro-details-table-body > .falnic-sc-app div {
+        transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease !important;
+    }
 
-#success-modal,
-#modal-final-success,
-#ai-assistant-modal {
-    backdrop-filter: blur(3px);
-}
+.falnic-sc-app #success-modal,
+.falnic-sc-app #modal-final-success,
+.falnic-sc-app #ai-assistant-modal {
+        backdrop-filter: blur(3px) !important;
+    }
 
-#success-modal > div,
-#modal-final-success > div,
-#ai-assistant-modal > div {
-    animation: modal-enter .18s ease-out;
-}
+.falnic-sc-app #success-modal > .falnic-sc-app div,
+.falnic-sc-app #modal-final-success > .falnic-sc-app div,
+.falnic-sc-app #ai-assistant-modal > .falnic-sc-app div {
+        animation: modal-enter .18s ease-out !important;
+    }
 
 @keyframes modal-enter {
     from {
@@ -637,63 +1243,63 @@ td {
     }
 }
 
-#ai-chat-log {
-    scroll-behavior: smooth;
-}
+.falnic-sc-app #ai-chat-log {
+        scroll-behavior: smooth !important;
+    }
 
-#ai-chat-log::-webkit-scrollbar,
-#success-modal::-webkit-scrollbar,
-#ai-assistant-modal .overflow-y-auto::-webkit-scrollbar {
-    width: .55rem;
-    height: .55rem;
-}
+.falnic-sc-app #ai-chat-log::-webkit-scrollbar,
+.falnic-sc-app #success-modal::-webkit-scrollbar,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .overflow-y-auto::-webkit-scrollbar {
+        width: .55rem !important;
+        height: .55rem !important;
+    }
 
-#ai-chat-log::-webkit-scrollbar-thumb,
-#success-modal::-webkit-scrollbar-thumb,
-#ai-assistant-modal .overflow-y-auto::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 9999px;
-}
+.falnic-sc-app #ai-chat-log::-webkit-scrollbar-thumb,
+.falnic-sc-app #success-modal::-webkit-scrollbar-thumb,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .overflow-y-auto::-webkit-scrollbar-thumb {
+        background: #cbd5e1 !important;
+        border-radius: 9999px !important;
+    }
 
-#ai-chat-log::-webkit-scrollbar-track,
-#success-modal::-webkit-scrollbar-track,
-#ai-assistant-modal .overflow-y-auto::-webkit-scrollbar-track {
-    background: #f8fafc;
-}
+.falnic-sc-app #ai-chat-log::-webkit-scrollbar-track,
+.falnic-sc-app #success-modal::-webkit-scrollbar-track,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .overflow-y-auto::-webkit-scrollbar-track {
+        background: #f8fafc !important;
+    }
 
 /* RTL-friendly responsive improvements */
 @media (max-width: 767px) {
-    .sticky {
-        position: static;
+    .falnic-sc-app .sticky {
+        position: static !important;
     }
 
-    .md\:scale-105 {
-        transform: none;
+    .falnic-sc-app .md\:scale-105 {
+        transform: none !important;
     }
 
-    #view-offers .border-t,
-    #view-server-details .flex.justify-end.gap-3,
-    #view-pro-results .flex.justify-end.gap-3,
-    #ai-assistant-modal .border-t {
-        align-items: stretch;
-        flex-direction: column;
-        gap: .75rem;
+    .falnic-sc-app #view-offers .falnic-sc-app .border-t,
+.falnic-sc-app #view-server-details .falnic-sc-app .flex.justify-end.gap-3,
+.falnic-sc-app #view-pro-results .falnic-sc-app .flex.justify-end.gap-3,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .border-t {
+        align-items: stretch !important;
+        flex-direction: column !important;
+        gap: .75rem !important;
     }
 
-    #ai-assistant-modal .p-6.border-b {
-        align-items: flex-start;
-        gap: 1rem;
+    .falnic-sc-app #ai-assistant-modal .falnic-sc-app .p-6.border-b {
+        align-items: flex-start !important;
+        gap: 1rem !important;
     }
 
-    #ai-assistant-modal form.flex {
-        flex-direction: column;
+    .falnic-sc-app #ai-assistant-modal .falnic-sc-app form.flex {
+        flex-direction: column !important;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    .falnic-sc-app *,
+.falnic-sc-app *::before,
+.falnic-sc-app *::after {
         scroll-behavior: auto !important;
         animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
@@ -702,54 +1308,405 @@ td {
 }
 
 /* Brand assets */
-.w-auto { width: auto; }
-.brand-logo-link img,
-img[alt="لوگوی فالنیک"] {
-    object-fit: contain;
+.falnic-sc-app .w-auto {
+        width: auto !important;
+    }
+.falnic-sc-app .brand-logo-link .falnic-sc-app img,
+.falnic-sc-app img[alt="لوگوی .falnic-sc-app فالنیک"] {
+        object-fit: contain !important;
+    }
+
+.falnic-sc-app .pro-step-container {
+        min-height: 1px !important;
+    }
+
+.falnic-sc-app .falnic-pro-section {
+        min-height: 1px !important;
+    }
+
+.falnic-sc-app .falnic-pro-section-title {
+        line-height: 1.6 !important;
+    }
+
+.falnic-sc-app .ai-message .falnic-sc-app p {
+        line-height: 1.9 !important;
+    }
+
+.falnic-sc-app .ai-choice-btn,
+.falnic-sc-app .ai-action-btn {
+        border-radius: .75rem !important;
+        border: 1px solid #dbeafe !important;
+        font-size: .75rem !important;
+        font-weight: 800 !important;
+        padding: .5rem .75rem !important;
+        transition: all .2s ease !important;
+    }
+
+.falnic-sc-app .ai-choice-btn {
+        background: #eff6ff !important;
+        color: #1e3a8a !important;
+    }
+
+.falnic-sc-app .ai-action-btn {
+        background: #ecfdf5 !important;
+        border-color: #bbf7d0 !important;
+        color: #047857 !important;
+    }
+
+.falnic-sc-app .ai-choice-btn:hover,
+.falnic-sc-app .ai-action-btn:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, .08) !important;
+    }
+.falnic-sc-app .flex-wrap {
+        flex-wrap: wrap !important;
+    }
+.falnic-sc-app .pt-3 {
+        padding-top: .75rem !important;
+    }
+.falnic-sc-app .last\:mb-0:last-child {
+        margin-bottom: 0 !important;
+    }
+
+/* Wrapper hardening: stacking context so -z-10 decorations stay visible
+   above theme backgrounds, explicit RTL, and base typography/colors. */
+.falnic-sc-app {
+    isolation: isolate;
+    direction: rtl;
 }
 
-.pro-step-container {
+.falnic-sc-app {
     min-height: 1px;
 }
 
-.falnic-pro-section {
-    min-height: 1px;
+/* ==========================================================================
+   Intro page — pixel-faithful to Configurator Intro desktop design
+   ========================================================================== */
+
+.falnic-sc-app #view-intro.falnic-intro {
+    max-width: 52rem !important;
+    padding-top: 2.75rem !important;
+    padding-bottom: 3rem !important;
 }
 
-.falnic-pro-section-title {
-    line-height: 1.6;
+.falnic-sc-app .falnic-intro-brands {
+    gap: 1.25rem !important;
+    margin-bottom: 2.75rem !important;
 }
 
-.ai-message p {
-    line-height: 1.9;
+.falnic-sc-app .falnic-intro-logo {
+    height: 3.5rem !important;
+    width: auto !important;
+    max-height: 56px !important;
 }
 
-.ai-choice-btn,
-.ai-action-btn {
-    border-radius: .75rem;
-    border: 1px solid #dbeafe;
-    font-size: .75rem;
-    font-weight: 800;
-    padding: .5rem .75rem;
-    transition: all .2s ease;
+.falnic-sc-app .falnic-intro-hpe {
+    height: 2.5rem !important;
+    width: auto !important;
+    max-height: 40px !important;
+    opacity: .95 !important;
 }
 
-.ai-choice-btn {
-    background: #eff6ff;
-    color: #1e3a8a;
+.falnic-sc-app .falnic-intro-title {
+    font-size: 1.625rem !important;
+    line-height: 1.45 !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    margin-bottom: .75rem !important;
+    letter-spacing: -0.01em !important;
 }
 
-.ai-action-btn {
-    background: #ecfdf5;
-    border-color: #bbf7d0;
-    color: #047857;
+.falnic-sc-app .falnic-intro-sub {
+    font-size: .875rem !important;
+    line-height: 1.85 !important;
+    color: #6b7280 !important;
+    max-width: 28rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: .65rem !important;
 }
 
-.ai-choice-btn:hover,
-.ai-action-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(15, 23, 42, .08);
+.falnic-sc-app .falnic-intro-hint {
+    color: #d97706 !important;
+    font-size: .75rem !important;
+    font-weight: 600 !important;
+    gap: .4rem !important;
+    margin-bottom: 2.5rem !important;
 }
-.flex-wrap { flex-wrap: wrap; }
-.pt-3 { padding-top: .75rem; }
-.last\:mb-0:last-child { margin-bottom: 0; }
+
+.falnic-sc-app .falnic-intro-hint-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1.05rem !important;
+    height: 1.05rem !important;
+    border-radius: 9999px !important;
+    background: #f59e0b !important;
+    color: #fff !important;
+    font-size: .65rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+}
+
+.falnic-sc-app .falnic-intro-cards {
+    gap: 1.25rem !important;
+    margin-bottom: 2.75rem !important;
+}
+
+.falnic-sc-app .falnic-path-card {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 15.5rem !important;
+    padding: 1.5rem 1.5rem 1.35rem !important;
+    border-radius: 1.15rem !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    box-shadow: none !important;
+    transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease !important;
+}
+
+.falnic-sc-app .falnic-path-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .07) !important;
+}
+
+.falnic-sc-app .falnic-path-guidance {
+    background: #eff6ff !important;
+    border-color: #dbeafe !important;
+}
+
+.falnic-sc-app .falnic-path-pro {
+    background: #fff7ed !important;
+    border-color: #ffedd5 !important;
+}
+
+.falnic-sc-app .falnic-path-icon {
+    position: absolute !important;
+    top: 1.35rem !important;
+    left: 1.35rem !important;
+    width: 2.65rem !important;
+    height: 2.65rem !important;
+    border-radius: 9999px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #fff !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, .12) !important;
+}
+
+.falnic-sc-app .falnic-path-icon svg {
+    display: block !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+}
+
+.falnic-sc-app .falnic-path-icon-guidance {
+    background: linear-gradient(145deg, #34d399 0%, #10b981 100%) !important;
+}
+
+.falnic-sc-app .falnic-path-icon-pro {
+    background: linear-gradient(145deg, #fb923c 0%, #f97316 100%) !important;
+}
+
+.falnic-sc-app .falnic-path-label {
+    font-size: .95rem !important;
+    font-weight: 800 !important;
+    margin: 0 0 .85rem !important;
+    padding-left: 3rem !important;
+    line-height: 1.4 !important;
+}
+
+.falnic-sc-app .falnic-path-label-guidance {
+    color: #0d9488 !important;
+}
+
+.falnic-sc-app .falnic-path-label-pro {
+    color: #f97316 !important;
+}
+
+.falnic-sc-app .falnic-path-desc {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    line-height: 1.75 !important;
+    margin: 0 0 1.5rem !important;
+    flex: 1 1 auto !important;
+}
+
+.falnic-sc-app .falnic-path-footer {
+    margin-top: auto !important;
+}
+
+.falnic-sc-app .falnic-path-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 2.5rem !important;
+    padding: .5rem 1.35rem !important;
+    border-radius: .55rem !important;
+    border: 1.5px solid #1e3a8a !important;
+    background: transparent !important;
+    color: #1e3a8a !important;
+    font-size: .875rem !important;
+    font-weight: 700 !important;
+    margin-bottom: .85rem !important;
+    transition: background-color .15s ease, color .15s ease, box-shadow .15s ease !important;
+}
+
+.falnic-sc-app .falnic-path-btn:hover {
+    background: #1e3a8a !important;
+    color: #fff !important;
+}
+
+.falnic-sc-app .falnic-path-note {
+    display: flex !important;
+    align-items: center !important;
+    gap: .4rem !important;
+    margin: 0 !important;
+    font-size: .75rem !important;
+    line-height: 1.5 !important;
+    color: #6b7280 !important;
+    font-weight: 500 !important;
+}
+
+.falnic-sc-app .falnic-path-check {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    border-radius: 9999px !important;
+    background: #22c55e !important;
+    color: #fff !important;
+    font-size: .65rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+}
+
+.falnic-sc-app .falnic-saved-title {
+    text-align: right !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    margin: 0 0 .85rem !important;
+}
+
+.falnic-sc-app .falnic-saved-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: .55rem !important;
+}
+
+.falnic-sc-app .falnic-saved-list > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0 !important;
+}
+
+.falnic-sc-app .falnic-saved-row {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 3.15rem !important;
+    padding: .85rem 1.15rem !important;
+    border-radius: .55rem !important;
+    border: none !important;
+    background: #eef2f7 !important;
+    color: #374151 !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    transition: background-color .15s ease, box-shadow .15s ease !important;
+}
+
+.falnic-sc-app .falnic-saved-row:hover {
+    background: #e5ebf3 !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, .06) !important;
+}
+
+.falnic-sc-app .falnic-saved-name {
+    font-size: .875rem !important;
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+    text-align: right !important;
+}
+
+.falnic-sc-app .falnic-saved-meta {
+    color: #9ca3af !important;
+    font-weight: 500 !important;
+}
+
+.falnic-sc-app .falnic-saved-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: .35rem !important;
+    font-size: .8125rem !important;
+    font-weight: 600 !important;
+    color: #4b5563 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.falnic-sc-app .falnic-saved-arrow {
+    font-size: .95rem !important;
+    line-height: 1 !important;
+}
+
+.falnic-sc-app .text-amber-600 {
+    color: #d97706 !important;
+}
+
+.falnic-sc-app .gap-1\.5 {
+    gap: .375rem !important;
+}
+
+.falnic-sc-app .px-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.falnic-sc-app .py-10 {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+}
+
+.falnic-sc-app .h-14 {
+    height: 3.5rem !important;
+}
+
+.falnic-sc-app .mb-10 {
+    margin-bottom: 2.5rem !important;
+}
+
+@media (min-width: 768px) {
+    .falnic-sc-app .falnic-intro-title {
+        font-size: 1.75rem !important;
+    }
+
+    .falnic-sc-app .falnic-path-card {
+        min-height: 16.25rem !important;
+        padding: 1.65rem 1.65rem 1.45rem !important;
+    }
+
+    .falnic-sc-app .falnic-path-desc {
+        font-size: 1.1rem !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .falnic-sc-app #view-intro.falnic-intro {
+        padding-top: 1.5rem !important;
+    }
+
+    .falnic-sc-app .falnic-path-card {
+        min-height: 0 !important;
+    }
+
+    .falnic-sc-app .falnic-saved-row {
+        flex-direction: column-reverse !important;
+        align-items: flex-start !important;
+        gap: .45rem !important;
+    }
+}

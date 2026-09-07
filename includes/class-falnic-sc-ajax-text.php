@@ -2,7 +2,7 @@
 /**
  * Text sanitization helpers for the AI assistant endpoint.
  *
- * Ported 1:1 from the standalone api/ai_chat.php.
+ * Prompt strings and user-facing AI copy for the chat gateway.
  *
  * @package FalnicServerConfigurator
  */

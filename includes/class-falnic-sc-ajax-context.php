@@ -2,9 +2,8 @@
 /**
  * AI context builder: whitelisted, compact context + safe action enrichment.
  *
- * Ported 1:1 from the standalone api/ai_chat.php (compactConfigSummary,
- * databaseSignals, compactHistory, normalizeAiPayload, enrichWithSafeActions,
- * buildCpuRamAction) — only the DB layer talks to $wpdb now.
+ * Builds compactConfigSummary, databaseSignals, compactHistory,
+ * normalizeAiPayload, enrichWithSafeActions, buildCpuRamAction.
  *
  * @package FalnicServerConfigurator
  */

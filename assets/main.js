@@ -1,3 +1,8 @@
+/*
+ * Falnic Server Configurator — front-end client (shortcode).
+ * Transport: WordPress admin-ajax via FALNIC_SC_CONFIG (see `api` object).
+ */
+
 // assets/main.js
 
 const state = {
@@ -63,40 +68,41 @@ const sessionManager = {
 
     renderLists: () => {
         const sessions = sessionManager.getAll().sort((a, b) => b.timestamp - a.timestamp);
-        const drafts = sessions.filter(s => s.status === 'draft');
-        const completed = sessions.filter(s => s.status === 'completed');
+        const allSaved = sessions.filter(s => s.status === 'draft' || s.status === 'completed');
 
-        const renderItems = (items, targetId, isCompleted) => {
-            const listEl = document.getElementById(targetId);
-            const containerEl = document.getElementById(targetId.replace('-list', '-container'));
-            if (!listEl || !containerEl) return;
+        const draftContainer = document.getElementById('draft-sessions-container');
+        const completedContainer = document.getElementById('completed-sessions-container');
+        const draftList = document.getElementById('draft-sessions-list');
 
-            if (items.length === 0) {
-                containerEl.classList.add('hidden');
-                return;
+        if (completedContainer) completedContainer.classList.add('hidden');
+        if (!draftContainer || !draftList) return;
+
+        if (allSaved.length === 0) {
+            draftContainer.classList.add('hidden');
+            draftList.innerHTML = '';
+            return;
+        }
+
+        draftContainer.classList.remove('hidden');
+        const titleEl = draftContainer.querySelector('.falnic-saved-title');
+        if (titleEl) titleEl.textContent = 'کانفیگ های ذخیره شده';
+
+        draftList.innerHTML = allSaved.map(item => {
+            const isCompleted = item.status === 'completed';
+            let codeLabel;
+            if (isCompleted && item.trackingCode) {
+                codeLabel = String(item.trackingCode);
+            } else {
+                const seed = String(item.id || '').replace(/\D/g, '') || String(item.timestamp || Date.now());
+                codeLabel = `SVR - ${seed.slice(-4).padStart(4, '0')}`;
             }
-
-            containerEl.classList.remove('hidden');
-            listEl.innerHTML = items.map(item => {
-                const date = new Date(item.timestamp).toLocaleDateString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-                const chassisName = item.stateDump.currentConfig?.chassis?.model || 'در حال نیازسنجی...';
-                const actionText = isCompleted ? 'مشاهده پیش‌فاکتور ←' : 'ادامه کانفیگ ←';
-                const actionClass = isCompleted ? 'text-green-600' : 'text-blue-900';
-                const modeName = item.stateDump.activeMode === 'pro' ? 'مسیر حرفه‌ای' : 'مسیر راهنمایی';
-
-                return `
-                <button onclick="sessionManager.load(${security.inlineJson(item.id)})" class="w-full bg-white border border-gray-200 hover:border-blue-400 hover:shadow-md text-gray-800 py-4 px-6 rounded-xl flex justify-between items-center transition text-right">
-                    <div>
-                        <div class="font-bold text-sm text-gray-800">${isCompleted ? `کد رهگیری: ${h(item.trackingCode)}` : h(chassisName)}</div>
-                        <div class="text-xs text-gray-400 mt-1">${h(modeName)} | بروزرسانی: ${h(date)}</div>
-                    </div>
-                    <span class="font-bold text-sm ${actionClass}">${actionText}</span>
+            const actionText = isCompleted ? 'مشاهده پیش‌فاکتور' : 'ادامه کانفیگ';
+            return `
+                <button type="button" onclick="sessionManager.load(${security.inlineJson(item.id)})" class="falnic-saved-row w-full flex justify-between items-center transition text-right">
+                    <span class="falnic-saved-action">${actionText} <span class="falnic-saved-arrow" aria-hidden="true">←</span></span>
+                    <span class="falnic-saved-name">کانفیگ ذخیره شده ${h(codeLabel)}</span>
                 </button>`;
-            }).join('');
-        };
-
-        renderItems(drafts, 'draft-sessions-list', false);
-        renderItems(completed, 'completed-sessions-list', true);
+        }).join('');
     },
 
     load: async (id) => {
@@ -390,11 +396,37 @@ function calculatePcieUsage(config) {
     return { avail_x16_gpu, avail_general, req_gpu, req_general, remaining_gpu_slots, total_avail_general };
 }
 
+// WordPress AJAX client — all calls go to admin-ajax.php with a nonce.
+// Response contracts must stay stable for this AJAX client.
+const FALNIC_CFG = window.FALNIC_SC_CONFIG || {};
+
 const api = {
+    request: async (action, data = {}, method = 'POST') => {
+        const params = new URLSearchParams();
+        params.set('action', action);
+        params.set('nonce', FALNIC_CFG.nonce || '');
+        let url = FALNIC_CFG.ajaxUrl || '';
+        let options;
+        if (method === 'GET') {
+            Object.entries(data).forEach(([k, v]) => params.set(k, v));
+            url += (url.includes('?') ? '&' : '?') + params.toString();
+            options = { method: 'GET', credentials: 'same-origin' };
+        } else {
+            params.set('payload', JSON.stringify(data));
+            options = {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body: params.toString()
+            };
+        }
+        const response = await fetch(url, options);
+        return response.json();
+    },
+
     fetchData: async () => {
         try {
-            const response = await fetch('api/get_data.php');
-            const result = await response.json();
+            const result = await api.request('falnic_sc_get_data', {}, 'GET');
             if (result.status === 'success') {
                 state.db = result.data;
                 configurator.initDropdowns();
@@ -403,8 +435,7 @@ const api = {
     },
     fetchChassisData: async (chassisId) => {
         try {
-            const response = await fetch(`api/get_data.php?chassis_id=${encodeURIComponent(chassisId)}`);
-            const result = await response.json();
+            const result = await api.request('falnic_sc_get_data', { chassis_id: chassisId }, 'GET');
             if (result.status === 'success') {
                 const fullChassisList = state.db.chassis;
                 state.db = { ...state.db, ...result.data, chassis: fullChassisList };
@@ -420,23 +451,9 @@ const api = {
         }
     },
 
-    fetchRecommendations: async (target, answers) => {
-        const response = await fetch('api/recommend_servers.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target, answers })
-        });
-        return response.json();
-    },
+    fetchRecommendations: async (target, answers) => api.request('falnic_sc_recommend', { target, answers }),
 
-    sendAIMessage: async (message, context, history) => {
-        const response = await fetch('api/ai_chat.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, context, history })
-        });
-        return response.json();
-    }
+    sendAIMessage: async (message, context, history) => api.request('falnic_sc_ai_chat', { message, context, history })
 };
 
 const validator = {
@@ -1764,12 +1781,7 @@ const configurator = {
         state.currentConfig.psuQty = state.currentConfig.chassis?.max_psu_bays || 2;
 
         try {
-            const response = await fetch('api/submit_config.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ target: state.target, config: state.currentConfig })
-            });
-            const result = await response.json();
+            const result = await api.request('falnic_sc_submit', { target: state.target, config: state.currentConfig });
 
             if (result.status === 'success') {
                 sessionManager.save('completed', result.tracking_code);
@@ -2263,6 +2275,14 @@ const smartAssistant = {
 document.addEventListener('DOMContentLoaded', () => {
     sessionManager.init();
     wizard.showView('view-intro');
+
+    // لینک‌های لوگو → بازگشت به صفحه شروع اپ
+    document.querySelectorAll('#falnic-sc-app [data-falnic-home]').forEach(el => {
+        el.addEventListener('click', event => {
+            event.preventDefault();
+            wizard.showView('view-intro');
+        });
+    });
 
     document.querySelectorAll('#view-pro input, #view-pro select').forEach(el => {
         el.addEventListener('input', () => {
