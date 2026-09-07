@@ -218,27 +218,21 @@
 
                     <!-- مرحله ۱: شاسی -->
                     <div id="pro-step-1" class="pro-step-container">
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> شاسی (Chassis) <span class="block text-xs text-gray-400 font-normal mt-1">یک گزینه را انتخاب کنید.</span></span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> شاسی (Chassis) <span class="block text-xs text-gray-400 font-normal mt-1">یک گزینه را انتخاب کنید.</span></span></div>
                             <div class="mt-4 pl-8">
                                 <select id="chassis-select" class="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-200" onchange="configurator.handleChassisChange()">
                                     <option value="">در حال دریافت اطلاعات...</option>
                                 </select>
                                 <div id="validator-chassis" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
-                        </details>
+                        </div>
                     </div>
 
                     <!-- مرحله ۲: پردازش و رم -->
                     <div id="pro-step-2" class="pro-step-container hidden">
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> پردازنده (CPU)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> پردازنده (CPU)</span></div>
                             <div class="mt-4 pl-8 flex gap-4">
                                 <div class="w-3/4">
                                     <select id="cpu-select" class="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 disabled:bg-gray-200 outline-none" disabled onchange="configurator.handleCpuChange()">
@@ -253,13 +247,10 @@
                                 </div>
                             </div>
                             <div id="validator-cpu" class="mt-3 ml-8 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
-                        </details>
+                        </div>
 
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> حافظه رم (RAM)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> حافظه رم (RAM)</span></div>
                             <div class="mt-4 pl-8 flex gap-4">
                                 <div class="w-3/4">
                                     <select id="ram-select" class="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 disabled:bg-gray-200 outline-none" disabled onchange="configurator.handleRamChange()">
@@ -272,28 +263,22 @@
                                 </div>
                             </div>
                             <div id="validator-ram" class="mt-3 ml-8 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
-                        </details>
+                        </div>
                     </div>
 
                     <!-- مرحله ۳: ذخیره‌سازی و کنترلر -->
                     <div id="pro-step-3" class="pro-step-container hidden">
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> فضای ذخیره سازی (Storage)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> فضای ذخیره سازی (Storage)</span></div>
                             <div class="mt-4 pl-8">
                                 <button onclick="configurator.addDriveRow()" id="add-drive-btn" class="mb-3 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 border border-blue-200 transition" disabled>➕ افزودن هارد جدید</button>
                                 <div id="drives-container" class="space-y-3"></div>
                                 <div id="validator-storage" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
-                        </details>
+                        </div>
 
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کنترلر رید (RAID Controller)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کنترلر رید (RAID Controller)</span></div>
                             <div class="mt-4 pl-8">
                                 <div id="default-controller-display" class="text-sm text-blue-800 bg-blue-50 border border-blue-200 p-3 rounded-lg mb-3 hidden"></div>
                                 <select id="controller-select" class="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 disabled:bg-gray-200 outline-none" disabled onchange="configurator.handlePCIeChange()">
@@ -306,28 +291,22 @@
                                 <div id="hw-raid-warning" class="hidden mt-3 text-sm bg-red-50 border border-red-200 text-red-700 rounded p-3 font-bold">⚠️ برای RAID پیشرفته، انتخاب کنترلر سخت‌افزاری یا SAS Expander ضروری است.</div>
                                 <div id="validator-raid-controller" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
-                        </details>
+                        </div>
                     </div>
 
                     <!-- مرحله ۴: HBA و گرافیک -->
                     <div id="pro-step-4" class="pro-step-container hidden">
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کارت‌های HBA (Host Bus Adapter)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کارت‌های HBA (Host Bus Adapter)</span></div>
                             <div class="mt-4 pl-8">
                                 <button onclick="configurator.addHbaRow()" id="add-hba-btn" class="mb-3 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 border border-blue-200 transition" disabled>➕ افزودن کارت HBA</button>
                                 <div id="hbas-container" class="space-y-3"></div>
                                 <div id="validator-hba" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
-                        </details>
+                        </div>
 
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کارت گرافیک (GPU)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کارت گرافیک (GPU)</span></div>
                             <div class="mt-4 pl-8 flex gap-4">
                                 <div class="w-3/4">
                                     <select id="gpu-select" class="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 disabled:bg-gray-200 outline-none" disabled onchange="configurator.handlePCIeChange()">
@@ -342,29 +321,23 @@
                                 </div>
                             </div>
                             <div id="validator-gpu" class="mt-3 ml-8 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
-                        </details>
+                        </div>
                     </div>
 
                     <!-- مرحله ۵: شبکه و رایزر -->
                     <div id="pro-step-5" class="pro-step-container hidden">
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کارت شبکه (Network Adapters)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> کارت شبکه (Network Adapters)</span></div>
                             <div class="mt-4 pl-8">
                                 <div id="default-network-display" class="text-sm text-blue-800 bg-blue-50 border border-blue-200 p-3 rounded-lg mb-3 hidden"></div>
                                 <button onclick="configurator.addNetworkRow()" id="add-network-btn" class="mb-3 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 border border-blue-200 transition" disabled>➕ افزودن کارت شبکه جانبی</button>
                                 <div id="networks-container" class="space-y-3"></div>
                                 <div id="validator-network" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
-                        </details>
+                        </div>
 
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> رایزرهای توسعه (PCIe Risers)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> رایزرهای توسعه (PCIe Risers)</span></div>
                             <div class="mt-4 pl-8 space-y-4">
                                 <div class="text-sm text-gray-700 bg-gray-50 border p-3 rounded-lg">
                                     <span class="text-green-500 font-bold">✔</span> <b>رایزر اول (پیش‌فرض روی مادربرد):</b> مدل 8-16-8 نصب است.
@@ -386,28 +359,22 @@
                                 </div>
                             </div>
                             <div id="validator-risers" class="mt-3 ml-8 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
-                        </details>
+                        </div>
                     </div>
 
                     <!-- مرحله ۶: تغذیه و جانبی -->
                     <div id="pro-step-6" class="pro-step-container hidden">
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> درایو نوری (Optical Drive / DVD)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> درایو نوری (Optical Drive / DVD)</span></div>
                             <div class="mt-4 pl-8">
                                 <button onclick="configurator.addOpticalRow()" id="add-optical-btn" class="mb-3 bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 border border-blue-200 transition" disabled>➕ افزودن درایو نوری</button>
                                 <div id="opticals-container" class="space-y-3"></div>
                                 <div id="validator-optical-drive" class="mt-3 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
                             </div>
-                        </details>
+                        </div>
 
-                        <details class="group p-4" open>
-                            <summary class="flex justify-between items-center cursor-pointer list-none font-bold text-gray-800">
-                                <span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> منبع تغذیه (Power Supply)</span>
-                                <span class="transition group-open:rotate-180">↓</span>
-                            </summary>
+                        <div class="p-4 falnic-pro-section">
+                            <div class="flex items-center font-bold text-gray-800 falnic-pro-section-title"><span class="flex items-center gap-2"><span class="text-blue-500 text-lg">💬</span> منبع تغذیه (Power Supply)</span></div>
                             <div class="mt-4 pl-8">
                                 <p class="text-xs text-gray-500 mb-2">تعداد پیش‌فرض و ثابت: ۲ عدد (Redundant)</p>
                                 <select id="psu-select" class="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 disabled:bg-gray-200 outline-none" disabled onchange="configurator.handlePsuChange()">
@@ -416,7 +383,7 @@
                                 <p id="psu-calc-display" class="text-sm font-bold text-blue-700 mt-3 p-3 bg-blue-50 rounded-lg hidden"></p>
                             </div>
                             <div id="validator-Power" class="mt-3 ml-8 text-sm bg-gray-50 border rounded p-3 space-y-1"></div>
-                        </details>
+                        </div>
                     </div>
 
                 </div>

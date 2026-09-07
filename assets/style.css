@@ -712,6 +712,14 @@ img[alt="لوگوی فالنیک"] {
     min-height: 1px;
 }
 
+.falnic-pro-section {
+    min-height: 1px;
+}
+
+.falnic-pro-section-title {
+    line-height: 1.6;
+}
+
 .ai-message p {
     line-height: 1.9;
 }

@@ -1321,6 +1321,14 @@
         min-height: 1px !important;
     }
 
+.falnic-sc-app .falnic-pro-section {
+        min-height: 1px !important;
+    }
+
+.falnic-sc-app .falnic-pro-section-title {
+        line-height: 1.6 !important;
+    }
+
 .falnic-sc-app .ai-message .falnic-sc-app p {
         line-height: 1.9 !important;
     }

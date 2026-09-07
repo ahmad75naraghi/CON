@@ -274,9 +274,9 @@ const uiRenderer = {
             if (netObj) addRow(netObj.model_name, n.qty, `Ports: ${netObj.port_count} | Speed: ${netObj.speed_gbps}Gbps | P/N: ${netObj.part_number}`);
         });
 
-        config.hbas.forEach(h => {
-            const hbaObj = state.db.hbas.find(x => x.id == h.hbaId);
-            if (hbaObj) addRow(hbaObj.model_name, h.qty, `P/N: ${hbaObj.part_number}`);
+        config.hbas.forEach(hbaRow => {
+            const hbaObj = state.db.hbas.find(x => x.id == hbaRow.hbaId);
+            if (hbaObj) addRow(hbaObj.model_name, hbaRow.qty, `P/N: ${hbaObj.part_number}`);
         });
 
         if (config.gpu && config.gpuQty > 0) {
@@ -376,9 +376,9 @@ function calculatePcieUsage(config) {
     if (config.sasExpander) req_general += 1;
     if (config.controller && config.controller.pcie_slots_used > 0) req_general += config.controller.pcie_slots_used;
 
-    config.hbas.forEach(h => {
-        let hbaObj = state.db?.hbas?.find(x => x.id == h.hbaId);
-        if (hbaObj && hbaObj.pcie_slots_used > 0) req_general += (hbaObj.pcie_slots_used * (parseInt(h.qty) || 1));
+    config.hbas.forEach(hbaRow => {
+        let hbaObj = state.db?.hbas?.find(x => x.id == hbaRow.hbaId);
+        if (hbaObj && hbaObj.pcie_slots_used > 0) req_general += (hbaObj.pcie_slots_used * (parseInt(hbaRow.qty) || 1));
     });
 
     config.networks.forEach(n => {
@@ -1485,13 +1485,13 @@ const configurator = {
         const container = document.getElementById('hbas-container');
         if (!container) return;
         container.innerHTML = '';
-        state.currentConfig.hbas.forEach((h, index) => {
+        state.currentConfig.hbas.forEach((hbaRow, index) => {
             let optionsHTML = '<option value="">انتخاب کارت HBA...</option>';
             state.db.hbas.forEach(hba => {
-                const selected = (h.hbaId == hba.id) ? 'selected' : '';
+                const selected = (hbaRow.hbaId == hba.id) ? 'selected' : '';
                 optionsHTML += `<option value="${hba.id}" ${selected}>${h(hba.model_name)}</option>`;
             });
-            let qty = parseInt(h.qty) || 1;
+            let qty = parseInt(hbaRow.qty) || 1;
             container.innerHTML += `
                 <div class="flex gap-2 items-center bg-gray-50 p-2 border border-gray-200 rounded-lg">
                     <select class="w-3/4 border border-gray-300 p-2 rounded bg-white text-xs outline-none" onchange="configurator.updateHbaRow(${index}, 'hbaId', this.value)">${optionsHTML}</select>

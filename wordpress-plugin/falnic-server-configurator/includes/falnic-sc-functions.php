@@ -167,3 +167,30 @@ function falnic_sc_validate_json_field( $raw, $column ) {
 	// Re-encode so stored JSON is always normalized (keys sorted kept as-is).
 	return wp_json_encode( $decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 }
+
+/**
+ * Does the site have a custom logo set (Appearance → Customize → Logo)?
+ *
+ * @return bool
+ */
+function falnic_sc_has_custom_logo() {
+	$logo_id = (int) get_theme_mod( 'custom_logo' );
+	return $logo_id > 0;
+}
+
+/**
+ * Logo URL for the app header: the site's own (custom) logo when one is set,
+ * falling back to the bundled Falnic logo.
+ *
+ * @param string $fallback Fallback URL (bundled logo).
+ * @return string
+ */
+function falnic_sc_site_logo_url( $fallback = '' ) {
+	if ( falnic_sc_has_custom_logo() ) {
+		$url = wp_get_attachment_image_url( (int) get_theme_mod( 'custom_logo' ), 'full' );
+		if ( $url ) {
+			return $url;
+		}
+	}
+	return $fallback;
+}

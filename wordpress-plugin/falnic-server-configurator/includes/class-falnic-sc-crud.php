@@ -289,6 +289,7 @@ class Falnic_SC_CRUD {
 					</div>
 				</div>
 
+			<div class="falnic-card falnic-table-card">
 				<table class="wp-list-table widefat fixed striped falnic-table">
 					<thead>
 						<tr>
@@ -302,7 +303,7 @@ class Falnic_SC_CRUD {
 					</thead>
 					<tbody>
 						<?php if ( empty( $rows ) ) : ?>
-							<tr><td colspan="<?php echo esc_attr( count( $list_fields ) + 3 ); ?>">موردی یافت نشد.</td></tr>
+							<tr><td colspan="<?php echo esc_attr( count( $list_fields ) + 3 ); ?>" class="falnic-empty"><span class="falnic-empty-emoji">🗂️</span> موردی یافت نشد.<br><span class="falnic-empty-hint">با جستجو دیگری امتحان کنید یا <?php echo '<a href="' . esc_url( $this->url( array( 'crud_action' => 'new' ) ) ) . '">مورد جدیدی بسازید</a>.'; ?></span></td></tr>
 						<?php else : ?>
 							<?php foreach ( $rows as $row ) : ?>
 								<tr>
@@ -320,15 +321,16 @@ class Falnic_SC_CRUD {
 										$edit_url   = wp_nonce_url( $this->url( array( 'crud_action' => 'edit', 'id' => $row['id'] ) ), 'falnic_sc_crud_' . $this->key );
 										$delete_url = wp_nonce_url( $this->url( array( 'crud_action' => 'delete', 'id' => $row['id'] ) ), 'falnic_sc_crud_' . $this->key );
 										?>
-										<a href="<?php echo esc_url( $edit_url ); ?>">ویرایش</a> |
-										<a href="<?php echo esc_url( $delete_url ); ?>" class="falnic-danger" data-falnic-confirm="«<?php echo esc_attr( $this->row_title( $row ) ); ?>» حذف شود؟">حذف</a>
-									</td>
-								</tr>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</tbody>
+									<a href="<?php echo esc_url( $edit_url ); ?>" class="falnic-action-btn falnic-action-edit">✎ ویرایش</a>
+									<a href="<?php echo esc_url( $delete_url ); ?>" class="falnic-action-btn falnic-action-delete" data-falnic-confirm="«<?php echo esc_attr( $this->row_title( $row ) ); ?>» حذف شود؟">✕ حذف</a>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</tbody>
 				</table>
-			</form>
+			</div>
+		</form>
 		</div>
 		<?php
 	}
@@ -491,6 +493,7 @@ class Falnic_SC_CRUD {
 				<input type="hidden" name="crud_action" value="save" />
 				<input type="hidden" name="id" value="<?php echo esc_attr( (string) $editing_id ); ?>" />
 
+				<div class="falnic-card falnic-form-card">
 				<table class="form-table falnic-form-table" role="presentation">
 					<?php foreach ( $this->def['fields'] as $name => $field ) : ?>
 						<?php
@@ -518,10 +521,12 @@ class Falnic_SC_CRUD {
 						</tr>
 					<?php endforeach; ?>
 				</table>
+				</div>
 
-				<p class="submit">
-					<button type="submit" class="button button-primary button-large">ذخیره</button>
-					<a class="button" href="<?php echo esc_url( $this->url() ); ?>">انصراف</a>
+				<p class="submit falnic-form-actions">
+					<span class="falnic-form-actions-hint">فیلدهای <span class="falnic-req">*</span> الزامی هستند.</span>
+					<a class="button falnic-btn-ghost" href="<?php echo esc_url( $this->url() ); ?>">انصراف</a>
+					<button type="submit" class="button button-primary button-large falnic-btn-save">💾 ذخیره <?php echo esc_html( $this->def['singular'] ); ?></button>
 				</p>
 			</form>
 		</div>
