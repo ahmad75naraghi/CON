@@ -137,16 +137,6 @@ function offerHasFiberNetwork(array $offer): bool
     return strpos($encoded ?: '', 'network') !== false || strpos(strtolower($offer['title'] ?? ''), 'fiber') !== false;
 }
 
-function meetsTarget(array $offer, array $target, float $multiplier = 1.0): bool
-{
-    if (!isAvailableOffer($offer)) return false;
-    if ($offer['cpu_cores'] < ($target['cores'] * $multiplier)) return false;
-    if ($offer['ram_gb'] < ($target['ram'] * $multiplier)) return false;
-    if ($target['storage'] > 0 && $offer['usable_storage_gb'] < ($target['storage'] * $multiplier)) return false;
-    if (!empty($target['gpu']) && $offer['gpu_memory_gb'] <= 0) return false;
-    return true;
-}
-
 function workloadBonus(array $offer, array $target): float
 {
     $bonus = 0;
@@ -178,24 +168,31 @@ function chooseRecommendations(array $offers, array $target): array
 {
     $available = array_values(array_filter($offers, fn($o) => isAvailableOffer($o)));
     if (!$available) $available = $offers;
+    if (!$available) return [];
 
-    $eligible = array_values(array_filter($available, fn($o) => meetsTarget($o, $target, 1.0)));
-    if (!$eligible) $eligible = $available;
+    // Stable tier ladder: offers are ranked weakest → strongest
+    // (performance_score ASC, generation_rank ASC, id ASC — the catalog order).
+    // اقتصادی = weakest, پیشرفته = strongest, مدیریت‌شده = middle closest to ×1.35.
+    usort($available, fn($a, $b) => [(int)$a['performance_score'], (int)$a['generation_rank'], (int)$a['id']]
+        <=> [(int)$b['performance_score'], (int)$b['generation_rank'], (int)$b['id']]);
 
-    usort($eligible, fn($a, $b) => [scoreDistance($a, $target, 1.0), $a['performance_score'], $a['ram_gb'], $a['usable_storage_gb']] <=> [scoreDistance($b, $target, 1.0), $b['performance_score'], $b['ram_gb'], $b['usable_storage_gb']]);
-    $eco = $eligible[0];
+    $eco = $available[0];
+    $advanced = $available[count($available) - 1];
 
-    $managedPool = array_values(array_filter($eligible, fn($o) => $o['id'] != $eco['id'] && (int)$o['expansion_score'] >= 50));
-    if (!$managedPool) $managedPool = array_values(array_filter($available, fn($o) => $o['id'] != $eco['id']));
-    usort($managedPool, fn($a, $b) => scoreDistance($a, $target, 1.35) <=> scoreDistance($b, $target, 1.35));
-    $managed = $managedPool[0] ?? $eco;
+    $middlePool = array_values(array_filter($available, fn($o) => $o['id'] != $eco['id'] && $o['id'] != $advanced['id']));
 
-    $advancedPool = array_values(array_filter($available, fn($o) => $o['id'] != $eco['id'] && $o['id'] != $managed['id'] && meetsTarget($o, $target, 2.0)));
-    if (!$advancedPool) {
-        $advancedPool = array_values(array_filter($available, fn($o) => $o['id'] != $eco['id'] && $o['id'] != $managed['id']));
+    $managed = null;
+    $best = null;
+    foreach ($middlePool as $offer) {
+        $distance = scoreDistance($offer, $target, 1.35);
+        if ($best === null || $distance < $best) {
+            $best = $distance;
+            $managed = $offer;
+        }
     }
-    usort($advancedPool, fn($a, $b) => [scoreDistance($a, $target, 2.0), -$a['generation_rank'], -$a['expansion_score']] <=> [scoreDistance($b, $target, 2.0), -$b['generation_rank'], -$b['expansion_score']]);
-    $advanced = $advancedPool[0] ?? $managed;
+    if ($managed === null) {
+        $managed = $available[1] ?? $eco;
+    }
 
     $eco['recommendation_tier'] = 'eco';
     $eco['recommendation_label'] = 'اقتصادی';

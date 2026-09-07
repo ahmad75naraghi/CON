@@ -1,3 +1,9 @@
+/*
+ * Falnic Server Configurator — WordPress build.
+ * Ported from the standalone assets/main.js; only the transport layer changed:
+ * api/*.php fetches were replaced with the WordPress AJAX client (see `api`).
+ */
+
 // assets/main.js
 
 const state = {
@@ -390,11 +396,37 @@ function calculatePcieUsage(config) {
     return { avail_x16_gpu, avail_general, req_gpu, req_general, remaining_gpu_slots, total_avail_general };
 }
 
+// WordPress AJAX client — all calls go to admin-ajax.php with a nonce.
+// Response contracts are identical to the standalone PHP endpoints.
+const FALNIC_CFG = window.FALNIC_SC_CONFIG || {};
+
 const api = {
+    request: async (action, data = {}, method = 'POST') => {
+        const params = new URLSearchParams();
+        params.set('action', action);
+        params.set('nonce', FALNIC_CFG.nonce || '');
+        let url = FALNIC_CFG.ajaxUrl || '';
+        let options;
+        if (method === 'GET') {
+            Object.entries(data).forEach(([k, v]) => params.set(k, v));
+            url += (url.includes('?') ? '&' : '?') + params.toString();
+            options = { method: 'GET', credentials: 'same-origin' };
+        } else {
+            params.set('payload', JSON.stringify(data));
+            options = {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body: params.toString()
+            };
+        }
+        const response = await fetch(url, options);
+        return response.json();
+    },
+
     fetchData: async () => {
         try {
-            const response = await fetch('api/get_data.php');
-            const result = await response.json();
+            const result = await api.request('falnic_sc_get_data', {}, 'GET');
             if (result.status === 'success') {
                 state.db = result.data;
                 configurator.initDropdowns();
@@ -403,8 +435,7 @@ const api = {
     },
     fetchChassisData: async (chassisId) => {
         try {
-            const response = await fetch(`api/get_data.php?chassis_id=${encodeURIComponent(chassisId)}`);
-            const result = await response.json();
+            const result = await api.request('falnic_sc_get_data', { chassis_id: chassisId }, 'GET');
             if (result.status === 'success') {
                 const fullChassisList = state.db.chassis;
                 state.db = { ...state.db, ...result.data, chassis: fullChassisList };
@@ -420,23 +451,9 @@ const api = {
         }
     },
 
-    fetchRecommendations: async (target, answers) => {
-        const response = await fetch('api/recommend_servers.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target, answers })
-        });
-        return response.json();
-    },
+    fetchRecommendations: async (target, answers) => api.request('falnic_sc_recommend', { target, answers }),
 
-    sendAIMessage: async (message, context, history) => {
-        const response = await fetch('api/ai_chat.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, context, history })
-        });
-        return response.json();
-    }
+    sendAIMessage: async (message, context, history) => api.request('falnic_sc_ai_chat', { message, context, history })
 };
 
 const validator = {
@@ -1764,12 +1781,7 @@ const configurator = {
         state.currentConfig.psuQty = state.currentConfig.chassis?.max_psu_bays || 2;
 
         try {
-            const response = await fetch('api/submit_config.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ target: state.target, config: state.currentConfig })
-            });
-            const result = await response.json();
+            const result = await api.request('falnic_sc_submit', { target: state.target, config: state.currentConfig });
 
             if (result.status === 'success') {
                 sessionManager.save('completed', result.tracking_code);
@@ -2263,6 +2275,14 @@ const smartAssistant = {
 document.addEventListener('DOMContentLoaded', () => {
     sessionManager.init();
     wizard.showView('view-intro');
+
+    // لینک‌های لوگو (به‌جای index.php مستقل) → بازگشت به صفحه شروع اپ
+    document.querySelectorAll('#falnic-sc-app [data-falnic-home]').forEach(el => {
+        el.addEventListener('click', event => {
+            event.preventDefault();
+            wizard.showView('view-intro');
+        });
+    });
 
     document.querySelectorAll('#view-pro input, #view-pro select').forEach(el => {
         el.addEventListener('input', () => {

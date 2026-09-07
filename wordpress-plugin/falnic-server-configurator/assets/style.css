@@ -1,0 +1,1381 @@
+/*
+ * Falnic Server Configurator — WordPress stylesheet.
+ * Built 1:1 from the standalone app's assets/style.css (plain CSS, no
+ * Tailwind): every selector is scoped under .falnic-sc-app and declarations
+ * carry !important so the app renders identically inside any WordPress
+ * theme. Rebuild with tools/build_style.py (see plugin docs).
+ */
+
+@font-face {font-family: "Falnic";
+    src: url("./falnic-font.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;}
+
+.falnic-sc-app *,
+.falnic-sc-app *::before,
+.falnic-sc-app *::after {
+        box-sizing: border-box !important;
+        border-width: 0 !important;
+        border-style: solid !important;
+        border-color: #e5e7eb !important;
+    }
+
+.falnic-sc-app {
+        line-height: 1.5 !important;
+        -webkit-text-size-adjust: 100% !important;
+        tab-size: 4 !important;
+    }
+
+.falnic-sc-app {
+        margin: 0 !important;
+        font-family: "Falnic", Tahoma, Arial, sans-serif !important;
+        background-color: #f8fafc !important;
+        color: #1f2937 !important;
+    }
+
+.falnic-sc-app button,
+.falnic-sc-app input,
+.falnic-sc-app select,
+.falnic-sc-app textarea {
+        font: inherit !important;
+        color: inherit !important;
+        margin: 0 !important;
+    }
+
+.falnic-sc-app button,
+.falnic-sc-app select {
+        text-transform: none !important;
+    }
+
+.falnic-sc-app button,
+.falnic-sc-app [type="button"],
+.falnic-sc-app [type="reset"],
+.falnic-sc-app [type="submit"] {
+        -webkit-appearance: button !important;
+        appearance: button !important;
+        background-color: transparent !important;
+        background-image: none !important;
+    }
+
+.falnic-sc-app button,
+.falnic-sc-app [role="button"] {
+        cursor: pointer !important;
+    }
+
+.falnic-sc-app button:disabled,
+.falnic-sc-app select:disabled,
+.falnic-sc-app input:disabled {
+        cursor: default !important;
+    }
+
+.falnic-sc-app img,
+.falnic-sc-app svg {
+        display: block !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+.falnic-sc-app table {
+        text-indent: 0 !important;
+        border-color: inherit !important;
+    }
+
+.falnic-sc-app summary {
+        display: list-item !important;
+    }
+
+/* Layout */
+.falnic-sc-app .container {
+        width: 100% !important;
+    }
+.falnic-sc-app .mx-auto {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+.falnic-sc-app .my-8 {
+        margin-top: 2rem !important;
+        margin-bottom: 2rem !important;
+    }
+.falnic-sc-app .block {
+        display: block !important;
+    }
+.falnic-sc-app .flex {
+        display: flex !important;
+    }
+.falnic-sc-app .grid {
+        display: grid !important;
+    }
+.falnic-sc-app .hidden {
+        display: none !important;
+    }
+.falnic-sc-app .inline-block {
+        display: inline-block !important;
+    }
+.falnic-sc-app .inline-flex {
+        display: inline-flex !important;
+    }
+.falnic-sc-app .fixed {
+        position: fixed !important;
+    }
+.falnic-sc-app .absolute {
+        position: absolute !important;
+    }
+.falnic-sc-app .relative {
+        position: relative !important;
+    }
+.falnic-sc-app .sticky {
+        position: sticky !important;
+    }
+.falnic-sc-app .inset-0 {
+        inset: 0 !important;
+    }
+.falnic-sc-app .top-1\/2 {
+        top: 50% !important;
+    }
+.falnic-sc-app .top-4 {
+        top: 1rem !important;
+    }
+.falnic-sc-app .top-6 {
+        top: 1.5rem !important;
+    }
+.falnic-sc-app .left-0 {
+        left: 0 !important;
+    }
+.falnic-sc-app .left-6 {
+        left: 1.5rem !important;
+    }
+.falnic-sc-app .right-0 {
+        right: 0 !important;
+    }
+.falnic-sc-app .right-1 {
+        right: .25rem !important;
+    }
+.falnic-sc-app .-top-5 {
+        top: -1.25rem !important;
+    }
+.falnic-sc-app .z-10 {
+        z-index: 10 !important;
+    }
+.falnic-sc-app .z-50 {
+        z-index: 50 !important;
+    }
+.falnic-sc-app .-z-10 {
+        z-index: -10 !important;
+    }
+
+.falnic-sc-app .flex-1 {
+        flex: 1 1 0% !important;
+    }
+.falnic-sc-app .flex-col {
+        flex-direction: column !important;
+    }
+.falnic-sc-app .flex-row-reverse {
+        flex-direction: row-reverse !important;
+    }
+.falnic-sc-app .items-start {
+        align-items: flex-start !important;
+    }
+.falnic-sc-app .items-center {
+        align-items: center !important;
+    }
+.falnic-sc-app .justify-center {
+        justify-content: center !important;
+    }
+.falnic-sc-app .justify-between {
+        justify-content: space-between !important;
+    }
+.falnic-sc-app .justify-end {
+        justify-content: flex-end !important;
+    }
+.falnic-sc-app .grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+.falnic-sc-app .w-full {
+        width: 100% !important;
+    }
+.falnic-sc-app .w-1\/2 {
+        width: 50% !important;
+    }
+.falnic-sc-app .w-1\/3 {
+        width: 33.333333% !important;
+    }
+.falnic-sc-app .w-1\/4 {
+        width: 25% !important;
+    }
+.falnic-sc-app .w-1\/6 {
+        width: 16.666667% !important;
+    }
+.falnic-sc-app .w-3\/4 {
+        width: 75% !important;
+    }
+.falnic-sc-app .w-4 {
+        width: 1rem !important;
+    }
+.falnic-sc-app .w-5 {
+        width: 1.25rem !important;
+    }
+.falnic-sc-app .w-6 {
+        width: 1.5rem !important;
+    }
+.falnic-sc-app .w-10 {
+        width: 2.5rem !important;
+    }
+.falnic-sc-app .w-16 {
+        width: 4rem !important;
+    }
+.falnic-sc-app .w-20 {
+        width: 5rem !important;
+    }
+.falnic-sc-app .max-w-sm {
+        max-width: 24rem !important;
+    }
+.falnic-sc-app .max-w-3xl {
+        max-width: 48rem !important;
+    }
+.falnic-sc-app .max-w-4xl {
+        max-width: 56rem !important;
+    }
+.falnic-sc-app .max-w-5xl {
+        max-width: 64rem !important;
+    }
+.falnic-sc-app .max-w-6xl {
+        max-width: 72rem !important;
+    }
+.falnic-sc-app .max-w-\[150px\] {
+        max-width: 150px !important;
+    }
+.falnic-sc-app .h-0\.5 {
+        height: .125rem !important;
+    }
+.falnic-sc-app .h-4 {
+        height: 1rem !important;
+    }
+.falnic-sc-app .h-5 {
+        height: 1.25rem !important;
+    }
+.falnic-sc-app .h-6 {
+        height: 1.5rem !important;
+    }
+.falnic-sc-app .h-10 {
+        height: 2.5rem !important;
+    }
+.falnic-sc-app .h-16 {
+        height: 4rem !important;
+    }
+.falnic-sc-app .h-fit {
+        height: fit-content !important;
+    }
+
+/* Spacing */
+.falnic-sc-app .gap-1 {
+        gap: .25rem !important;
+    }
+.falnic-sc-app .gap-2 {
+        gap: .5rem !important;
+    }
+.falnic-sc-app .gap-3 {
+        gap: .75rem !important;
+    }
+.falnic-sc-app .gap-4 {
+        gap: 1rem !important;
+    }
+.falnic-sc-app .gap-6 {
+        gap: 1.5rem !important;
+    }
+.falnic-sc-app .p-2 {
+        padding: .5rem !important;
+    }
+.falnic-sc-app .p-3 {
+        padding: .75rem !important;
+    }
+.falnic-sc-app .p-4 {
+        padding: 1rem !important;
+    }
+.falnic-sc-app .p-6 {
+        padding: 1.5rem !important;
+    }
+.falnic-sc-app .p-8 {
+        padding: 2rem !important;
+    }
+.falnic-sc-app .p-10 {
+        padding: 2.5rem !important;
+    }
+.falnic-sc-app .px-2 {
+        padding-left: .5rem !important;
+        padding-right: .5rem !important;
+    }
+.falnic-sc-app .px-3 {
+        padding-left: .75rem !important;
+        padding-right: .75rem !important;
+    }
+.falnic-sc-app .px-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+.falnic-sc-app .px-5 {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+    }
+.falnic-sc-app .px-6 {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+.falnic-sc-app .px-8 {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+.falnic-sc-app .py-1 {
+        padding-top: .25rem !important;
+        padding-bottom: .25rem !important;
+    }
+.falnic-sc-app .py-2 {
+        padding-top: .5rem !important;
+        padding-bottom: .5rem !important;
+    }
+.falnic-sc-app .py-3 {
+        padding-top: .75rem !important;
+        padding-bottom: .75rem !important;
+    }
+.falnic-sc-app .py-4 {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+.falnic-sc-app .pt-1 {
+        padding-top: .25rem !important;
+    }
+.falnic-sc-app .pt-2 {
+        padding-top: .5rem !important;
+    }
+.falnic-sc-app .pt-4 {
+        padding-top: 1rem !important;
+    }
+.falnic-sc-app .pt-6 {
+        padding-top: 1.5rem !important;
+    }
+.falnic-sc-app .pb-2 {
+        padding-bottom: .5rem !important;
+    }
+.falnic-sc-app .pb-4 {
+        padding-bottom: 1rem !important;
+    }
+.falnic-sc-app .pb-20 {
+        padding-bottom: 5rem !important;
+    }
+.falnic-sc-app .pl-8 {
+        padding-left: 2rem !important;
+    }
+.falnic-sc-app .pr-2 {
+        padding-right: .5rem !important;
+    }
+.falnic-sc-app .pr-6 {
+        padding-right: 1.5rem !important;
+    }
+.falnic-sc-app .mt-1 {
+        margin-top: .25rem !important;
+    }
+.falnic-sc-app .mt-2 {
+        margin-top: .5rem !important;
+    }
+.falnic-sc-app .mt-3 {
+        margin-top: .75rem !important;
+    }
+.falnic-sc-app .mt-4 {
+        margin-top: 1rem !important;
+    }
+.falnic-sc-app .mt-6 {
+        margin-top: 1.5rem !important;
+    }
+.falnic-sc-app .mt-8 {
+        margin-top: 2rem !important;
+    }
+.falnic-sc-app .mt-12 {
+        margin-top: 3rem !important;
+    }
+.falnic-sc-app .mb-1\.5 {
+        margin-bottom: .375rem !important;
+    }
+.falnic-sc-app .mb-2 {
+        margin-bottom: .5rem !important;
+    }
+.falnic-sc-app .mb-3 {
+        margin-bottom: .75rem !important;
+    }
+.falnic-sc-app .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+.falnic-sc-app .mb-5 {
+        margin-bottom: 1.25rem !important;
+    }
+.falnic-sc-app .mb-6 {
+        margin-bottom: 1.5rem !important;
+    }
+.falnic-sc-app .mb-8 {
+        margin-bottom: 2rem !important;
+    }
+.falnic-sc-app .mb-10 {
+        margin-bottom: 2.5rem !important;
+    }
+.falnic-sc-app .mb-12 {
+        margin-bottom: 3rem !important;
+    }
+.falnic-sc-app .ml-2 {
+        margin-left: .5rem !important;
+    }
+.falnic-sc-app .ml-8 {
+        margin-left: 2rem !important;
+    }
+.falnic-sc-app .-mx-2 {
+        margin-left: -.5rem !important;
+        margin-right: -.5rem !important;
+    }
+.falnic-sc-app .space-y-1 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: .25rem !important;
+    }
+.falnic-sc-app .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: .5rem !important;
+    }
+.falnic-sc-app .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: .75rem !important;
+    }
+.falnic-sc-app .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1rem !important;
+    }
+.falnic-sc-app .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 2rem !important;
+    }
+
+/* Typography */
+.falnic-sc-app .text-left {
+        text-align: left !important;
+    }
+.falnic-sc-app .text-center {
+        text-align: center !important;
+    }
+.falnic-sc-app .text-right {
+        text-align: right !important;
+    }
+.falnic-sc-app .text-\[10px\] {
+        font-size: 10px !important;
+        line-height: 1rem !important;
+    }
+.falnic-sc-app .text-xs {
+        font-size: .75rem !important;
+        line-height: 1rem !important;
+    }
+.falnic-sc-app .text-sm {
+        font-size: .875rem !important;
+        line-height: 1.25rem !important;
+    }
+.falnic-sc-app .text-base {
+        font-size: 1rem !important;
+        line-height: 1.5rem !important;
+    }
+.falnic-sc-app .text-lg {
+        font-size: 1.125rem !important;
+        line-height: 1.75rem !important;
+    }
+.falnic-sc-app .text-xl {
+        font-size: 1.25rem !important;
+        line-height: 1.75rem !important;
+    }
+.falnic-sc-app .text-2xl {
+        font-size: 1.5rem !important;
+        line-height: 2rem !important;
+    }
+.falnic-sc-app .text-3xl {
+        font-size: 1.875rem !important;
+        line-height: 2.25rem !important;
+    }
+.falnic-sc-app .text-4xl {
+        font-size: 2.25rem !important;
+        line-height: 2.5rem !important;
+    }
+.falnic-sc-app .font-normal {
+        font-weight: 400 !important;
+    }
+.falnic-sc-app .font-medium {
+        font-weight: 500 !important;
+    }
+.falnic-sc-app .font-semibold {
+        font-weight: 600 !important;
+    }
+.falnic-sc-app .font-bold {
+        font-weight: 700 !important;
+    }
+.falnic-sc-app .font-mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+    }
+.falnic-sc-app .leading-none {
+        line-height: 1 !important;
+    }
+.falnic-sc-app .leading-relaxed {
+        line-height: 1.625 !important;
+    }
+.falnic-sc-app .list-none {
+        list-style-type: none !important;
+    }
+.falnic-sc-app .line-clamp-1,
+.falnic-sc-app .line-clamp-3 {
+        display: -webkit-box !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+.falnic-sc-app .line-clamp-1 {
+        -webkit-line-clamp: 1 !important;
+    }
+.falnic-sc-app .line-clamp-3 {
+        -webkit-line-clamp: 3 !important;
+    }
+
+/* Colors */
+.falnic-sc-app .text-white {
+        color: #fff !important;
+    }
+.falnic-sc-app .text-gray-300 {
+        color: #d1d5db !important;
+    }
+.falnic-sc-app .text-gray-400 {
+        color: #9ca3af !important;
+    }
+.falnic-sc-app .text-gray-500 {
+        color: #6b7280 !important;
+    }
+.falnic-sc-app .text-gray-600 {
+        color: #4b5563 !important;
+    }
+.falnic-sc-app .text-gray-700 {
+        color: #374151 !important;
+    }
+.falnic-sc-app .text-gray-800 {
+        color: #1f2937 !important;
+    }
+.falnic-sc-app .text-gray-900 {
+        color: #111827 !important;
+    }
+.falnic-sc-app .text-blue-500 {
+        color: #3b82f6 !important;
+    }
+.falnic-sc-app .text-blue-600 {
+        color: #2563eb !important;
+    }
+.falnic-sc-app .text-blue-700 {
+        color: #1d4ed8 !important;
+    }
+.falnic-sc-app .text-blue-800 {
+        color: #1e40af !important;
+    }
+.falnic-sc-app .text-blue-900 {
+        color: #1e3a8a !important;
+    }
+.falnic-sc-app .text-green-500 {
+        color: #22c55e !important;
+    }
+.falnic-sc-app .text-green-600 {
+        color: #16a34a !important;
+    }
+.falnic-sc-app .text-green-700 {
+        color: #15803d !important;
+    }
+.falnic-sc-app .text-orange-500 {
+        color: #f97316 !important;
+    }
+.falnic-sc-app .text-orange-600 {
+        color: #ea580c !important;
+    }
+.falnic-sc-app .text-red-500 {
+        color: #ef4444 !important;
+    }
+.falnic-sc-app .text-red-600 {
+        color: #dc2626 !important;
+    }
+.falnic-sc-app .text-red-700 {
+        color: #b91c1c !important;
+    }
+.falnic-sc-app .text-yellow-600 {
+        color: #ca8a04 !important;
+    }
+.falnic-sc-app .text-amber-600 {
+        color: #d97706 !important;
+    }
+.falnic-sc-app .text-purple-700 {
+        color: #7e22ce !important;
+    }
+.falnic-sc-app .text-teal-600 {
+        color: #0d9488 !important;
+    }
+
+.falnic-sc-app .bg-white {
+        background-color: #fff !important;
+    }
+.falnic-sc-app .bg-black {
+        background-color: #000 !important;
+    }
+.falnic-sc-app .bg-gray-50 {
+        background-color: #f9fafb !important;
+    }
+.falnic-sc-app .bg-gray-100 {
+        background-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .bg-gray-200 {
+        background-color: #e5e7eb !important;
+    }
+.falnic-sc-app .bg-gray-900 {
+        background-color: #111827 !important;
+    }
+.falnic-sc-app .bg-blue-50 {
+        background-color: #eff6ff !important;
+    }
+.falnic-sc-app .bg-blue-100 {
+        background-color: #dbeafe !important;
+    }
+.falnic-sc-app .bg-blue-600 {
+        background-color: #2563eb !important;
+    }
+.falnic-sc-app .bg-blue-900 {
+        background-color: #1e3a8a !important;
+    }
+.falnic-sc-app .bg-green-50 {
+        background-color: #f0fdf4 !important;
+    }
+.falnic-sc-app .bg-green-100 {
+        background-color: #dcfce7 !important;
+    }
+.falnic-sc-app .bg-green-500 {
+        background-color: #22c55e !important;
+    }
+.falnic-sc-app .bg-orange-50 {
+        background-color: #fff7ed !important;
+    }
+.falnic-sc-app .bg-orange-500 {
+        background-color: #f97316 !important;
+    }
+.falnic-sc-app .bg-purple-50 {
+        background-color: #faf5ff !important;
+    }
+.falnic-sc-app .bg-purple-100 {
+        background-color: #f3e8ff !important;
+    }
+.falnic-sc-app .bg-purple-600 {
+        background-color: #9333ea !important;
+    }
+.falnic-sc-app .bg-red-50 {
+        background-color: #fef2f2 !important;
+    }
+.falnic-sc-app .bg-red-100 {
+        background-color: #fee2e2 !important;
+    }
+.falnic-sc-app .bg-red-600 {
+        background-color: #dc2626 !important;
+    }
+.falnic-sc-app .bg-yellow-50 {
+        background-color: #fefce8 !important;
+    }
+.falnic-sc-app .bg-gray-900.bg-opacity-50 {
+        background-color: rgba(17, 24, 39, .5) !important;
+    }
+.falnic-sc-app .bg-black.bg-opacity-70 {
+        background-color: rgba(0, 0, 0, .7) !important;
+    }
+
+/* Borders */
+.falnic-sc-app .border {
+        border-width: 1px !important;
+    }
+.falnic-sc-app .border-2 {
+        border-width: 2px !important;
+    }
+.falnic-sc-app .border-t {
+        border-top-width: 1px !important;
+    }
+.falnic-sc-app .border-b {
+        border-bottom-width: 1px !important;
+    }
+.falnic-sc-app .border-b-8 {
+        border-bottom-width: 8px !important;
+    }
+.falnic-sc-app .border-r-4 {
+        border-right-width: 4px !important;
+    }
+.falnic-sc-app .border-collapse {
+        border-collapse: collapse !important;
+    }
+.falnic-sc-app .border-gray-100 {
+        border-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .border-gray-200 {
+        border-color: #e5e7eb !important;
+    }
+.falnic-sc-app .border-gray-300 {
+        border-color: #d1d5db !important;
+    }
+.falnic-sc-app .border-blue-100 {
+        border-color: #dbeafe !important;
+    }
+.falnic-sc-app .border-blue-200 {
+        border-color: #bfdbfe !important;
+    }
+.falnic-sc-app .border-blue-300 {
+        border-color: #93c5fd !important;
+    }
+.falnic-sc-app .border-blue-400 {
+        border-color: #60a5fa !important;
+    }
+.falnic-sc-app .border-blue-500 {
+        border-color: #3b82f6 !important;
+    }
+.falnic-sc-app .border-blue-700 {
+        border-color: #1d4ed8 !important;
+    }
+.falnic-sc-app .border-blue-900 {
+        border-color: #1e3a8a !important;
+    }
+.falnic-sc-app .border-green-300 {
+        border-color: #86efac !important;
+    }
+.falnic-sc-app .border-green-500 {
+        border-color: #22c55e !important;
+    }
+.falnic-sc-app .border-orange-100 {
+        border-color: #ffedd5 !important;
+    }
+.falnic-sc-app .border-orange-500 {
+        border-color: #f97316 !important;
+    }
+.falnic-sc-app .border-purple-100 {
+        border-color: #f3e8ff !important;
+    }
+.falnic-sc-app .border-purple-200 {
+        border-color: #e9d5ff !important;
+    }
+.falnic-sc-app .border-red-100 {
+        border-color: #fee2e2 !important;
+    }
+.falnic-sc-app .border-red-200 {
+        border-color: #fecaca !important;
+    }
+.falnic-sc-app .border-red-300 {
+        border-color: #fca5a5 !important;
+    }
+.falnic-sc-app .border-red-500 {
+        border-color: #ef4444 !important;
+    }
+.falnic-sc-app .divide-y > :not([hidden]) ~ :not([hidden]) {
+        border-top-width: 1px !important;
+    }
+.falnic-sc-app .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+        border-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+        border-color: #e5e7eb !important;
+    }
+.falnic-sc-app .last\:border-0:last-child {
+        border-width: 0 !important;
+    }
+
+.falnic-sc-app .rounded {
+        border-radius: .25rem !important;
+    }
+.falnic-sc-app .rounded-md {
+        border-radius: .375rem !important;
+    }
+.falnic-sc-app .rounded-lg {
+        border-radius: .5rem !important;
+    }
+.falnic-sc-app .rounded-xl {
+        border-radius: .75rem !important;
+    }
+.falnic-sc-app .rounded-2xl {
+        border-radius: 1rem !important;
+    }
+.falnic-sc-app .rounded-full {
+        border-radius: 9999px !important;
+    }
+
+/* Effects */
+.falnic-sc-app .shadow-sm {
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05) !important;
+    }
+.falnic-sc-app .shadow-md {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .shadow-lg {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .shadow-2xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25) !important;
+    }
+.falnic-sc-app .opacity-80 {
+        opacity: .8 !important;
+    }
+.falnic-sc-app .ring-2 {
+        box-shadow: 0 0 0 2px var(--ring-color, rgba(59, 130, 246, .5)) !important;
+    }
+.falnic-sc-app .ring-4 {
+        box-shadow: 0 0 0 4px var(--ring-color, rgba(59, 130, 246, .25)) !important;
+    }
+.falnic-sc-app .ring-blue-100 {
+        --ring-color: #dbeafe !important;
+    }
+.falnic-sc-app .ring-blue-500 {
+        --ring-color: #3b82f6 !important;
+    }
+.falnic-sc-app .ring-red-100 {
+        --ring-color: #fee2e2 !important;
+    }
+.falnic-sc-app .transform {
+        transform: translateZ(0) !important;
+    }
+.falnic-sc-app .scale-105 {
+        transform: scale(1.05) !important;
+    }
+.falnic-sc-app .transition {
+        transition-property: color, background-color, border-color, opacity, box-shadow, transform !important;
+        transition-duration: 150ms !important;
+        transition-timing-function: cubic-bezier(.4, 0, .2, 1) !important;
+    }
+.falnic-sc-app .transition-all {
+        transition-property: all !important;
+        transition-duration: 150ms !important;
+        transition-timing-function: cubic-bezier(.4, 0, .2, 1) !important;
+    }
+.falnic-sc-app .duration-300 {
+        transition-duration: 300ms !important;
+    }
+.falnic-sc-app .duration-500 {
+        transition-duration: 500ms !important;
+    }
+
+@keyframes pulse {
+    50% { opacity: .5; }
+}
+.falnic-sc-app .animate-pulse {
+        animation: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite !important;
+    }
+
+/* Controls */
+.falnic-sc-app .cursor-pointer {
+        cursor: pointer !important;
+    }
+.falnic-sc-app .cursor-not-allowed {
+        cursor: not-allowed !important;
+    }
+.falnic-sc-app .outline-none {
+        outline: 2px solid transparent !important;
+        outline-offset: 2px !important;
+    }
+.falnic-sc-app .overflow-x-auto {
+        overflow-x: auto !important;
+    }
+.falnic-sc-app .overflow-y-auto {
+        overflow-y: auto !important;
+    }
+.falnic-sc-app .disabled\:bg-gray-200:disabled {
+        background-color: #e5e7eb !important;
+    }
+.falnic-sc-app .disabled\:opacity-50:disabled {
+        opacity: .5 !important;
+    }
+.falnic-sc-app .focus\:ring-1:focus {
+        box-shadow: 0 0 0 1px var(--focus-ring-color, rgba(59, 130, 246, .35)) !important;
+    }
+.falnic-sc-app .focus\:ring-2:focus {
+        box-shadow: 0 0 0 2px var(--focus-ring-color, rgba(59, 130, 246, .35)) !important;
+    }
+.falnic-sc-app .focus\:ring-blue-200:focus {
+        --focus-ring-color: #bfdbfe !important;
+    }
+.falnic-sc-app .focus\:ring-blue-500:focus {
+        --focus-ring-color: #3b82f6 !important;
+    }
+
+/* Hover states */
+.falnic-sc-app .hover\:bg-white:hover {
+        background-color: #fff !important;
+    }
+.falnic-sc-app .hover\:bg-gray-50:hover {
+        background-color: #f9fafb !important;
+    }
+.falnic-sc-app .hover\:bg-gray-100:hover {
+        background-color: #f3f4f6 !important;
+    }
+.falnic-sc-app .hover\:bg-blue-50:hover {
+        background-color: #eff6ff !important;
+    }
+.falnic-sc-app .hover\:bg-blue-100:hover {
+        background-color: #dbeafe !important;
+    }
+.falnic-sc-app .hover\:bg-blue-700:hover {
+        background-color: #1d4ed8 !important;
+    }
+.falnic-sc-app .hover\:bg-blue-800:hover {
+        background-color: #1e40af !important;
+    }
+.falnic-sc-app .hover\:bg-blue-900:hover {
+        background-color: #1e3a8a !important;
+    }
+.falnic-sc-app .hover\:bg-orange-50:hover {
+        background-color: #fff7ed !important;
+    }
+.falnic-sc-app .hover\:bg-red-100:hover {
+        background-color: #fee2e2 !important;
+    }
+.falnic-sc-app .hover\:text-white:hover {
+        color: #fff !important;
+    }
+.falnic-sc-app .hover\:text-gray-800:hover {
+        color: #1f2937 !important;
+    }
+.falnic-sc-app .hover\:text-blue-700:hover {
+        color: #1d4ed8 !important;
+    }
+.falnic-sc-app .hover\:border-blue-400:hover {
+        border-color: #60a5fa !important;
+    }
+.falnic-sc-app .hover\:shadow-md:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .hover\:shadow-lg:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1) !important;
+    }
+.falnic-sc-app .hover\:opacity-80:hover {
+        opacity: .8 !important;
+    }
+
+.falnic-sc-app .group[open] .falnic-sc-app .group-open\:rotate-180 {
+        transform: rotate(180deg) !important;
+    }
+
+/* Custom tooltip styles */
+.falnic-sc-app .tooltip-icon {
+        cursor: help !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 18px !important;
+        height: 18px !important;
+        background: #3b82f6 !important;
+        color: white !important;
+        border-radius: 50% !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        margin-right: 5px !important;
+        position: relative !important;
+        top: -2px !important;
+    }
+
+.falnic-sc-app .tooltip-container {
+        position: relative !important;
+        display: inline-block !important;
+    }
+
+.falnic-sc-app .tooltip-text {
+        visibility: hidden !important;
+        width: max-content !important;
+        max-width: 350px !important;
+        background-color: #1f2937 !important;
+        color: #fff !important;
+        text-align: right !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+        position: absolute !important;
+        z-index: 50 !important;
+        bottom: 125% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        opacity: 0 !important;
+        transition: opacity .3s !important;
+        font-size: 12px !important;
+        font-weight: normal !important;
+        line-height: 1.6 !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, .3) !important;
+    }
+
+.falnic-sc-app .tooltip-text::after {
+        content: "" !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 50% !important;
+        margin-left: -5px !important;
+        border-width: 5px !important;
+        border-style: solid !important;
+        border-color: #1f2937 transparent transparent transparent !important;
+    }
+
+.falnic-sc-app .tooltip-container:hover .falnic-sc-app .tooltip-text {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+/* Responsive utilities */
+@media (min-width: 640px) {
+    .falnic-sc-app .sm\:w-auto {
+        width: auto !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .falnic-sc-app .md\:inline-block {
+        display: inline-block !important;
+    }
+    .falnic-sc-app .md\:flex-row {
+        flex-direction: row !important;
+    }
+    .falnic-sc-app .md\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    .falnic-sc-app .md\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+    .falnic-sc-app .md\:col-span-3 {
+        grid-column: span 3 / span 3 !important;
+    }
+    .falnic-sc-app .md\:w-1\/3 {
+        width: 33.333333% !important;
+    }
+    .falnic-sc-app .md\:w-2\/3 {
+        width: 66.666667% !important;
+    }
+}
+
+@media print {
+    .falnic-sc-app .falnic-sc-app * {
+        visibility: hidden !important;
+    }
+
+    .falnic-sc-app #success-modal,
+.falnic-sc-app #success-modal .falnic-sc-app * {
+        visibility: visible !important;
+    }
+
+    .falnic-sc-app #success-modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: white !important;
+    }
+
+    .falnic-sc-app .no-print {
+        display: none !important;
+    }
+
+    .falnic-sc-app .bg-opacity-50 {
+        background: transparent !important;
+    }
+}
+
+/* Additional utilities used by dynamic JavaScript-rendered markup */
+.falnic-sc-app .gap-x-2 {
+        column-gap: .5rem !important;
+    }
+.falnic-sc-app .gap-y-4 {
+        row-gap: 1rem !important;
+    }
+
+@media (min-width: 768px) {
+    .falnic-sc-app .md\:scale-105 {
+        transform: scale(1.05) !important;
+    }
+    .falnic-sc-app .hidden.md\:inline-block,
+.falnic-sc-app .md\:inline-block {
+        display: inline-block !important;
+    }
+}
+
+/* Smart assistant modal utilities */
+.falnic-sc-app .top-0 {
+        top: 0 !important;
+    }
+.falnic-sc-app .justify-start {
+        justify-content: flex-start !important;
+    }
+.falnic-sc-app .h-96 {
+        height: 24rem !important;
+    }
+.falnic-sc-app .max-h-\[90vh\] {
+        max-height: 90vh !important;
+    }
+.falnic-sc-app .max-w-\[80\%\] {
+        max-width: 80% !important;
+    }
+.falnic-sc-app .max-w-\[85\%\] {
+        max-width: 85% !important;
+    }
+.falnic-sc-app .hover\:bg-gray-200:hover {
+        background-color: #e5e7eb !important;
+    }
+
+/* Professional polish layer: keeps the previous utility-class API while improving consistency */
+:root {
+        --color-primary: #1e3a8a !important;
+        --color-primary-hover: #1e40af !important;
+        --color-accent: #9333ea !important;
+        --color-surface: #ffffff !important;
+        --color-page: #f8fafc !important;
+        --color-border: #e5e7eb !important;
+        --color-muted: #6b7280 !important;
+        --radius-control: .5rem !important;
+        --shadow-focus: 0 0 0 3px rgba(59, 130, 246, .18) !important;
+    }
+
+.falnic-sc-app {
+        scroll-behavior: smooth !important;
+    }
+
+.falnic-sc-app {
+        min-height: 100vh !important;
+        background:
+        radial-gradient(circle at top right, rgba(219, 234, 254, .55), transparent 34rem),
+        var(--color-page) !important;
+        -webkit-font-smoothing: antialiased !important;
+        -moz-osx-font-smoothing: grayscale !important;
+    }
+
+::selection {
+        background: rgba(30, 58, 138, .16) !important;
+        color: #111827 !important;
+    }
+
+.falnic-sc-app button,
+.falnic-sc-app a,
+.falnic-sc-app select,
+.falnic-sc-app input {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+
+.falnic-sc-app button {
+        user-select: none !important;
+    }
+
+.falnic-sc-app button:disabled,
+.falnic-sc-app input:disabled,
+.falnic-sc-app select:disabled {
+        opacity: .72 !important;
+    }
+
+.falnic-sc-app button:focus-visible,
+.falnic-sc-app input:focus-visible,
+.falnic-sc-app select:focus-visible,
+.falnic-sc-app summary:focus-visible {
+        outline: 2px solid transparent !important;
+        box-shadow: var(--shadow-focus) !important;
+    }
+
+.falnic-sc-app input,
+.falnic-sc-app select {
+        min-height: 2.75rem !important;
+        line-height: 1.5 !important;
+    }
+
+.falnic-sc-app select {
+        background-image:
+        linear-gradient(45deg, transparent 50%, #6b7280 50%),
+        linear-gradient(135deg, #6b7280 50%, transparent 50%) !important;
+        background-position:
+        left .95rem center,
+        left .65rem center !important;
+        background-size: .3rem .3rem, .3rem .3rem !important;
+        background-repeat: no-repeat !important;
+        padding-left: 2rem !important;
+    }
+
+.falnic-sc-app summary::-webkit-details-marker {
+        display: none !important;
+    }
+
+.falnic-sc-app summary {
+        border-radius: .75rem !important;
+    }
+
+.falnic-sc-app summary:focus-visible {
+        padding: .25rem !important;
+    }
+
+.falnic-sc-app th,
+.falnic-sc-app td {
+        vertical-align: top !important;
+    }
+
+/* Stable card and panel behavior */
+.falnic-sc-app #view-intro .falnic-sc-app .rounded-2xl,
+.falnic-sc-app #view-offers .falnic-sc-app .rounded-2xl,
+.falnic-sc-app #pro-step-content,
+.falnic-sc-app #guidance-content,
+.falnic-sc-app #success-modal .falnic-sc-app .bg-white,
+.falnic-sc-app #modal-final-success .falnic-sc-app .bg-white,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .bg-white {
+        border-color: var(--color-border) !important;
+    }
+
+.falnic-sc-app #view-intro .falnic-sc-app .rounded-2xl:hover,
+.falnic-sc-app #view-offers .falnic-sc-app .rounded-2xl:hover {
+        transform: translateY(-2px) !important;
+    }
+
+.falnic-sc-app #pro-step-content .falnic-sc-app details,
+.falnic-sc-app #guidance-content,
+.falnic-sc-app #details-table-body > .falnic-sc-app div,
+.falnic-sc-app #pro-details-table-body > .falnic-sc-app div {
+        transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease !important;
+    }
+
+.falnic-sc-app #success-modal,
+.falnic-sc-app #modal-final-success,
+.falnic-sc-app #ai-assistant-modal {
+        backdrop-filter: blur(3px) !important;
+    }
+
+.falnic-sc-app #success-modal > .falnic-sc-app div,
+.falnic-sc-app #modal-final-success > .falnic-sc-app div,
+.falnic-sc-app #ai-assistant-modal > .falnic-sc-app div {
+        animation: modal-enter .18s ease-out !important;
+    }
+
+@keyframes modal-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.falnic-sc-app #ai-chat-log {
+        scroll-behavior: smooth !important;
+    }
+
+.falnic-sc-app #ai-chat-log::-webkit-scrollbar,
+.falnic-sc-app #success-modal::-webkit-scrollbar,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .overflow-y-auto::-webkit-scrollbar {
+        width: .55rem !important;
+        height: .55rem !important;
+    }
+
+.falnic-sc-app #ai-chat-log::-webkit-scrollbar-thumb,
+.falnic-sc-app #success-modal::-webkit-scrollbar-thumb,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .overflow-y-auto::-webkit-scrollbar-thumb {
+        background: #cbd5e1 !important;
+        border-radius: 9999px !important;
+    }
+
+.falnic-sc-app #ai-chat-log::-webkit-scrollbar-track,
+.falnic-sc-app #success-modal::-webkit-scrollbar-track,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .overflow-y-auto::-webkit-scrollbar-track {
+        background: #f8fafc !important;
+    }
+
+/* RTL-friendly responsive improvements */
+@media (max-width: 767px) {
+    .falnic-sc-app .sticky {
+        position: static !important;
+    }
+
+    .falnic-sc-app .md\:scale-105 {
+        transform: none !important;
+    }
+
+    .falnic-sc-app #view-offers .falnic-sc-app .border-t,
+.falnic-sc-app #view-server-details .falnic-sc-app .flex.justify-end.gap-3,
+.falnic-sc-app #view-pro-results .falnic-sc-app .flex.justify-end.gap-3,
+.falnic-sc-app #ai-assistant-modal .falnic-sc-app .border-t {
+        align-items: stretch !important;
+        flex-direction: column !important;
+        gap: .75rem !important;
+    }
+
+    .falnic-sc-app #ai-assistant-modal .falnic-sc-app .p-6.border-b {
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+
+    .falnic-sc-app #ai-assistant-modal .falnic-sc-app form.flex {
+        flex-direction: column !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .falnic-sc-app *,
+.falnic-sc-app *::before,
+.falnic-sc-app *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* Brand assets */
+.falnic-sc-app .w-auto {
+        width: auto !important;
+    }
+.falnic-sc-app .brand-logo-link .falnic-sc-app img,
+.falnic-sc-app img[alt="لوگوی .falnic-sc-app فالنیک"] {
+        object-fit: contain !important;
+    }
+
+.falnic-sc-app .pro-step-container {
+        min-height: 1px !important;
+    }
+
+.falnic-sc-app .falnic-pro-section {
+        min-height: 1px !important;
+    }
+
+.falnic-sc-app .falnic-pro-section-title {
+        line-height: 1.6 !important;
+    }
+
+.falnic-sc-app .ai-message .falnic-sc-app p {
+        line-height: 1.9 !important;
+    }
+
+.falnic-sc-app .ai-choice-btn,
+.falnic-sc-app .ai-action-btn {
+        border-radius: .75rem !important;
+        border: 1px solid #dbeafe !important;
+        font-size: .75rem !important;
+        font-weight: 800 !important;
+        padding: .5rem .75rem !important;
+        transition: all .2s ease !important;
+    }
+
+.falnic-sc-app .ai-choice-btn {
+        background: #eff6ff !important;
+        color: #1e3a8a !important;
+    }
+
+.falnic-sc-app .ai-action-btn {
+        background: #ecfdf5 !important;
+        border-color: #bbf7d0 !important;
+        color: #047857 !important;
+    }
+
+.falnic-sc-app .ai-choice-btn:hover,
+.falnic-sc-app .ai-action-btn:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, .08) !important;
+    }
+.falnic-sc-app .flex-wrap {
+        flex-wrap: wrap !important;
+    }
+.falnic-sc-app .pt-3 {
+        padding-top: .75rem !important;
+    }
+.falnic-sc-app .last\:mb-0:last-child {
+        margin-bottom: 0 !important;
+    }
+
+/* Wrapper hardening: stacking context so -z-10 decorations stay visible
+   above theme backgrounds, explicit RTL, and base typography/colors. */
+.falnic-sc-app {
+    isolation: isolate;
+    direction: rtl;
+}
+
+.falnic-sc-app {
+    min-height: 1px;
+}

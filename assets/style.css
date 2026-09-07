@@ -497,6 +497,7 @@ summary {
 .h-96 { height: 24rem; }
 .max-h-\[90vh\] { max-height: 90vh; }
 .max-w-\[80\%\] { max-width: 80%; }
+.max-w-\[85\%\] { max-width: 85%; }
 .hover\:bg-gray-200:hover { background-color: #e5e7eb; }
 
 /* Professional polish layer: keeps the previous utility-class API while improving consistency */
@@ -709,6 +710,14 @@ img[alt="لوگوی فالنیک"] {
 
 .pro-step-container {
     min-height: 1px;
+}
+
+.falnic-pro-section {
+    min-height: 1px;
+}
+
+.falnic-pro-section-title {
+    line-height: 1.6;
 }
 
 .ai-message p {
