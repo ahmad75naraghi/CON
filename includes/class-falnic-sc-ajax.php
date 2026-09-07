@@ -1,16 +1,13 @@
 <?php
 /**
- * AJAX endpoints (public front-end API).
+ * AJAX endpoints (public front-end API) for assets/main.js:
  *
- * Faithful port of the standalone api/*.php endpoints onto WordPress:
+ *   falnic_sc_get_data    — chassis list / compatible parts
+ *   falnic_sc_recommend   — three prepared offers (eco / managed / advanced)
+ *   falnic_sc_submit      — validate + store configuration
+ *   falnic_sc_ai_chat     — AI gateway (OpenAI-compatible)
  *
- *   falnic_sc_get_data   ← api/get_data.php
- *   falnic_sc_recommend  ← api/recommend_servers.php
- *   falnic_sc_submit     ← api/submit_config.php
- *   falnic_sc_ai_chat    ← api/ai_chat.php
- *
- * Response contracts are byte-compatible with the original endpoints so the
- * existing front-end (assets/main.js) keeps working unchanged.
+ * Response contracts must stay stable for the front-end client.
  *
  * @package FalnicServerConfigurator
  */
@@ -73,7 +70,7 @@ class Falnic_SC_Ajax {
 	// -------------------------------------------------------------------
 
 	/**
-	 * JSON columns decoded per table key (same map as the standalone app).
+	 * JSON columns decoded per table key (per-table JSON column map).
 	 *
 	 * @var array
 	 */
@@ -304,7 +301,7 @@ class Falnic_SC_Ajax {
 
 	/**
 	 * Fallback offers used when the catalog table is unavailable/empty
-	 * (ported verbatim from the standalone app).
+	 * (tier ladder: eco / managed / advanced).
 	 *
 	 * @return array
 	 */

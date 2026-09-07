@@ -2,9 +2,9 @@
 /**
  * Table registry + schema access.
  *
- * The plugin keeps the exact same table names and column structure as the
- * standalone app (falnicc1_server_configurator.sql) so an existing dump can be
- * imported into the WordPress database — or vice versa — without any changes.
+ * Table names and column structure are stable catalog identifiers
+ * (Chassis, CPUs, …). An existing dump with the same names can be imported
+ * into the WordPress database without renaming.
  *
  * @package FalnicServerConfigurator
  */
@@ -28,9 +28,9 @@ class Falnic_SC_Tables {
 	private static $schema = null;
 
 	/**
-	 * Full table map. Names are intentionally NOT wp-prefixed by default to stay
-	 * 1:1 compatible with the original database; a filter is available for sites
-	 * that prefer a prefix.
+	 * Full table map. Names are intentionally NOT wp-prefixed by default so
+	 * catalog dumps stay portable; filter `falnic_sc_table_name` is available
+	 * for sites that prefer a prefix.
 	 *
 	 * @return array key => table name
 	 */
@@ -43,7 +43,7 @@ class Falnic_SC_Tables {
 				/**
 				 * Filters the physical table name for each plugin table.
 				 *
-				 * @param string $name Default name (identical to the standalone app).
+				 * @param string $name Default physical table name.
 				 * @param string $key  Table key (chassis, cpus, ...).
 				 */
 				$map[ $key ] = apply_filters( 'falnic_sc_table_name', $name, $key );
@@ -55,8 +55,8 @@ class Falnic_SC_Tables {
 	}
 
 	/**
-	 * Schema definitions (tables, columns, indexes) — generated from the
-	 * original dump, must remain identical.
+	 * Schema definitions (tables, columns, indexes). Source of truth for
+	 * installer verification; keep in sync with seed data.
 	 *
 	 * @return array
 	 */
@@ -108,8 +108,8 @@ class Falnic_SC_Tables {
 	/**
 	 * Map every column of a table to a simple PHP type: int|float|string.
 	 *
-	 * Mirrors how the original PDO + mysqlnd stack returned native types for
-	 * numeric columns while keeping varchar/text values as strings.
+	 * Numeric columns are cast to int/float; varchar/text stay strings so the
+	 * front-end JSON contract stays stable.
 	 *
 	 * @param string $key Table key.
 	 * @return array column => int|float|string
@@ -141,8 +141,7 @@ class Falnic_SC_Tables {
 
 	/**
 	 * Cast one database row (or list of rows) to native PHP types using the
-	 * schema column types. Keeps front-end JSON contracts identical to the
-	 * standalone app.
+	 * schema column types. Keeps front-end JSON contracts stable.
 	 *
 	 * @param string       $key  Table key.
 	 * @param array[]|array $rows Row or rows.

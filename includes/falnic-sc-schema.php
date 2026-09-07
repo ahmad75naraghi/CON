@@ -2,9 +2,8 @@
 /**
  * Schema definitions for the Falnic Server Configurator plugin.
  *
- * GENERATED from falnicc1_server_configurator.sql — do not edit column
- * definitions by hand: the structure must stay 1:1 identical to the
- * standalone app dump so both stacks can share the same database.
+ * Source of truth for table/column/index verification in the installer.
+ * Keep aligned with seed/catalog-seed.sql when changing structure.
  */
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
